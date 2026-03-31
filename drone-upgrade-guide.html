@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War: Survival — Drone Upgrade Priority Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f13;--surface:#16171d;--surface2:#1e1f27;--border:#2a2b36;--text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;--accent:#a78bfa;--accent-bg:rgba(167,139,250,.08);--green:#34d399;--green-bg:rgba(52,211,153,.08);--green-border:rgba(52,211,153,.25);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.08);--amber-border:rgba(251,191,36,.25);--red:#f87171;--red-bg:rgba(248,113,113,.06);--blue:#60a5fa;--blue-bg:rgba(96,165,250,.08);--blue-border:rgba(96,165,250,.25);--cyan:#22d3ee;--cyan-bg:rgba(34,211,238,.08);--cyan-border:rgba(34,211,238,.25);--radius:10px;--radius-lg:14px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:600;margin-bottom:.75rem}.section{margin-bottom:2.5rem}.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-bottom:10px}.card h3{font-size:.95rem;font-weight:600;margin-bottom:4px}.card p{font-size:.88rem;color:var(--text2);line-height:1.65}
+.label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:6px}
+.label-core{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.label-comp{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.label-chip{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(167,139,250,.25)}
+.label-tip{background:var(--cyan-bg);color:var(--cyan);border:1px solid var(--cyan-border)}
+.label-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.82rem}
+/* Systems overview */
+.sys-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}@media(max-width:500px){.sys-grid{grid-template-columns:1fr}}
+.sys-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
+.sys-card h3{font-size:.92rem;font-weight:600;margin-bottom:4px}.sys-card p{font-size:.82rem;color:var(--text2)}
+.sys-card .sys-icon{font-size:1.3rem;margin-bottom:6px}
+/* Milestone timeline */
+.milestones{position:relative;padding-left:28px;margin-bottom:1.5rem}.milestones::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.ms-item{position:relative;margin-bottom:1.25rem}.ms-dot{position:absolute;left:-24px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--green);background:var(--green-bg)}
+.ms-dot.major{border-color:var(--amber);background:var(--amber-bg)}.ms-lvl{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;color:var(--green)}
+.ms-lvl.major{color:var(--amber)}.ms-text{font-size:.85rem;color:var(--text2)}.ms-text strong{color:var(--text)}
+/* Chip types */
+.chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}@media(max-width:500px){.chip-grid{grid-template-columns:1fr}}
+.chip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
+.chip-name{font-size:.95rem;font-weight:600;margin-bottom:4px}.chip-desc{font-size:.82rem;color:var(--text2)}.chip-prio{font-size:.75rem;font-weight:600;margin-top:6px;padding:2px 8px;border-radius:4px;display:inline-block}
+.prio-1{background:var(--green-bg);color:var(--green)}.prio-2{background:var(--blue-bg);color:var(--blue)}.prio-3{background:var(--accent-bg);color:var(--accent)}.prio-4{background:rgba(107,105,128,.15);color:var(--text3)}
+.warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid var(--red);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.warn-box h3{font-size:.9rem;font-weight:600;color:var(--red);margin-bottom:4px}.warn-box p{font-size:.85rem;color:var(--text2)}
+.tip-box{background:var(--green-bg);border:1px solid var(--green-border);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.tip-box h3{font-size:.9rem;font-weight:600;color:var(--green);margin-bottom:4px}.tip-box p{font-size:.85rem;color:var(--text2)}
+.parts-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1.5rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.parts-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.parts-table td{padding:9px 12px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Drone Upgrade Priority Guide</h1>
+<p class="subtitle">Last War: Survival — The strongest force multiplier most players underestimate</p>
+
+<div class="tip-box"><h3>Why drones matter so much</h3><p>Drones provide combat bonuses across ALL your squads. They're untargetable by enemies, deal automatic damage, and scale with investment. Players who prioritize drone upgrades consistently outperform others at the same power level. It's easy to fall behind on drones and almost impossible to catch up — start investing from Day 1.</p></div>
+
+<div class="section">
+<h2>The 4 drone upgrade systems</h2>
+<div class="sys-grid">
+  <div class="sys-card"><div class="sys-icon">📊</div><h3>Data Training (Leveling)</h3><p>Raise your drone's base level using Battle Data and Drone Parts. The core progression system. Parts are required every 5 levels up to 150, then every level after.</p></div>
+  <div class="sys-card"><div class="sys-icon">🔧</div><h3>Components (Gear)</h3><p>Equip the drone with gear of varying rarities. Merge 3 identical components to upgrade level. Adds 10,000 power per upgrade. Unlocks at HQ 15.</p></div>
+  <div class="sys-card"><div class="sys-icon">💎</div><h3>Skill Chips</h3><p>4 chip slots (Initial, Defense, Attack, Interference) that boost your drone and hero squads. Unlocks at Combat Boost Level 10 (~Day 85). The biggest power leap.</p></div>
+  <div class="sys-card"><div class="sys-icon">🎨</div><h3>Skins</h3><p>Cosmetic + small stat boosts (attack, crit rate). From events and premium packs. Nice but not a priority — focus on the other three first.</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Drone leveling: resource requirements</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Two resources are needed: Battle Data (XP fuel) and Drone Parts (checkpoint gates).</p>
+<table class="parts-table">
+<thead><tr><th>Level range</th><th>Parts needed</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">1–150</td><td style="color:var(--green)" class="mono">Every 5 levels</td><td style="color:var(--text2)">10 parts at Lv5, scaling up. Total ~10,000 parts to 150.</td></tr>
+<tr><td class="mono">151–250</td><td style="color:var(--amber)" class="mono">Every level</td><td style="color:var(--text2)">Starts at 500 parts, +100 every 10 levels. Gets expensive fast.</td></tr>
+<tr><td class="mono">250+</td><td style="color:var(--red)" class="mono">Every level + tech research</td><td style="color:var(--text2)">Requires additional Tech Research to unlock further levels.</td></tr>
+</tbody>
+</table>
+<div class="card"><span class="label label-core">Leveling tip</span><h3>Exploit the crit mechanic</h3><p>While your upgrade progress is under 80%, every tap has a <strong>50% chance to double the XP gained</strong>. This means you get roughly 1.5× the value of your Battle Data on average. Don't rush past checkpoints — let the crit mechanic work for you.</p></div>
+<div class="card"><h3>Battle Data sources</h3><p>Radar missions (purple and orange give the most), hunting zombies/Doom Elites, events, and daily tasks. Never let stamina sit at 100 — always convert it into Battle Data through radar missions.</p></div>
+<div class="card"><h3>Drone Parts sources</h3><p>Daily tasks, radar missions (chance drops), alliance events, Campaign Store, VIP Store (diamonds), limited-time events. Parts are always scarce — plan ahead and stockpile before hitting a checkpoint.</p></div>
+</div>
+
+<div class="section">
+<h2>Key drone milestones</h2>
+<div class="milestones">
+  <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 31</div><div class="ms-text">First drone skill unlocks</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 50</div><div class="ms-text"><strong>Drone skin #2 unlocks.</strong> Nice stat boost.</div></div>
+  <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 51</div><div class="ms-text">Second drone skill unlocks</div></div>
+  <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 71</div><div class="ms-text">Third drone skill unlocks</div></div>
+  <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 91</div><div class="ms-text">Fourth drone skill unlocks</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 100</div><div class="ms-text"><strong>Drone skin #3.</strong> Major power milestone for mid-game.</div></div>
+  <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 111</div><div class="ms-text">Fifth drone skill unlocks</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 150</div><div class="ms-text"><strong>Combat Boost Level 2 — unlocks chips for 2nd troop.</strong> After this, parts are needed every level.</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 200</div><div class="ms-text"><strong>Drone skin #5.</strong> Significant combat boost.</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 250</div><div class="ms-text"><strong>Drone skin #6.</strong> Requires further Tech Research to go beyond.</div></div>
+</div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+<h2>Components (drone gear)</h2>
+<div class="card"><span class="label label-comp">Unlocks at HQ 15</span><h3>Merge 3 identical components → next level</h3><p>Components work like gear for your drone. Each component type boosts different stats. Up to Level 7, upgrading requires merging 3 identical items. At Level 8+, improvements come through research progress percentages instead. Use Selection Chests to target the exact component you need for your next upgrade step.</p></div>
+<div class="card"><h3>Component chest timing</h3><p><strong>Open component chests on Wednesdays only</strong> (VS Day 3 — Age of Science). This earns you Alliance Duel points for opening them. Opening on other days wastes potential event scoring. Save all component chests throughout the week.</p></div>
+</div>
+
+<div class="section">
+<h2>Skill Chips — the biggest power leap</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Unlocks at Combat Boost Level 10 (~server Day 85). Four chip slots, each with a different combat role:</p>
+<div class="chip-grid">
+  <div class="chip-card"><div class="chip-name">Initial (Movement)</div><div class="chip-desc">Activates at battle start — creates a shield that absorbs enemy attacks for a set duration. Protects your frontline through the critical opening burst.</div><div class="chip-prio prio-1">Priority 1 — survivability</div></div>
+  <div class="chip-card"><div class="chip-name">Defense</div><div class="chip-desc">Defensive mechanism that reduces incoming damage to your team. Stacks with Initial chip for a very tanky opening phase.</div><div class="chip-prio prio-2">Priority 2 — durability</div></div>
+  <div class="chip-card"><div class="chip-name">Attack</div><div class="chip-desc">Enhances damage output of rear-row heroes. Triggers on every drone bombing cycle. Higher burst for faster kills.</div><div class="chip-prio prio-3">Priority 3 — offense</div></div>
+  <div class="chip-card"><div class="chip-name">Interference</div><div class="chip-desc">Disrupts enemy strategy by extending damage duration and intensity of drone attacks. Niche but powerful in prolonged fights.</div><div class="chip-prio prio-4">Priority 4 — situational</div></div>
+</div>
+
+<div class="warn-box"><h3>Legendary chips ALWAYS beat Epic chips</h3><p>Many players hold onto heavily invested Epic (purple) chips because they've sunk resources into them. Don't do this. A fresh Legendary (gold) chip outpaces an invested Epic every time. Why? Legendary effects usually last until the battle ends, while Epics are short bursts (~15 seconds) that vanish before fights are halfway done. Replace Epics with Legendaries as soon as you get them.</p></div>
+
+<div class="card"><span class="label label-chip">Chip strategy</span><h3>Build one chip set per troop type</h3><p>Create separate chip loadouts for your Tank squad, Aircraft squad, and Missile squad. Each troop type benefits from different chip combinations. Don't use a one-size-fits-all approach — tailor each set to the squad's strengths.</p></div>
+
+<div class="card"><h3>Chip upgrade methods</h3><p><strong>Star Rating:</strong> Combine duplicate chips of the same type to increase stars (like hero stars). <strong>Level Up:</strong> Use identical chips or upgrade components — components add 10,000 points per upgrade, while chips give more. Use the Chip Lab (unlocks at Lv 15) to craft specific chips instead of relying on random chest drops.</p></div>
+
+<div class="card"><h3>Chip chest timing</h3><p><strong>Open Skill Chip Chests on Mondays only</strong> (VS Day 1 — Radar Training). This earns Alliance Duel points. Save all chip chests throughout the week. Use the Chip Lab to craft missing chips rather than hoping for luck.</p></div>
+</div>
+
+<div class="section">
+<h2>Combat Boost progression</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Combat Boost is a separate leveling track that unlocks chip capabilities for additional squads:</p>
+<table class="parts-table">
+<thead><tr><th>Combat Boost Level</th><th>Drone Level Required</th><th>Unlock</th></tr></thead>
+<tbody>
+<tr><td class="mono">Level 1</td><td class="mono">~Day 85 milestone</td><td style="color:var(--text2)">Skill chip system for 1st troop</td></tr>
+<tr><td class="mono">Level 2</td><td class="mono">Drone Lv 150</td><td style="color:var(--text2)">Chips for 2nd troop + chip boost +1</td></tr>
+<tr><td class="mono">Level 3</td><td class="mono">Drone Lv 300</td><td style="color:var(--text2)">Chips for 3rd troop + chip boost +2</td></tr>
+<tr><td class="mono">Level 4</td><td class="mono">Drone Lv 450</td><td style="color:var(--text2)">Chips for 4th troop + chip boost +3</td></tr>
+<tr><td class="mono">Level 7</td><td class="mono">Drone Lv 900</td><td style="color:var(--text2)">Massive attribute increase — up to +2.5M drone combat power</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+<h2>Daily drone routine</h2>
+<div class="card"><span class="label label-tip">Every day</span><h3>Never let stamina sit at 100</h3><p>Convert all stamina into radar missions (which drop Battle Data and Drone Parts) and zombie hunting. Stamina regenerates over time — every minute at cap is wasted progression.</p></div>
+<div class="card"><span class="label label-tip">Every day</span><h3>Buy Drone Components from VIP Store (if surplus diamonds)</h3><p>The VIP Store is one of the most consistent sources of drone components. If you have diamonds to spare after stamina and speedups, invest here.</p></div>
+<div class="card"><span class="label label-warn">Mondays</span><h3>Open all Skill Chip Chests</h3><p>Save them all week, dump on Monday for VS Day points.</p></div>
+<div class="card"><span class="label label-warn">Wednesdays</span><h3>Open all Drone Component Chests</h3><p>Save them all week, dump on Wednesday for VS Day points.</p></div>
+<div class="card"><span class="label label-warn">Mondays</span><h3>Spend all Drone Parts + Battle Data</h3><p>Monday (Radar Training day) is when these earn VS Duel points. Hoard all week, dump on Monday.</p></div>
+</div>
+
+<div class="tip-box"><h3>The drone investment cycle</h3><p>Every diamond and stamina point you invest in your drone pays dividends in every single battle you fight, across all squads, for the rest of the game. Unlike hero upgrades (which help one squad) or building upgrades (which are one-time), drone power multiplies everything. This is why experienced players call drones the single best ROI system in Last War.</p></div>
+</div>
+</body>
+</html>

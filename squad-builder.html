@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War: Survival — Squad Builder & Formation Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0f13; --surface: #16171d; --surface2: #1e1f27; --surface3: #262730;
+  --border: #2a2b36; --text: #e8e6f0; --text2: #9d9baf; --text3: #6b6980;
+  --tank: #60a5fa; --tank-bg: rgba(96,165,250,0.08); --tank-border: rgba(96,165,250,0.25);
+  --air: #a78bfa; --air-bg: rgba(167,139,250,0.08); --air-border: rgba(167,139,250,0.25);
+  --missile: #f87171; --missile-bg: rgba(248,113,113,0.08); --missile-border: rgba(248,113,113,0.2);
+  --green: #34d399; --green-bg: rgba(52,211,153,0.08);
+  --amber: #fbbf24; --amber-bg: rgba(251,191,36,0.08);
+  --radius: 10px; --radius-lg: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--missile)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 2rem; }
+h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
+.section { margin-bottom: 2.5rem; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+/* Counter Triangle */
+.counter-tri { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; }
+.tri-top { margin-bottom: 1.5rem; }
+.tri-bottom { display: flex; gap: 3rem; }
+.tri-node { text-align: center; }
+.tri-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 6px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.tri-icon:hover { transform: scale(1.1); }
+.tri-icon.tank { background: var(--tank-bg); border: 2px solid var(--tank-border); color: var(--tank); }
+.tri-icon.air { background: var(--air-bg); border: 2px solid var(--air-border); color: var(--air); }
+.tri-icon.missile { background: var(--missile-bg); border: 2px solid var(--missile-border); color: var(--missile); }
+.tri-label { font-size: 0.85rem; font-weight: 600; }
+.tri-arrows { color: var(--text3); font-size: 0.8rem; margin-top: 4px; }
+.tri-legend { display: flex; gap: 1.5rem; margin-top: 1.25rem; font-size: 0.8rem; color: var(--text3); }
+
+/* Squad Tabs */
+.squad-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+.sq-tab { flex: 1; padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text2); font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center; }
+.sq-tab:hover { background: var(--surface2); color: var(--text); }
+.sq-tab.active-tank { background: var(--tank-bg); border-color: var(--tank-border); color: var(--tank); }
+.sq-tab.active-air { background: var(--air-bg); border-color: var(--air-border); color: var(--air); }
+.sq-tab.active-missile { background: var(--missile-bg); border-color: var(--missile-border); color: var(--missile); }
+
+/* Squad Content */
+.squad-panel { display: none; }
+.squad-panel.active { display: block; }
+.formation-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 12px; }
+.formation-card.recommended { border-color: var(--green); }
+.form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.form-title { font-size: 1rem; font-weight: 600; }
+.form-badge { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 9px; border-radius: 4px; }
+.badge-best { background: var(--green-bg); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+.badge-meta { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); }
+.badge-niche { background: rgba(107,105,128,0.15); color: var(--text3); border: 1px solid var(--border); }
+.hero-slots { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.hero-slot { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; flex: 1; min-width: 120px; }
+.hero-name { font-size: 0.88rem; font-weight: 600; }
+.hero-role { font-size: 0.75rem; color: var(--text3); }
+.hero-type { font-size: 0.68rem; font-weight: 600; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; }
+.type-tank { background: var(--tank-bg); color: var(--tank); }
+.type-air { background: var(--air-bg); color: var(--air); }
+.type-missile { background: var(--missile-bg); color: var(--missile); }
+.form-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.65; }
+.form-notes { font-size: 0.82rem; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.form-notes strong { color: var(--text2); }
+
+/* Buff table */
+.buff-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 1.5rem; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+.buff-table th { text-align: left; padding: 10px 14px; background: var(--surface2); color: var(--text3); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.buff-table td { padding: 10px 14px; border-top: 1px solid var(--border); }
+.buff-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--green); }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 28px; margin-bottom: 1.5rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.tl-item { position: relative; margin-bottom: 1.25rem; }
+.tl-dot { position: absolute; left: -24px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+.tl-dot.tank { border-color: var(--tank); background: var(--tank-bg); }
+.tl-dot.air { border-color: var(--air); background: var(--air-bg); }
+.tl-dot.missile { border-color: var(--missile); background: var(--missile-bg); }
+.tl-dot.neutral { border-color: var(--text3); background: var(--surface2); }
+.tl-day { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+.tl-day.tank { color: var(--tank); }
+.tl-day.air { color: var(--air); }
+.tl-day.missile { color: var(--missile); }
+.tl-day.neutral { color: var(--text3); }
+.tl-text { font-size: 0.85rem; color: var(--text2); }
+.tl-text strong { color: var(--text); }
+
+.tip-box { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-left: 3px solid var(--green); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.15rem; margin-bottom: 1rem; }
+.tip-box h3 { font-size: 0.9rem; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+.tip-box p { font-size: 0.85rem; color: var(--text2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 10px; }
+.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+.card p { font-size: 0.88rem; color: var(--text2); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1><span>Squad Builder & Formations</span></h1>
+  <p class="subtitle">Last War: Survival — Counter system, meta formations, and when to build what</p>
+
+  <div class="section">
+    <h2>The counter triangle</h2>
+    <p style="color:var(--text2);font-size:0.88rem;margin-bottom:1rem;">Everything in Last War PvP revolves around this rock-paper-scissors mechanic. Building around it is the single most important strategic decision.</p>
+    <div class="counter-tri">
+      <div class="tri-top"><div class="tri-node"><div class="tri-icon air">AIR</div><div class="tri-label" style="color:var(--air)">Aircraft</div></div></div>
+      <div style="display:flex;justify-content:space-between;width:280px;color:var(--text3);font-size:0.78rem;margin:-6px 0 8px;">
+        <span>beats ↓</span><span>↓ beats</span>
+      </div>
+      <div class="tri-bottom">
+        <div class="tri-node"><div class="tri-icon tank">TNK</div><div class="tri-label" style="color:var(--tank)">Tank</div></div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:0.78rem;">beats →</div>
+        <div class="tri-node"><div class="tri-icon missile">MSL</div><div class="tri-label" style="color:var(--missile)">Missile</div></div>
+      </div>
+      <div class="tri-legend">
+        <span>Tank beats Missile</span>
+        <span>Missile beats Aircraft</span>
+        <span>Aircraft beats Tank</span>
+      </div>
+    </div>
+
+    <h2>Same-type lineup bonuses</h2>
+    <table class="buff-table">
+      <thead><tr><th>Heroes of same type</th><th>HP / ATK / DEF bonus</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>3 same type</td><td><span class="buff-val">+5%</span></td><td style="color:var(--text3)">Minimum for any bonus</td></tr>
+        <tr><td>3 same + 2 other</td><td><span class="buff-val">+10%</span></td><td style="color:var(--text3)">Mixed squad option</td></tr>
+        <tr><td>4 same type</td><td><span class="buff-val">+15%</span></td><td style="color:var(--text3)">Strong — 1 flex slot</td></tr>
+        <tr><td>5 same type (full)</td><td><span class="buff-val">+20%</span></td><td style="color:var(--text3)">Maximum — recommended</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box">
+      <h3>Always aim for 5/5 same type on your main squad</h3>
+      <p>The +20% bonus to HP, ATK, and DEF is enormous. A full same-type team with average heroes will often beat a mixed team of individually stronger heroes. Only break the 5/5 for specific hybrid builds in Season 4+ when you have Tactics Cards and Exclusive Weapons to compensate.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <h2>Meta formations by squad type</h2>
+    <div class="squad-tabs">
+      <button class="sq-tab active-tank" onclick="showSquad('tank')">Tank</button>
+      <button class="sq-tab" onclick="showSquad('air')">Aircraft</button>
+      <button class="sq-tab" onclick="showSquad('missile')">Missile</button>
+      <button class="sq-tab" onclick="showSquad('hybrid')">Hybrid / S4+</button>
+    </div>
+
+    <!-- TANK -->
+    <div class="squad-panel active" id="panel-tank">
+      <div class="formation-card recommended">
+        <div class="form-header"><span class="form-title">Classic Tank (Early–Mid Meta)</span><span class="form-badge badge-best">Best early game</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank / Shield</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Stetmann</div><div class="hero-role">Sustained DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Buffer / Support</div><span class="hero-type type-tank">Tank</span></div>
+        </div>
+        <div class="form-desc">The dominant early-game formation. Murphy and Williams create an extremely durable frontline while Kimberly deals massive AoE damage. Stetmann provides sustained DPS and Marshall buffs the entire squad's attack speed. Crushes Missile squads by design.</div>
+        <div class="form-notes"><strong>Get by:</strong> Day 57 of server for all 5 UR heroes. <strong>Kimberly:</strong> Available for ~$2 on Day 1, or free in Tavern on Day 60. <strong>Priority upgrades:</strong> Kimberly's gear and skills first — she's the damage engine.</div>
+      </div>
+
+      <div class="formation-card">
+        <div class="form-header"><span class="form-title">Anti-Air Tank (Season 4+)</span><span class="form-badge badge-meta">Counter meta</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Anti-Air Specialist</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Buffer</div><span class="hero-type type-tank">Tank</span></div>
+        </div>
+        <div class="form-desc">A 4+1 hybrid that swaps Stetmann for Adam (Missile) to counter Aircraft-heavy servers. Adam's Exclusive Weapon lets him survive much longer against Aircraft than a standard Tank hero. You drop from +20% to +15% type bonus, but gain a critical matchup advantage. Best used when your server is dominated by Air squads.</div>
+        <div class="form-notes"><strong>Trade-off:</strong> -5% type bonus for a specific counter capability. Only worth it in Aircraft-dominated metas.</div>
+      </div>
+    </div>
+
+    <!-- AIRCRAFT -->
+    <div class="squad-panel" id="panel-air">
+      <div class="formation-card recommended">
+        <div class="form-header"><span class="form-title">Core Aircraft (Mid–Late Meta)</span><span class="form-badge badge-best">Current PvP king</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Carlie</div><div class="hero-role">Off-Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
+        </div>
+        <div class="form-desc">The king of PvP from Day 70 onward. Aircraft naturally counter Tanks (the most common squad type), giving an inherent 20% damage advantage in most server fights. Lucius is widely considered the best tank hero in the game once his Exclusive Weapon is unlocked. DVA and Morrison provide devastating burst damage that can delete the enemy backline before they fire skills.</div>
+        <div class="form-notes"><strong>Get by:</strong> Day 71 of server for all 5 UR heroes. <strong>Lucius:</strong> Best tank in the game with Exclusive Weapon. <strong>Why it dominates:</strong> Counters the most popular squad type (Tank) with a 20% type bonus on top of a 20% matchup advantage.</div>
+      </div>
+
+      <div class="formation-card">
+        <div class="form-header"><span class="form-title">Air + Murphy Hybrid (Season 4+ with Tactics Cards)</span><span class="form-badge badge-meta">Competitive meta</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Pure Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
+        </div>
+        <div class="form-desc">The most feared squad in high-level PvP. Murphy's Exclusive Weapon and high-level Tactics Cards make him a better pure damage sponge than Carlie. You lose the 5-hero bonus (dropping to 15%), but Murphy's individual tankiness gives your Air backline significantly more time to delete the enemy.</div>
+        <div class="form-notes"><strong>Requires:</strong> Season 4+ Tactics Cards. Murphy at high stars with Exclusive Weapon. <strong>Don't use this</strong> if your Murphy isn't heavily invested — vanilla Carlie is better at low investment.</div>
+      </div>
+    </div>
+
+    <!-- MISSILE -->
+    <div class="squad-panel" id="panel-missile">
+      <div class="formation-card">
+        <div class="form-header"><span class="form-title">Core Missile (Counter-pick)</span><span class="form-badge badge-niche">Niche / Anti-Air</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Fiona</div><div class="hero-role">Primary AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Swift</div><div class="hero-role">Finisher</div><span class="hero-type type-missile">Missile</span></div>
+        </div>
+        <div class="form-desc">Built to counter Aircraft squads. Adam and McGregor protect the damage dealers while Fiona unleashes devastating cluster attacks and Tesla provides consistent single-target damage. Swift finishes off weakened targets. This squad excels when your server is Aircraft-heavy, but struggles against Tank squads, making it a counter-pick rather than a main.</div>
+        <div class="form-notes"><strong>Get by:</strong> Day 99 for all 5 UR heroes — the slowest to assemble. <strong>Best as:</strong> 2nd or 3rd squad in Alliance Wars / 3v3 to counter specific Aircraft opponents.</div>
+      </div>
+
+      <div class="formation-card">
+        <div class="form-header"><span class="form-title">Season 5 Missile (Venom UR)</span><span class="form-badge badge-meta">S5 meta shift</span></div>
+        <div class="hero-slots">
+          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Fiona</div><div class="hero-role">AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><div class="hero-name">Venom (UR)</div><div class="hero-role">Burst + DoT</div><span class="hero-type type-missile">Missile</span></div>
+        </div>
+        <div class="form-desc">Season 5 promotes Venom to UR rarity, making the full 5-man Missile team significantly more viable. With Fiona's Exclusive Weapon, missiles can now reliably burst down Aircraft squads. This is the strongest Missile formation has ever been.</div>
+        <div class="form-notes"><strong>Requires:</strong> Season 5 (Golden Wasteland). Venom's UR promotion. Fiona's Exclusive Weapon for full effectiveness.</div>
+      </div>
+    </div>
+
+    <!-- HYBRID -->
+    <div class="squad-panel" id="panel-hybrid">
+      <div class="card">
+        <h3>When to break the 5/5 type rule</h3>
+        <p>From Season 4 onward, Tactics Cards and Exclusive Weapons can compensate for losing the +20% type bonus. The key threshold: <strong>a hybrid is worth it only when the off-type hero's individual contribution exceeds the 5% stat loss for your entire squad.</strong> In practice, this means only heroes with strong Exclusive Weapons at high star levels should be splashed into off-type squads.</p>
+      </div>
+      <div class="card">
+        <h3>Multi-squad strategy (Season 3+)</h3>
+        <p>By Season 3, most competitive players run multiple squads for 3v3 and Alliance Wars. The standard approach:<br><br>
+        <strong>Squad 1 (main):</strong> Your most invested squad. Usually Aircraft in the current meta — it counters the most common opponent type.<br>
+        <strong>Squad 2:</strong> Tank squad — naturally beats Missile and is the easiest to build since you started with it.<br>
+        <strong>Squad 3:</strong> Missile squad — counter-pick against Aircraft-heavy opponents. Build this last.</p>
+      </div>
+      <div class="card">
+        <h3>Reading the matchup before battle</h3>
+        <p>Always scout your opponent before sending squads. In 3v3 or Alliance Wars:<br>
+        — If they run mostly Tanks → send Aircraft<br>
+        — If they run mostly Aircraft → send Missiles (or Anti-Air Tank hybrid)<br>
+        — If they run mostly Missiles → send Tanks<br>
+        — If they run mixed → lead with your strongest squad and adapt</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <h2>Server meta timeline — what to build and when</h2>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot tank"></div><div class="tl-day tank">Days 1–57</div><div class="tl-text"><strong>Tank dominance.</strong> Everyone builds Tanks first because UR heroes are available earliest. Murphy + Kimberly carry. Focus all resources on your 5-tank squad.</div></div>
+      <div class="tl-item"><div class="tl-dot neutral"></div><div class="tl-day neutral">Days 57–70</div><div class="tl-text"><strong>Transition period.</strong> Full Tank squad complete. Start saving Air hero shards from recruitment. Don't split resources yet — keep upgrading your Tank squad while collecting Air heroes passively.</div></div>
+      <div class="tl-item"><div class="tl-dot air"></div><div class="tl-day air">Day 70+ (mid game)</div><div class="tl-text"><strong>Air meta begins.</strong> Aircraft counters the server-wide Tank majority, giving you a natural 20% advantage in every fight. Start transitioning investment toward Air squad. This becomes your primary PvP squad.</div></div>
+      <div class="tl-item"><div class="tl-dot missile"></div><div class="tl-day missile">Day 99+ (Season 3)</div><div class="tl-text"><strong>Missile becomes viable.</strong> All 5 Missile UR heroes available. Build as a counter-pick squad for 3v3 and Alliance Wars. Don't make this your main unless your server is unusually Air-heavy.</div></div>
+      <div class="tl-item"><div class="tl-dot neutral"></div><div class="tl-day neutral">Season 4+ (late game)</div><div class="tl-text"><strong>Hybrid era.</strong> Tactics Cards and Exclusive Weapons enable strategic 4+1 mixes. Murphy-in-Air and Adam-in-Tank become meta. Multi-squad management is expected for competitive play.</div></div>
+      <div class="tl-item"><div class="tl-dot missile"></div><div class="tl-day missile">Season 5</div><div class="tl-text"><strong>Missile resurgence.</strong> Venom UR promotion + Fiona Exclusive Weapon make Missiles genuinely competitive as a primary squad for the first time. The triangle becomes more balanced.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Hero investment priority</h2>
+    <div class="card">
+      <h3>General rule: DPS first, tank second, support last</h3>
+      <p>Your damage dealers (Kimberly for Tank, DVA for Air, Fiona/Tesla for Missile) should receive gear, skill medals, EXP, and shards before anyone else. Higher damage improves performance across all game modes and accelerates resource gain, which feeds back into faster overall progression. Upgrade damage pieces before defense pieces on gear. Don't neglect ore production — gear upgrades depend on it.</p>
+    </div>
+    <div class="card">
+      <h3>Upgrade your type center building</h3>
+      <p>The Tank/Air/Missile Center buildings provide stat bonuses to all heroes of that type, plus march speed. Upgrade your main squad's center first. This is a base-wide multiplier that affects every battle.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSquad(type) {
+  document.querySelectorAll('.squad-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + type).classList.add('active');
+  document.querySelectorAll('.sq-tab').forEach(t => {
+    t.className = 'sq-tab';
+    if ((type === 'tank' && t.textContent === 'Tank') ||
+        (type === 'air' && t.textContent === 'Aircraft') ||
+        (type === 'missile' && t.textContent === 'Missile') ||
+        (type === 'hybrid' && t.textContent.includes('Hybrid'))) {
+      t.classList.add('active-' + type);
+    }
+  });
+}
+</script>
+</body>
+</html>

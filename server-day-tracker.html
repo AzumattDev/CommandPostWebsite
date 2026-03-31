@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Day Tracker — The Command Post</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+:root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838;--border2:#31334a;--text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;--purple:#a78bfa;--green:#34d399;--green-bg:rgba(52,211,153,.06);--green-border:rgba(52,211,153,.25);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.06);--red:#f87171;--red-bg:rgba(248,113,113,.06);--blue:#60a5fa;--blue-bg:rgba(96,165,250,.06);--cyan:#22d3ee;--radius:10px;--radius-lg:14px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.92rem;margin-bottom:1.5rem}
+h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
+.setup{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem;display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.setup .field{flex:1;min-width:200px}
+.field label{display:block;font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;font-weight:500}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.95rem}
+.field input:focus{outline:none;border-color:var(--cyan)}
+.btn{padding:10px 20px;border-radius:8px;border:1px solid rgba(34,211,238,.25);background:rgba(34,211,238,.08);color:var(--cyan);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .15s}
+.btn:hover{background:rgba(34,211,238,.15)}
+/* Current day display */
+.day-display{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:2rem}
+.day-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
+.day-card .dv{font-family:'Chakra Petch',sans-serif;font-size:1.8rem;font-weight:700}.day-card .dl{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+/* Timeline */
+.timeline-section{margin-bottom:2rem}
+.tl-filters{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.tl-filter{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.tl-filter:hover{background:var(--surface2);color:var(--text2)}.tl-filter.active{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.25);color:var(--purple)}
+.tl{position:relative;padding-left:32px}.tl::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:14px;padding-bottom:2px}
+.tl-dot{position:absolute;left:-26px;top:8px;width:10px;height:10px;border-radius:50%;border:2px solid}
+.tl-dot.past{border-color:var(--text3);background:var(--surface2);opacity:.4}
+.tl-dot.current{border-color:var(--green);background:var(--green);box-shadow:0 0 8px rgba(52,211,153,.4)}
+.tl-dot.future{border-color:var(--amber);background:rgba(251,191,36,.2)}
+.tl-dot.far{border-color:var(--border2);background:var(--surface2)}
+.tl-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;transition:border-color .15s}
+.tl-card.past{opacity:.5}.tl-card.current{border-color:var(--green-border);background:rgba(52,211,153,.03)}
+.tl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.tl-day{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600}
+.tl-day.past{color:var(--text3)}.tl-day.current{color:var(--green)}.tl-day.future{color:var(--amber)}.tl-day.far{color:var(--text3)}
+.tl-badge{font-size:.65rem;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:500}
+.badge-hero{background:rgba(167,139,250,.1);color:var(--purple)}.badge-event{background:rgba(96,165,250,.1);color:var(--blue)}
+.badge-weapon{background:rgba(251,191,36,.1);color:var(--amber)}.badge-feature{background:rgba(52,211,153,.1);color:var(--green)}
+.badge-season{background:rgba(248,113,113,.1);color:var(--red)}
+.tl-title{font-size:.9rem;font-weight:600}.tl-desc{font-size:.8rem;color:var(--text2);margin-top:2px}
+.tl-eta{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);margin-top:4px}
+.hidden{display:none}
+.save-note{font-size:.78rem;color:var(--text3);margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Server Day Tracker</h1>
+<p class="subtitle">Enter your server's start date to see your current day and upcoming hero/event unlocks.</p>
+
+<div class="setup">
+  <div class="field">
+    <label>Server start date</label>
+    <input type="date" id="startDate" onchange="saveAndCalc()">
+  </div>
+  <button class="btn" onclick="saveAndCalc()">Track my server</button>
+</div>
+<p class="save-note">Your date is saved in this browser — you only need to set it once.</p>
+
+<div class="day-display" id="dayDisplay" style="display:none">
+  <div class="day-card"><div class="dv" id="dd-day" style="color:var(--cyan)">?</div><div class="dl">Server day</div></div>
+  <div class="day-card"><div class="dv" id="dd-week" style="color:var(--purple)">?</div><div class="dl">Week</div></div>
+  <div class="day-card"><div class="dv" id="dd-next" style="color:var(--amber)">?</div><div class="dl">Next unlock in</div></div>
+  <div class="day-card"><div class="dv" id="dd-phase" style="color:var(--green)">?</div><div class="dl">Phase</div></div>
+</div>
+
+<div class="timeline-section" id="tlSection" style="display:none">
+<h2>Hero & event unlock timeline</h2>
+<div class="tl-filters">
+  <button class="tl-filter active" onclick="setFilter('all')">All</button>
+  <button class="tl-filter" onclick="setFilter('hero')">Heroes</button>
+  <button class="tl-filter" onclick="setFilter('weapon')">Weapons</button>
+  <button class="tl-filter" onclick="setFilter('event')">Events</button>
+  <button class="tl-filter" onclick="setFilter('feature')">Features</button>
+  <button class="tl-filter" onclick="setFilter('season')">Seasons</button>
+</div>
+<div class="tl" id="timeline"></div>
+</div>
+</div>
+
+<script>
+// Timeline events: [day, type, title, description]
+const EVENTS = [
+  [1,'hero','Kimberly available (~$2 pack)','Highest DPS tank hero. Available as a purchase from Day 1.'],
+  [1,'feature','Game starts — Pioneer Target begins','7-day starter marathon. Focus HQ rush and reaching 4.5M CP.'],
+  [7,'event','Pioneer Target ends','Claim M5-A Railgun if you hit 4.5M CP.'],
+  [14,'event','First City Clash','Alliance territory capture begins. Coordinate with R5.'],
+  [21,'event','Alliance Duel unlocks','Weekly VS event starts. Begin hoarding resources for daily themes.'],
+  [29,'hero','Williams (Tank) — Battle Pass','Core tank hero. Pairs with Murphy as frontline duo.'],
+  [38,'feature','Drone Center unlocks','After Stage 38 / saving Monica. Start investing in drone immediately.'],
+  [42,'event','First Capitol War eligible','Top alliances can begin contesting the Capitol.'],
+  [50,'hero','Carlie (Aircraft) — Tavern','Aircraft tank hero. Start of air squad building.'],
+  [57,'hero','Stetmann (Tank) — Battle Pass','Core tank DPS. Completes the 5-tank UR lineup.'],
+  [60,'hero','Kimberly free in Tavern','If you didn\'t buy her Day 1, she\'s now recruitable for free.'],
+  [64,'hero','Lucius (Aircraft) — Legend Returns','Best tank hero in the game (with Exclusive Weapon). Core air build.'],
+  [64,'hero','Swift (Missile) — Tavern','Missile finisher hero.'],
+  [71,'hero','Schuyler (Aircraft) + Williams — Tavern','Full 5-hero air squad now available. Meta shift from Tank to Air begins.'],
+  [78,'event','Ghost Ops unlocks','Weekly event for farming shards of ALL heroes, including ones not yet in Tavern.'],
+  [82,'feature','Drone Skill Chips unlock','Combat Boost Level 10. Massive power spike — 4 chip slots per squad.'],
+  [85,'hero','Morrison (Aircraft) — Legend Returns','Anti-defense DPS. Completes aircraft lineup options.'],
+  [85,'hero','Adam (Missile) — Tavern','Missile frontline tank. Key for anti-air hybrid builds.'],
+  [92,'hero','McGregor (Missile) — Legend Returns','Missile taunt tank with crowd control.'],
+  [99,'hero','Fiona (Missile) — Tavern','Last UR hero added. Full 5-missile squad now possible.'],
+  [105,'event','Glittering Market event','Buy DVA, Swift, Kimberly, Carlie, Tesla for 500 diamonds each.'],
+  [120,'season','Season 1 — Crimson Plague begins','New map, virus mechanics, Military Strongholds, city recapture. Mason → UR upgrade.'],
+  [120,'weapon','Kimberly, DVA, Tesla Exclusive Weapons','Season 1 weapons. Major power spike for these heroes.'],
+  [150,'weapon','Murphy, Carlie, Swift Exclusive Weapons','Season 2 weapons.'],
+  [176,'season','Season 2 — Polar Storm begins','Ice season. Violet → UR. McGregor UR. Oil resource introduced (Age of Oil).'],
+  [232,'season','Season 3 — Golden Realm begins','Desert/Egypt theme. Scarlet → UR. Spice resource.'],
+  [288,'season','Season 4 — Evernight Isle begins','Dark theme. Tactics Cards introduced. Hybrid squad era. T11 troops via Armament Institute.'],
+  [344,'season','Season 5 — Golden Wasteland (Wild West)','8 warzones on 1 map. Venom → UR. Fiona/Stetmann/Morrison Exclusive Weapons. CrystalGold economy.'],
+];
+
+let currentFilter = 'all';
+let serverStart = null;
+
+function saveAndCalc(){
+  const input = document.getElementById('startDate').value;
+  if(!input) return;
+  localStorage.setItem('cp_server_start', input);
+  serverStart = new Date(input);
+  render();
+}
+
+function loadSaved(){
+  const saved = localStorage.getItem('cp_server_start');
+  if(saved){
+    document.getElementById('startDate').value = saved;
+    serverStart = new Date(saved);
+    render();
+  }
+}
+
+function getServerDay(){
+  if(!serverStart) return 0;
+  const now = new Date();
+  const diff = Math.floor((now - serverStart) / (1000*60*60*24)) + 1;
+  return Math.max(1, diff);
+}
+
+function render(){
+  const day = getServerDay();
+  const week = Math.ceil(day / 7);
+
+  // Find phase
+  let phase = 'Pre-Season';
+  if(day >= 344) phase = 'Season 5';
+  else if(day >= 288) phase = 'Season 4';
+  else if(day >= 232) phase = 'Season 3';
+  else if(day >= 176) phase = 'Season 2';
+  else if(day >= 120) phase = 'Season 1';
+
+  // Find next unlock
+  const futureEvents = EVENTS.filter(e => e[0] > day);
+  const nextEvent = futureEvents[0];
+  const daysToNext = nextEvent ? nextEvent[0] - day : 0;
+
+  document.getElementById('dd-day').textContent = day;
+  document.getElementById('dd-week').textContent = week;
+  document.getElementById('dd-next').textContent = nextEvent ? daysToNext + 'd' : '—';
+  document.getElementById('dd-phase').textContent = phase;
+  document.getElementById('dayDisplay').style.display = 'grid';
+  document.getElementById('tlSection').style.display = 'block';
+
+  renderTimeline(day);
+}
+
+function renderTimeline(currentDay){
+  const el = document.getElementById('timeline');
+  const filtered = currentFilter === 'all' ? EVENTS : EVENTS.filter(e => e[1] === currentFilter);
+
+  el.innerHTML = filtered.map(([day, type, title, desc]) => {
+    let status = 'far';
+    if(day < currentDay - 7) status = 'past';
+    else if(day <= currentDay) status = 'current';
+    else if(day <= currentDay + 14) status = 'future';
+
+    const eta = day > currentDay ? `${day - currentDay} days away (Day ${day})` :
+                day === currentDay ? 'TODAY' :
+                `${currentDay - day} days ago (Day ${day})`;
+
+    const badgeClass = {hero:'badge-hero',event:'badge-event',weapon:'badge-weapon',feature:'badge-feature',season:'badge-season'}[type];
+    const badgeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+
+    return `<div class="tl-item">
+      <div class="tl-dot ${status}"></div>
+      <div class="tl-card ${status}">
+        <div class="tl-header">
+          <span class="tl-day ${status}">Day ${day}</span>
+          <span class="tl-badge ${badgeClass}">${badgeLabel}</span>
+        </div>
+        <div class="tl-title">${title}</div>
+        <div class="tl-desc">${desc}</div>
+        <div class="tl-eta">${eta}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f){
+  currentFilter = f;
+  document.querySelectorAll('.tl-filter').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(serverStart) render();
+}
+
+loadSaved();
+</script>
+</body>
+</html>

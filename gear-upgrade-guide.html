@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War: Survival — Gear Crafting & Upgrade Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f13;--surface:#16171d;--surface2:#1e1f27;--border:#2a2b36;--text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;--accent:#a78bfa;--accent-bg:rgba(167,139,250,.08);--green:#34d399;--green-bg:rgba(52,211,153,.08);--green-border:rgba(52,211,153,.25);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.08);--amber-border:rgba(251,191,36,.25);--red:#f87171;--red-bg:rgba(248,113,113,.06);--blue:#60a5fa;--blue-bg:rgba(96,165,250,.08);--blue-border:rgba(96,165,250,.25);--radius:10px;--radius-lg:14px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,#f87171,var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:600;margin-bottom:.75rem}.section{margin-bottom:2.5rem}.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-bottom:10px}.card h3{font-size:.95rem;font-weight:600;margin-bottom:4px}.card p{font-size:.88rem;color:var(--text2);line-height:1.65}
+.label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:6px}
+.label-atk{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2)}.label-def{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.label-tip{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}.label-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.82rem}
+/* Gear slots */
+.gear-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}@media(max-width:500px){.gear-grid{grid-template-columns:1fr}}
+.gear-slot{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center}
+.gear-icon{font-size:1.5rem;margin-bottom:6px}.gear-name{font-size:1rem;font-weight:600;margin-bottom:2px}.gear-stat{font-size:.82rem;color:var(--text3)}.gear-who{font-size:.78rem;margin-top:6px;padding:3px 8px;border-radius:4px;display:inline-block}
+.for-atk{background:var(--red-bg);color:var(--red)}.for-def{background:var(--blue-bg);color:var(--blue)}.for-all{background:var(--accent-bg);color:var(--accent)}
+/* Priority list numbered */
+.craft-order{list-style:none;padding:0;counter-reset:craft}.craft-order li{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px 12px 50px;margin-bottom:8px;position:relative;counter-increment:craft}
+.craft-order li::before{content:counter(craft);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--amber-bg);border:1px solid var(--amber-border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:var(--amber);font-family:'JetBrains Mono',monospace}
+.craft-order li .c-title{font-size:.9rem;font-weight:600;margin-bottom:2px}.craft-order li .c-desc{font-size:.82rem;color:var(--text2)}
+.rarity-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1.5rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.rarity-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.rarity-table td{padding:9px 12px;border-top:1px solid var(--border)}
+.r-common{color:#9ca3af}.r-rare{color:var(--blue)}.r-epic{color:var(--accent)}.r-legend{color:var(--amber)}.r-mythic{color:var(--red)}
+.warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid var(--red);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.warn-box h3{font-size:.9rem;font-weight:600;color:var(--red);margin-bottom:4px}.warn-box p{font-size:.85rem;color:var(--text2)}
+.tip-box{background:var(--green-bg);border:1px solid var(--green-border);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.tip-box h3{font-size:.9rem;font-weight:600;color:var(--green);margin-bottom:4px}.tip-box p{font-size:.85rem;color:var(--text2)}
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem}.tab{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text3);font-family:inherit;text-align:center;transition:all .15s}
+.tab:hover{background:var(--surface2);color:var(--text2)}.tab.active{background:var(--accent-bg);border-color:rgba(167,139,250,.25);color:var(--accent)}
+.role-panel{display:none}.role-panel.active{display:block}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Gear Crafting & Upgrade Guide</h1>
+<p class="subtitle">Last War: Survival — What to craft first, upgrade order, and how to avoid wasting Ore</p>
+
+<div class="section">
+<h2>The 4 gear slots</h2>
+<div class="gear-grid">
+  <div class="gear-slot"><div class="gear-icon">🔫</div><div class="gear-name">Gun (Cannon)</div><div class="gear-stat">Boosts Attack power</div><div class="gear-who for-atk">DPS heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon">💾</div><div class="gear-name">Chip</div><div class="gear-stat">Crit Rate + secondary damage</div><div class="gear-who for-atk">DPS heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon">🛡️</div><div class="gear-name">Armor</div><div class="gear-stat">Physical damage resistance</div><div class="gear-who for-def">Tank heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon">📡</div><div class="gear-name">Radar</div><div class="gear-stat">Energy damage resistance + survivability</div><div class="gear-who for-all">Everyone needs this</div></div>
+</div>
+<div class="tip-box"><h3>Radar is universally valuable</h3><p>Radar reduces incoming skill/energy damage and increases survivability for ALL heroes. Every serious player eventually puts Radar on everyone in their main team. It works equally well for PvE and PvP, making it the safest upgrade choice when in doubt.</p></div>
+</div>
+
+<div class="section">
+<h2>Gear rarity progression</h2>
+<table class="rarity-table">
+<thead><tr><th>Rarity</th><th>Max Level</th><th>Strategy</th></tr></thead>
+<tbody>
+<tr><td class="r-common" style="font-weight:600">Common (Green)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Don't invest anything. Dismantle immediately.</td></tr>
+<tr><td class="r-rare" style="font-weight:600">Rare (Blue)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Short-term filler only. Dismantle when you have Epic.</td></tr>
+<tr><td class="r-epic" style="font-weight:600">Epic (Purple)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Temporary. Use until you can craft Legendary. Don't over-invest.</td></tr>
+<tr><td class="r-legend" style="font-weight:600">Legendary (Gold)</td><td class="mono">Lv 40 → Stars</td><td style="color:var(--text2)"><strong>Your target.</strong> Rush to gold gear ASAP. Star upgrades (1–5★) using blueprints are the real power spikes.</td></tr>
+<tr><td class="r-mythic" style="font-weight:600">Mythic (Red)</td><td class="mono">Stars</td><td style="color:var(--text2)">Endgame. Extremely expensive. Only focus after main squad is full Legendary with stars.</td></tr>
+</tbody>
+</table>
+<div class="card"><span class="label label-warn">Key insight</span><h3>The real power comes from star upgrades, not crafting</h3><p>Getting gear to Legendary is just the start. Star upgrades (using Legendary/Mythic blueprints + prints) provide permanent stat increases that compound quickly. The big spikes are at 2-star and 4-star. Misallocating prints or ore on the wrong item can stall growth for weeks.</p></div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+<h2>Upgrade priority by hero role</h2>
+<div class="tabs">
+  <button class="tab active" onclick="showRole('dps')">DPS / Attackers</button>
+  <button class="tab" onclick="showRole('tank')">Tanks / Defenders</button>
+  <button class="tab" onclick="showRole('mythic')">Mythic tier</button>
+</div>
+
+<div class="role-panel active" id="panel-dps">
+  <div class="card"><span class="label label-atk">DPS heroes</span><h3>Gun → Chip → Radar</h3>
+  <p>Gun gives the biggest boost to raw damage. Chip strengthens secondary multipliers and skill output. Radar helps your DPS survive longer, especially against energy-heavy enemies. If you're constantly losing your main carry early in fights, swap to Gun → Radar → Chip for better uptime.</p></div>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">For a Tank main squad, craft in this exact order:</p>
+  <ol class="craft-order">
+    <li><div class="c-title">Kimberly's Gun</div><div class="c-desc">She's your main damage dealer. Her gun has the highest impact on your squad's total output.</div></li>
+    <li><div class="c-title">Guns for remaining attackers</div><div class="c-desc">Stetmann, then Marshall (or whoever is in your back row dealing damage).</div></li>
+    <li><div class="c-title">Chips for Kimberly → other attackers</div><div class="c-desc">Crit rate and damage multipliers. Kimberly first, then distribute.</div></li>
+    <li><div class="c-title">Radars for attackers (last)</div><div class="c-desc">Finally give your damage dealers some survivability once their offense is covered.</div></li>
+  </ol>
+</div>
+
+<div class="role-panel" id="panel-tank">
+  <div class="card"><span class="label label-def">Tank heroes</span><h3>Armor → Radar → (optional Gun)</h3>
+  <p>Their job is to take hits, not deal them. Armor handles physical damage from enemies and bosses. Radar provides energy resistance and overall durability. Only consider a Gun if you have extra prints/resources — it can help with aggro generation in longer fights.</p></div>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">For your frontline (Murphy, Williams, etc.):</p>
+  <ol class="craft-order">
+    <li><div class="c-title">Murphy's Radar</div><div class="c-desc">Murphy is your main defender. Radar increases his energy resistance — critical against heroes like Kimberly and Stetmann.</div></li>
+    <li><div class="c-title">Radar for 2nd tank (Williams)</div><div class="c-desc">Same logic. Your frontline needs to survive long enough for your DPS to work.</div></li>
+    <li><div class="c-title">Armor for Murphy → Williams</div><div class="c-desc">Physical damage resistance. Completes the defensive setup.</div></li>
+    <li><div class="c-title">Chips for defenders (low priority)</div><div class="c-desc">Only after all attackers and defenders have their primary gear.</div></li>
+  </ol>
+</div>
+
+<div class="role-panel" id="panel-mythic">
+  <div class="card"><span class="label" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2)">Mythic priority</span><h3>Radar → Armor → Gun → Chip</h3>
+  <p>At Mythic tier, Radar stands out with its ability to reduce critical hit damage by 30%. In late-game PvP where critical strikes are common, this is the single most impactful upgrade. Armor follows — it reduces the likelihood of crits occurring. Survivability before damage is the rule at Mythic level. A team that stays alive longer deals more total damage.</p></div>
+  <div class="card"><h3>Mythic gear punishes indecision</h3><p>Mythic blueprints are extremely rare. Every piece should serve a defined purpose. The bottleneck isn't crafting — it's blueprints. Structure your blueprint pipeline before you start: know which hero gets which Mythic piece first.</p></div>
+</div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+<h2>Upgrade Ore management</h2>
+<div class="card"><span class="label label-tip">Rule</span><h3>Upgrade in 10-level increments</h3><p>Every 10 levels (10, 20, 30, 40) unlocks a new attribute on the gear. Don't leave gear at awkward in-between levels. Get to the next 10-level milestone before moving on to another piece.</p></div>
+<div class="card"><span class="label label-tip">Rule</span><h3>Main squad only — never spread thin</h3><p>Focus ALL your Upgrade Ore on your top 5 heroes' gear. Spreading across multiple squads or secondary heroes is the fastest way to stall your progression. Only expand to Squad 2 after Squad 1 is fully geared with starred Legendary.</p></div>
+<div class="card"><h3>Ore sources (in order of reliability)</h3><p>Smelter (passive — keep it running 24/7), Alliance Duel rewards, events and limited-time activities, daily tasks, plundering (target players with Ore), VIP Store (situational). Don't neglect your Smelter — every hour without it running is Ore you've lost forever.</p></div>
+</div>
+
+<div class="warn-box"><h3>Common gear mistakes</h3><p>Investing in Common/Rare gear (waste of Ore). Spreading Ore across all 5 heroes equally instead of focusing DPS first. Upgrading gear on heroes you aren't actively using. Ignoring the Gear Factory level — it determines what rarity you can craft. Buying gear materials with diamonds (farmable elsewhere for free). Not saving blueprints from the Honor Store (biggest late-game bottleneck).</p></div>
+
+<div class="tip-box"><h3>Honor Store: blueprints only</h3><p>There is only ONE thing you should ever buy in the Honor Store: Gear Blueprints. Not speedups, not resources, not decorative chests. In the late game, blueprints become the biggest bottleneck for growth. Stockpile them now, even if you're a new player. You'll thank yourself later.</p></div>
+</div>
+
+<script>
+function showRole(r){document.querySelectorAll('.role-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+r).classList.add('active');document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if((r==='dps'&&t.textContent.includes('DPS'))||(r==='tank'&&t.textContent.includes('Tank'))||(r==='mythic'&&t.textContent.includes('Mythic')))t.classList.add('active')})}
+</script>
+</body>
+</html>

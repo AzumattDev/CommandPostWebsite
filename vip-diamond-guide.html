@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War: Survival — VIP & Diamond Spending Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f13;--surface:#16171d;--surface2:#1e1f27;--border:#2a2b36;--text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;--accent:#a78bfa;--accent-bg:rgba(167,139,250,.08);--green:#34d399;--green-bg:rgba(52,211,153,.08);--green-border:rgba(52,211,153,.25);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.08);--amber-border:rgba(251,191,36,.25);--red:#f87171;--red-bg:rgba(248,113,113,.06);--blue:#60a5fa;--blue-bg:rgba(96,165,250,.08);--blue-border:rgba(96,165,250,.25);--radius:10px;--radius-lg:14px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--amber),#fde68a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:600;margin-bottom:.75rem}.section{margin-bottom:2.5rem}.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-bottom:10px}.card h3{font-size:.95rem;font-weight:600;margin-bottom:4px}.card p{font-size:.88rem;color:var(--text2);line-height:1.65}
+.label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:6px}
+.label-do{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}.label-dont{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.label-tip{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}.label-vip{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.82rem}
+/* VIP table */
+.vip-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1.5rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.vip-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.vip-table td{padding:9px 12px;border-top:1px solid var(--border)}.vip-table tr.milestone{background:rgba(251,191,36,.04)}
+.vip-table tr.milestone td:first-child{color:var(--amber);font-weight:600}
+.vip-val{font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:500}
+/* Spending priority */
+.spend-list{list-style:none;padding:0;counter-reset:spend}.spend-list li{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px 12px 50px;margin-bottom:8px;position:relative;counter-increment:spend}
+.spend-list li::before{content:counter(spend);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--accent-bg);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.spend-list li .s-title{font-size:.9rem;font-weight:600;margin-bottom:2px}.spend-list li .s-desc{font-size:.82rem;color:var(--text2)}
+.spend-list li .s-cost{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:4px}
+.warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid var(--red);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.warn-box h3{font-size:.9rem;font-weight:600;color:var(--red);margin-bottom:4px}.warn-box p{font-size:.85rem;color:var(--text2)}
+.tip-box{background:var(--green-bg);border:1px solid var(--green-border);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.tip-box h3{font-size:.9rem;font-weight:600;color:var(--green);margin-bottom:4px}.tip-box p{font-size:.85rem;color:var(--text2)}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
+@media(max-width:600px){.time-grid{grid-template-columns:1fr}}
+.time-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center}
+.time-card .dur{font-size:.82rem;color:var(--text3);margin-bottom:4px}.time-card .cost{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--amber)}
+.time-card .rate{font-size:.75rem;color:var(--text3);margin-top:4px}
+.store-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.store-table th{text-align:left;padding:9px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.store-table td{padding:9px 12px;border-top:1px solid var(--border)}.buy-yes{color:var(--green);font-weight:600}.buy-no{color:var(--red);font-weight:600}.buy-maybe{color:var(--amber);font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>VIP & Diamond Spending Guide</h1>
+<p class="subtitle">Last War: Survival — Where every diamond should go, and what to never waste them on</p>
+
+<div class="section">
+<h2>VIP activation costs</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">VIP level determines which perks are available. VIP time must be purchased separately to activate them. Time stacks — buying more adds to your existing duration.</p>
+<div class="time-grid">
+  <div class="time-card"><div class="dur">24 hours</div><div class="cost">1,000 💎</div><div class="rate">Best for testing</div></div>
+  <div class="time-card" style="border-color:var(--amber-border)"><div class="dur">7 days</div><div class="cost">3,000 💎</div><div class="rate">429/day</div></div>
+  <div class="time-card" style="border-color:var(--green-border)"><div class="dur">30 days</div><div class="cost">10,000 💎</div><div class="rate">333/day — best value</div></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Key VIP milestone levels</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Not all VIP levels are equal. These are the ones that actually change your gameplay:</p>
+<div style="overflow-x:auto">
+<table class="vip-table">
+<thead><tr><th>Level</th><th>Key unlock</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td class="mono">VIP 1</td><td>Adventurer Taylor (survivor)</td><td style="color:var(--text2)">Extra treasure reward from radar tasks. Unlocked automatically early.</td></tr>
+<tr class="milestone"><td class="mono">VIP 3</td><td>+10% construction speed</td><td style="color:var(--text2)">First meaningful speed boost. Great early F2P milestone — achievable from daily chests.</td></tr>
+<tr class="milestone"><td class="mono">VIP 6</td><td>2nd permanent builder queue</td><td style="color:var(--text2)"><strong>Critical milestone.</strong> Rush to VIP 6 ASAP. Double building speed changes everything.</td></tr>
+<tr class="milestone"><td class="mono">VIP 7</td><td>Auto-functions unlock</td><td style="color:var(--text2)">Massive time-savers. Less daily clicking, more actual playing. The "sweet spot" for F2P/low spenders.</td></tr>
+<tr class="milestone"><td class="mono">VIP 8</td><td>Extra march queue + Agent Shirley</td><td style="color:var(--text2)">Farm or fight more simultaneously. Shirley is a valuable survivor. The "buy-in" point for efficiency.</td></tr>
+<tr><td class="mono">VIP 9</td><td>+60% building speed</td><td style="color:var(--text2)">Sweet spot for base developers. Those week-long timers become much more manageable.</td></tr>
+<tr class="milestone"><td class="mono">VIP 11</td><td>+50% construction + 15% research speed</td><td style="color:var(--text2)"><strong>Major power spike.</strong> One of the sharpest jumps in the game. For serious players rushing tech and HQ.</td></tr>
+<tr><td class="mono">VIP 14</td><td>+20% healing boost</td><td style="color:var(--text2)">PvP recovery advantage. Carried through VIP 15.</td></tr>
+<tr class="milestone"><td class="mono">VIP 15</td><td>+10% training speed + healing</td><td style="color:var(--text2)">Non-negotiable for rally leads and war whales. Faster queues + faster healing = back on the map hours before opponents.</td></tr>
+<tr><td class="mono">VIP 18</td><td>Maximum level (current cap)</td><td style="color:var(--text2)">Whale territory. All bonuses maxed. Extremely expensive to reach.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="tip-box"><h3>F2P VIP strategy</h3><p>Claim the free daily VIP chest (up to 200 points/day). Join a strong alliance — whale purchases give everyone VIP points through alliance gift chests. Spend diamonds on VIP points when you're close to a milestone level (3, 6, 7, 8). The 30-day activation is always the best diamond-to-time ratio.</p></div>
+
+<hr class="divider">
+
+<div class="section">
+<h2>Diamond spending priority (F2P & low spender)</h2>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Diamonds are scarce. This is the strict order of where they should go:</p>
+<ol class="spend-list">
+  <li><div class="s-title">VIP levels → reach VIP 6</div><div class="s-desc">The 2nd permanent builder is the single biggest progression unlock for diamonds. After VIP 6, continue toward VIP 8 for Agent Shirley and the extra march.</div><div class="s-cost">1 diamond = 1 VIP point</div></li>
+  <li><div class="s-title">VIP Store: Stamina (every Monday)</div><div class="s-desc">Buy all 5× Stamina (50 each) = 300 diamonds/week. This is the best value in the entire shop. Stamina fuels campaign progress, hero XP farming, and radar missions. Buy this without fail.</div><div class="s-cost">300 💎/week — non-negotiable</div></li>
+  <li><div class="s-title">VIP Store: 8h & 3h Speedups</div><div class="s-desc">Best diamond-to-time ratio for acceleration. Use them to hit Arms Race milestones or finish critical HQ levels. Only buy when you have an active project that needs them.</div><div class="s-cost">Buy only when needed</div></li>
+  <li><div class="s-title">Shields (before Kill Events)</div><div class="s-desc">8h, 12h, or 24h shields before you go offline during Kill Events or Saturday VS combat. Losing troops costs far more than a shield.</div><div class="s-cost">Situational — don't skip</div></li>
+  <li><div class="s-title">Teleports</div><div class="s-desc">Move closer to your Alliance Hive. Essential for coordination, alliance helps, and protection. Buy as needed.</div><div class="s-cost">Situational</div></li>
+  <li><div class="s-title">Drone Components (VIP Store)</div><div class="s-desc">Drones are one of the strongest force multipliers. If you have surplus diamonds after the above, drone components from the VIP Store are a great long-term investment.</div><div class="s-cost">Surplus diamonds only</div></li>
+  <li><div class="s-title">VIP Store: Skill Medals (Season 2+)</div><div class="s-desc">Skill medals become a major bottleneck in Season 2+. Only buy if you have 5,000+ diamond surplus and your main hero's skills are lagging behind.</div><div class="s-cost">4 💎 each — only when surplus</div></li>
+</ol>
+</div>
+
+<div class="section">
+<h2>VIP Store buying guide (Monday reset)</h2>
+<div style="overflow-x:auto">
+<table class="store-table">
+<thead><tr><th>Item</th><th>Buy?</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Stamina ×5</td><td class="buy-yes">Always</td><td style="color:var(--text2)">300 diamonds total. Best value in the game. Buy every week.</td></tr>
+<tr><td>8h / 3h Speedups</td><td class="buy-yes">Yes</td><td style="color:var(--text2)">Best diamond-to-time ratio. Buy when you have active projects.</td></tr>
+<tr><td>Skill Medals</td><td class="buy-maybe">Situational</td><td style="color:var(--text2)">Only if surplus diamonds and actively upgrading hero skills.</td></tr>
+<tr><td>Drone Components</td><td class="buy-maybe">Situational</td><td style="color:var(--text2)">Good long-term value if drone is under-leveled.</td></tr>
+<tr><td>Resource Chests</td><td class="buy-no">Never</td><td style="color:var(--text2)">Easily earned elsewhere for free. Terrible diamond value.</td></tr>
+<tr><td>Gear Materials</td><td class="buy-no">Never</td><td style="color:var(--text2)">Superalloy etc. — farmable from other sources.</td></tr>
+<tr><td>Recruitment Tickets</td><td class="buy-no">Never</td><td style="color:var(--text2)">You get plenty from events and daily tasks.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="warn-box"><h3>Diamond spending traps</h3><p><strong>Never use diamonds to speed up timers directly</strong> — the exchange rate is terrible. Buy speedups from the VIP Store instead. Never buy random pop-up resource packs. Never spend diamonds on stamina refills beyond the VIP Store's weekly 5 purchases. The VIP Store resets every Monday — don't let it go to waste.</p></div>
+
+<div class="tip-box"><h3>Diamond income sources (F2P)</h3><p>Daily tasks (up to 30 diamonds), 3v3 Brawl thumbs up (10 diamonds/day), alliance gift chests from whale purchases, event rewards, campaign progression, and code redemptions. In a strong alliance, you can earn thousands of free diamonds per week just from alliance gifts.</p></div>
+</div>
+</body>
+</html>
