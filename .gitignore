@@ -6,3 +6,10 @@ riderModule.iml
 .idea/
 .vs/
 CommandPostWebsite.sln.DotSettings.user
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
