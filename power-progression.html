@@ -66,6 +66,17 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .milestone-hq { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); font-weight: 500; }
 .milestone-text { font-size: 0.88rem; color: var(--text2); }
 .milestone-text strong { color: var(--text); }
+.hq-table{width:100%;border-collapse:collapse;font-size:.84rem;background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.hq-table th{text-align:left;padding:9px 14px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.hq-table td{padding:8px 14px;border-top:1px solid var(--border)}
+.hq-table tbody tr:hover{background:var(--surface2)}
+.hq-mono{font-family:'JetBrains Mono',monospace}
+.col-hq{color:var(--accent);font-weight:600}
+.col-tc{color:var(--blue)}
+.hq-s2{background:rgba(251,191,36,.03)}
+.hq-note{background:rgba(251,191,36,.04);border:1px solid var(--amber-border);border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.hq-note h3{font-size:.9rem;font-weight:600;color:var(--amber);margin-bottom:4px}
+.hq-note p{font-size:.85rem;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -160,6 +171,57 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
     <div class="milestone"><div style="display:flex;flex-direction:column;align-items:center;"><div class="milestone-dot"></div><div class="milestone-line" style="flex:1;"></div></div><div class="milestone-content"><div class="milestone-hq">HQ 24–27</div><div class="milestone-text"><strong>T8–T9 troops.</strong> Major stat jump at T9. Don't force it before your economy supports it.</div></div></div>
     <div class="milestone"><div style="display:flex;flex-direction:column;align-items:center;"><div class="milestone-dot"></div><div class="milestone-line" style="flex:1;"></div></div><div class="milestone-content"><div class="milestone-hq">HQ 30</div><div class="milestone-text"><strong>T10 troops + endgame.</strong> Special Forces research required. Lock barracks at waterfall Rung 5 (20-24-27-30).</div></div></div>
     <div class="milestone"><div style="display:flex;flex-direction:column;align-items:center;"><div class="milestone-dot" style="background:var(--amber);"></div></div><div class="milestone-content"><div class="milestone-hq" style="color:var(--amber);">HQ 31+ (Age of Oil)</div><div class="milestone-text"><strong>Oil becomes the bottleneck.</strong> Unlock oil wells ASAP. T11 troops available in Season 4+. HQ 31 reindeer trucks give weapon shard chests.</div></div></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-title">HQ level unlock requirements</div>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Every HQ upgrade requires your Tech Center AND one other specific building at a matching level. Only upgrade what's required — nothing else.</p>
+  <div style="overflow-x:auto;margin-bottom:1rem;">
+  <table class="hq-table">
+    <thead><tr><th>HQ Level</th><th>Tech Center</th><th>Building #2</th><th style="text-align:right">Level</th></tr></thead>
+    <tbody>
+      <tr><td class="col-hq hq-mono">HQ 10</td><td class="col-tc hq-mono">TC 9</td><td>Hospital</td><td class="hq-mono" style="text-align:right">9</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 11</td><td class="col-tc hq-mono">TC 10</td><td>Wall</td><td class="hq-mono" style="text-align:right">10</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 12</td><td class="col-tc hq-mono">TC 11</td><td>Barracks</td><td class="hq-mono" style="text-align:right">11</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 13</td><td class="col-tc hq-mono">TC 12</td><td>Tank Center</td><td class="hq-mono" style="text-align:right">12</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 14</td><td class="col-tc hq-mono">TC 13</td><td>Drill Ground</td><td class="hq-mono" style="text-align:right">13</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 15</td><td class="col-tc hq-mono">TC 14</td><td>Wall</td><td class="hq-mono" style="text-align:right">14</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 16</td><td class="col-tc hq-mono">TC 15</td><td>Alliance Center</td><td class="hq-mono" style="text-align:right">15</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 17</td><td class="col-tc hq-mono">TC 16</td><td>Tank Center</td><td class="hq-mono" style="text-align:right">16</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 18</td><td class="col-tc hq-mono">TC 17</td><td>Hospital</td><td class="hq-mono" style="text-align:right">17</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 19</td><td class="col-tc hq-mono">TC 18</td><td>Wall</td><td class="hq-mono" style="text-align:right">18</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 20</td><td class="col-tc hq-mono">TC 19</td><td>Barracks</td><td class="hq-mono" style="text-align:right">19</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 21</td><td class="col-tc hq-mono">TC 20</td><td>Tank Center</td><td class="hq-mono" style="text-align:right">20</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 22</td><td class="col-tc hq-mono">TC 21</td><td>Drill Ground</td><td class="hq-mono" style="text-align:right">21</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 23</td><td class="col-tc hq-mono">TC 22</td><td>Wall</td><td class="hq-mono" style="text-align:right">22</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 24</td><td class="col-tc hq-mono">TC 23</td><td>Alliance Center</td><td class="hq-mono" style="text-align:right">23</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 25</td><td class="col-tc hq-mono">TC 24</td><td>Tank Center</td><td class="hq-mono" style="text-align:right">24</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 26</td><td class="col-tc hq-mono">TC 25</td><td>Hospital</td><td class="hq-mono" style="text-align:right">25</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 27</td><td class="col-tc hq-mono">TC 26</td><td>Wall</td><td class="hq-mono" style="text-align:right">26</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 28</td><td class="col-tc hq-mono">TC 27</td><td>Barracks</td><td class="hq-mono" style="text-align:right">27</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 29</td><td class="col-tc hq-mono">TC 28</td><td>Tank Center</td><td class="hq-mono" style="text-align:right">28</td></tr>
+      <tr><td class="col-hq hq-mono">HQ 30</td><td class="col-tc hq-mono">TC 29</td><td>Drill Ground</td><td class="hq-mono" style="text-align:right">29</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="hq-note">
+    <h3>HQ 31–35: Age of Oil research gate</h3>
+    <p>To unlock HQ 31–35, you must first complete <strong>HQ Expansion Lv1</strong> in the Age of Oil tech tree. This costs approximately <strong>616M Food &amp; Iron, 1.8G Gold, 4.1M Oil</strong> and takes roughly 942 days of research time.</p>
+  </div>
+
+  <div style="overflow-x:auto;margin-bottom:1rem;">
+  <table class="hq-table">
+    <thead><tr><th>HQ Level</th><th>Tech Center</th><th>Buildings Required</th><th style="text-align:right">Level</th></tr></thead>
+    <tbody>
+      <tr class="hq-s2"><td class="col-hq hq-mono">HQ 31</td><td class="col-tc hq-mono">TC 30</td><td>Tank Center + Barracks</td><td class="hq-mono" style="text-align:right">30</td></tr>
+      <tr class="hq-s2"><td class="col-hq hq-mono">HQ 32</td><td class="col-tc hq-mono">TC 31</td><td>Tank Center + Barracks + Wall</td><td class="hq-mono" style="text-align:right">31</td></tr>
+      <tr class="hq-s2"><td class="col-hq hq-mono">HQ 33</td><td class="col-tc hq-mono">TC 32</td><td>Tank Center + Barracks + Hospital + Drill Ground</td><td class="hq-mono" style="text-align:right">32</td></tr>
+      <tr class="hq-s2"><td class="col-hq hq-mono">HQ 34</td><td class="col-tc hq-mono">TC 33</td><td>Tank Center + Barracks + Wall + Alliance Center</td><td class="hq-mono" style="text-align:right">33</td></tr>
+      <tr class="hq-s2"><td class="col-hq hq-mono">HQ 35</td><td class="col-tc hq-mono">TC 34</td><td>Tank Center + Barracks + Hospital + Drill Ground</td><td class="hq-mono" style="text-align:right">34</td></tr>
+    </tbody>
+  </table>
   </div>
 </div>
 
