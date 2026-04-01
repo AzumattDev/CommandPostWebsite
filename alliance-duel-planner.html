@@ -154,10 +154,10 @@ const days = [
       { t: "Keep hoarding construction speedups", d: "Don't spend building speedups yet. Tuesday is their day." },
     ],
     tips: [
-      { t: "Hero XP decision", d: "It's more profitable to save Hero XP for Thursday (Hero Day). Only use it on Monday if you're short on points for a chest or the alliance urgently needs the win." },
+      { t: "Hero XP: Monday scores it, Thursday maximizes it", d: "Hero XP is a valid Monday scoring item but earns more points per item on Thursday. Save it for Thursday unless you're close to a chest threshold or the alliance urgently needs the win." },
       { t: "Save vs. spend Drone resources", d: "If the opponent is weak, spend just enough to hit all 9 individual chests. Bank leftovers for next week." },
     ],
-    points: ["Stamina use", "Radar tasks", "Drone Parts", "Battle Data", "Chip Chests", "Resource gathering"]
+    points: ["Radar tasks", "Stamina", "Hero XP", "Drone Data", "Drone Parts", "Gather Gold/Iron/Food", "Chip Chests"]
   },
   {
     tab: "Tue", name: "Tuesday", theme: "Base expansion", value: "2 pts",
@@ -170,7 +170,7 @@ const days = [
       {img:'survivorticket.png', label:'Survivor Recruit'},
     ],
     today: [
-      { t: "Finish buildings with speedups", d: "Use building speedups (including universal) to complete all queued constructions. Aim for 10–14 days' worth of speedups across 2–3 major buildings." },
+      { t: "Finish buildings with speedups", d: "Use building speedups to complete all queued constructions. Generic (universal) speedups count toward Building Speed too — dump any non-specific speedups today. Aim for 10–14 days' worth across 2–3 major buildings." },
       { t: "Unpack gift-boxed buildings", d: "Open any buildings you left in the 'gift' state. Increasing building power = big points." },
       { t: "Send UR (orange) trucks only", d: "Use Trade Contracts to refresh until you get Legendary trucks. Don't settle for lower rarity." },
       { t: "Complete Legendary Secret Tasks", d: "Do orange tasks in Secret Command Post. Use Secret Orders to refresh. Save starred tasks for Saturday." },
@@ -185,7 +185,7 @@ const days = [
       { t: "Arms Race overlap", d: "Building speedups and power overlap with Arms Race: City Building. Do them in parallel for double credit." },
       { t: "Starred secret tasks", d: "Star-marked legendary tasks last a long time. Leave them pending — they're best used on Day 6 (Saturday)." },
     ],
-    points: ["Building speedups", "Building power", "UR Trucks", "Secret Tasks", "Survivor Recruits", "Armament (S4+)"]
+    points: ["Building Power", "Building Speed", "Generic speedups", "UR Trucks", "Legend Tasks", "Survivor Recruits"]
   },
   {
     tab: "Wed", name: "Wednesday", theme: "Age of science", value: "2 pts",
@@ -199,7 +199,7 @@ const days = [
     ],
     today: [
       { t: "Claim stacked radar rewards", d: "Collect all the radar tasks you've been saving since Monday — instant point injection." },
-      { t: "Finish research with speedups", d: "Spend tech research speedups (and universal) to complete technologies. Don't hold completed research — it blocks your Tech Center." },
+      { t: "Finish research with speedups", d: "Spend tech research speedups to complete technologies. Generic (universal) speedups count toward Tech Speed too — use any you have left. Don't hold completed research — it blocks your Tech Center." },
       { t: "Spend ALL Valor Badges", d: "This is THE day for badges. Use them on Alliance Duel research (top priority), then Trucks and Special Forces branches." },
       { t: "Open Drone Component Chests", d: "All saved Lv.1–7 component chests get opened today. Only available on Wednesdays." },
     ],
@@ -212,7 +212,7 @@ const days = [
       { t: "Alliance Duel tech is critical", d: "Upgrading Alliance Duel research increases your points by up to 150%. Prioritize 'Advanced Reward' and 'Super Reward' techs to unlock better chests." },
       { t: "Arms Race overlap", d: "Overlaps with Arms Race: Tech Research. Complete them together." },
     ],
-    points: ["Radar tasks", "Research speedups", "Tech power", "Valor Badges", "Drone Component Chests"]
+    points: ["Radar tasks", "Tech Power", "Tech Speed", "Generic speedups", "Valor Badges", "Drone Component Chests"]
   },
   {
     tab: "Thu", name: "Thursday", theme: "Train heroes", value: "2 pts",
@@ -228,7 +228,7 @@ const days = [
       { t: "Use Hero Shards (UR/SSR/SR)", d: "Promote hero stars. Includes Universal Shards and Overlord Universal Shards." },
       { t: "Use Skill Medals", d: "Upgrade hero skills. Increases combat power AND earns Duel points." },
       { t: "Elite Recruitment", d: "Use all saved Legendary, New Era, and Hero's Return tickets in the Tavern." },
-      { t: "Upgrade Exclusive Weapons", d: "If unlocked, use Exclusive Weapon shards for additional points." },
+      { t: "Use Weapon Shards (S1+)", d: "If you're in Season 1+, use Exclusive Weapon Shards to upgrade hero weapons. Each shard used scores points separately." },
     ],
     prep: [
       { t: "Stack radar tasks for Friday", d: "Complete radar missions, DON'T claim. Ready for tomorrow." },
@@ -239,7 +239,7 @@ const days = [
       { t: "Easiest scoring day", d: "Thursday is generally the most straightforward day — dump resources and watch points climb." },
       { t: "Bond Badges & Training Certs", d: "Some guides suggest using Bond Badges, Training Certificates, and Training Guidebooks on this day or Friday. Check what gives your alliance more points." },
     ],
-    points: ["Hero XP", "Hero Shards", "Skill Medals", "Elite Recruitment", "Exclusive Weapons"]
+    points: ["Hero Recruit", "Hero XP", "Hero Shards", "Skill Medals", "Weapon Shards (S1+)"]
   },
   {
     tab: "Fri", name: "Friday", theme: "Total mobilization", value: "2 pts",
@@ -260,10 +260,10 @@ const days = [
     ],
     today: [
       { t: "Claim stacked radar rewards", d: "Collect all radar tasks saved from Thursday." },
-      { t: "Train soldiers (main focus)", d: "Use training speedups and universal speedups to train and promote troops. This is your #1 point source today. Promoting troop tiers often gives more points than direct training." },
-      { t: "Finish leftover buildings", d: "Use any remaining construction speedups. Unpack any leftover gift boxes." },
-      { t: "Finish leftover research", d: "Complete any remaining tech with spare speedups." },
-      { t: "Gorilla Overlord upgrades (late game)", d: "If available, upgrade your Gorilla Overlord for additional points." },
+      { t: "Train soldiers (main focus)", d: "Use training speedups and generic/universal speedups to train and promote troops. This is your #1 point source today. Promoting troop tiers often gives more points than direct training." },
+      { t: "Finish leftover buildings", d: "Use any remaining construction speedups. Unpack any leftover gift boxes. Building Power and Building Speed both score today." },
+      { t: "Finish leftover research", d: "Complete any remaining tech with spare speedups. Tech Power and Tech Speed both score today." },
+      { t: "Overlord upgrades (S2+)", d: "Use Overlord Shards, Guidebooks, Certificates, Bronze Badges, and Star Badges to level up your Overlord. All five item types score separately — use them all." },
     ],
     prep: [
       { t: "ACTIVATE SHIELD before sleeping", d: "This is the single most important prep. Put up a 24h shield Friday night. Saturday is combat day — enemies in other time zones WILL attack you while you sleep.", warn: true },
@@ -274,7 +274,7 @@ const days = [
       { t: "Arms Race overlap", d: "Troop training overlaps with Arms Race: Unit Progression. Synchronize!" },
       { t: "Don't send gatherers tonight", d: "Any squads on tiles Saturday morning are free kills for the enemy." },
     ],
-    points: ["Radar tasks", "Training speedups", "Troop power", "Building speedups", "Tech speedups", "Overlord (late)"]
+    points: ["Radar tasks", "Train Unit", "Train Speed", "Building Power/Speed", "Tech Power/Speed", "Generic speedups", "Overlord items (S2+)"]
   },
   {
     tab: "Sat", name: "Saturday", theme: "Enemy buster", value: "4 pts",
@@ -292,8 +292,8 @@ const days = [
       { t: "Check your shield!", d: "First thing: make sure your shield is active. Re-apply if needed." },
       { t: "Send UR Trucks", d: "Guaranteed points that don't depend on combat. Use Trade Contracts to refresh for orange trucks." },
       { t: "Complete all saved Secret Tasks", d: "Now is the time to finish starred legendary tasks you've been hoarding all week." },
-      { t: "Dump ALL remaining speedups", d: "Every type of speedup (healing, training, construction, tech, universal) earns points today. Use everything you have left." },
-      { t: "Fight the rival alliance", d: "Killing units of your VS opponent gives 5x more points than killing anyone else. Coordinate with your alliance on targets." },
+      { t: "Dump ALL remaining speedups", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories today. Use every last one you have." },
+      { t: "Kill enemy units", d: "Unit Killed scores directly — each kill earns points. Killing your VS opponent's units gives 5x more points than others. Coordinate attack waves with your alliance." },
     ],
     prep: [],
     tips: [
@@ -302,7 +302,7 @@ const days = [
       { t: "Last-minute push tactic", d: "If facing a stronger foe, save all resources until the last minutes before reset for one massive push. It keeps them guessing." },
       { t: "DO NOT gather resources", d: "Never send troops to tiles on Saturday. They will be destroyed and you'll gift the enemy free points." },
     ],
-    points: ["UR Trucks", "Secret Tasks", "ALL speedups", "Enemy kills (5x for VS)", "Own troop losses"]
+    points: ["UR Trucks", "Legend Tasks", "Building Speed", "Tech Speed", "Train Speed", "Healing Speed", "Generic speedups", "Unit Kills (5x vs VS)"]
   }
 ];
 
