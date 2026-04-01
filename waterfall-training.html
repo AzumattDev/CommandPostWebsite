@@ -90,6 +90,19 @@ details[open].glossary summary::before { transform: rotate(90deg); }
 .tip-box { background: var(--blue-bg); border: 1px solid rgba(96,165,250,0.2); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.15rem; margin-bottom: 1rem; }
 .tip-box h3 { font-size: 0.9rem; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
 .tip-box p { font-size: 0.85rem; color: var(--text2); }
+.wf-diag { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.15rem; margin-top: 1rem; overflow-x: auto; }
+.wfd-row-lbl { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.wfd-cols { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; min-width: 360px; margin-bottom: 10px; }
+.wfd-col { border-radius: 7px; overflow: hidden; border: 1px solid; }
+.wfd-col-head { padding: 6px 8px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; }
+.wfd-col-body { padding: 8px 6px; text-align: center; background: var(--surface); }
+.wfd-col-tier { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; }
+.wfd-col-sub { font-size: 0.62rem; color: var(--text3); margin-top: 2px; }
+.wfd-cascade { display: flex; align-items: stretch; gap: 4px; min-width: 360px; }
+.wfd-cas-step { flex: 1; border-radius: 7px; padding: 8px 4px; text-align: center; border: 1px solid; min-width: 0; }
+.wfd-cas-tier { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; }
+.wfd-cas-lbl { font-size: 0.6rem; margin-top: 3px; opacity: 0.75; }
+.wfd-cas-arrow { display: flex; align-items: center; color: var(--accent); font-size: 1rem; flex-shrink: 0; padding: 0 1px; }
 </style>
 </head>
 <body>
@@ -251,6 +264,12 @@ details[open].glossary summary::before { transform: rotate(90deg); }
         <h4>Your next move</h4>
         <div id="result-content"></div>
       </div>
+      <div class="wf-diag" id="wf-diag">
+        <div class="wfd-row-lbl" style="color:var(--text3)">All week — train in all barracks</div>
+        <div class="wfd-cols" id="wfd-cols"></div>
+        <div class="wfd-row-lbl" style="color:var(--accent)">VS Day (Total Mobilization) — cascade</div>
+        <div class="wfd-cascade" id="wfd-cascade"></div>
+      </div>
     </div>
   </div>
 
@@ -382,6 +401,41 @@ function calculate() {
   html += `<div class="result-row"><span class="result-label">Closest rung</span><span class="result-val purple">Rung ${closestRung}</span></div>`;
 
   document.getElementById('result-content').innerHTML = html;
+  renderDiagram(levels, tiers, trainTier);
+}
+
+function renderDiagram(levels, tiers, trainTier) {
+  const CC = ['rgba(251,191,36,.12)','rgba(249,115,22,.12)','rgba(239,68,68,.12)','rgba(185,28,28,.12)'];
+  const CB = ['rgba(251,191,36,.35)','rgba(249,115,22,.35)','rgba(239,68,68,.35)','rgba(185,28,28,.35)'];
+  const CT = ['#fbbf24','#f97316','#ef4444','#dc2626'];
+
+  let cols = '';
+  for (let i = 0; i < 4; i++) {
+    cols += `<div class="wfd-col" style="border-color:${CB[i]}">
+      <div class="wfd-col-head" style="background:${CC[i]};color:${CT[i]}">B${i+1} &middot; L${levels[i]}</div>
+      <div class="wfd-col-body">
+        <div class="wfd-col-tier" style="color:${CT[i]}">${trainTier}</div>
+        <div class="wfd-col-sub">train all week</div>
+      </div>
+    </div>`;
+  }
+
+  let cascade = `<div class="wfd-cas-step" style="background:${CC[0]};border-color:${CB[0]}">
+    <div class="wfd-cas-tier" style="color:${CT[0]}">${trainTier}</div>
+    <div class="wfd-cas-lbl" style="color:${CT[0]}">L${levels[0]} &mdash; trains</div>
+  </div>`;
+  for (let i = 1; i < 4; i++) {
+    if (tiers[i] !== tiers[i - 1]) {
+      cascade += `<div class="wfd-cas-arrow">&rarr;</div>
+      <div class="wfd-cas-step" style="background:${CC[i]};border-color:${CB[i]}">
+        <div class="wfd-cas-tier" style="color:${CT[i]}">${tiers[i-1]}&rarr;${tiers[i]}</div>
+        <div class="wfd-cas-lbl" style="color:${CT[i]}">L${levels[i]} &mdash; upgrades</div>
+      </div>`;
+    }
+  }
+
+  document.getElementById('wfd-cols').innerHTML = cols;
+  document.getElementById('wfd-cascade').innerHTML = cascade;
 }
 
 loadInputs();
