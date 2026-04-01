@@ -24,7 +24,8 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .score-bar { display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap; }
 .score-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; text-align: center; flex: 1; min-width: 80px; }
 .score-chip .day { font-size: 0.75rem; color: var(--text3); font-weight: 500; }
-.score-chip .pts { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin-top: 2px; }
+.score-chip .chip-theme { font-size: 0.58rem; color: var(--text3); margin-top: 1px; line-height: 1.2; opacity: 0.7; }
+.score-chip .pts { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin-top: 3px; }
 .pts-1 { color: var(--blue); }
 .pts-2 { color: var(--accent); }
 .pts-4 { color: var(--red); }
@@ -89,13 +90,13 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
   <p class="subtitle">Last War: Survival — What to do today, what to prepare for tomorrow (Mon–Sat)</p>
 
   <div class="score-bar">
-    <div class="score-chip"><div class="day">Sun</div><div class="pts pts-0">Prep</div></div>
-    <div class="score-chip"><div class="day">Mon</div><div class="pts pts-1">1 pt</div></div>
-    <div class="score-chip"><div class="day">Tue</div><div class="pts pts-2">2 pts</div></div>
-    <div class="score-chip"><div class="day">Wed</div><div class="pts pts-2">2 pts</div></div>
-    <div class="score-chip"><div class="day">Thu</div><div class="pts pts-2">2 pts</div></div>
-    <div class="score-chip"><div class="day">Fri</div><div class="pts pts-2">2 pts</div></div>
-    <div class="score-chip"><div class="day">Sat</div><div class="pts pts-4">4 pts</div></div>
+    <div class="score-chip"><div class="day">Sun</div><div class="chip-theme">Prep Day</div><div class="pts pts-0">—</div></div>
+    <div class="score-chip"><div class="day">Mon</div><div class="chip-theme">Radar Training</div><div class="pts pts-1">1 pt</div></div>
+    <div class="score-chip"><div class="day">Tue</div><div class="chip-theme">Base Expansion</div><div class="pts pts-2">2 pts</div></div>
+    <div class="score-chip"><div class="day">Wed</div><div class="chip-theme">Age of Science</div><div class="pts pts-2">2 pts</div></div>
+    <div class="score-chip"><div class="day">Thu</div><div class="chip-theme">Train Heroes</div><div class="pts pts-2">2 pts</div></div>
+    <div class="score-chip"><div class="day">Fri</div><div class="chip-theme">Total Mobilization</div><div class="pts pts-2">2 pts</div></div>
+    <div class="score-chip"><div class="day">Sat</div><div class="chip-theme">Enemy Buster</div><div class="pts pts-4">4 pts</div></div>
   </div>
 
   <div class="golden-rules">
@@ -131,7 +132,7 @@ const days = [
     points: []
   },
   {
-    tab: "Mon", name: "Monday", theme: "Radar & Drone day", value: "1 pt",
+    tab: "Mon", name: "Monday", theme: "Day 1 — Radar Training", value: "1 pt",
     icons: [
       {img:'radartask.png', label:'Radar Task'},
       {img:'stamina_green.png', label:'Stamina'},
@@ -164,7 +165,7 @@ const days = [
     points: ["Radar tasks", "Stamina", "Hero XP", "Drone Data", "Drone Parts", "Gather Gold/Iron/Food", "Chip Chests"]
   },
   {
-    tab: "Tue", name: "Tuesday", theme: "Base building day", value: "2 pts",
+    tab: "Tue", name: "Tuesday", theme: "Day 2 — Base Expansion", value: "2 pts",
     icons: [
       {img:'buildingpower.png', label:'Building Power'},
       {img:'buildingspeed.png', label:'Building Speed'},
@@ -195,7 +196,7 @@ const days = [
     points: ["Building Power", "Building Speed", "Generic speedups", "UR Trucks", "Legend Tasks", "Survivor Recruits"]
   },
   {
-    tab: "Wed", name: "Wednesday", theme: "Research & tech day", value: "2 pts",
+    tab: "Wed", name: "Wednesday", theme: "Day 3 — Age of Science", value: "2 pts",
     icons: [
       {img:'radartask.png', label:'Radar Task'},
       {img:'techpower.png', label:'Tech Power'},
@@ -226,7 +227,7 @@ const days = [
     points: ["Radar tasks", "Tech Power", "Tech Speed", "Generic speedups", "Valor Badges", "Drone Component Chests"]
   },
   {
-    tab: "Thu", name: "Thursday", theme: "Hero training day", value: "2 pts",
+    tab: "Thu", name: "Thursday", theme: "Day 4 — Train Heroes", value: "2 pts",
     icons: [
       {img:'herorecruitticket.png', label:'Hero Recruit'},
       {img:'heroxp.png', label:'Hero XP'},
@@ -255,7 +256,7 @@ const days = [
     points: ["Hero Recruit", "Hero XP", "Hero Shards", "Skill Medals", "Weapon Shards (S1+)"]
   },
   {
-    tab: "Fri", name: "Friday", theme: "Total mobilization", value: "2 pts",
+    tab: "Fri", name: "Friday", theme: "Day 5 — Total Mobilization", value: "2 pts",
     icons: [
       {img:'radartask.png', label:'Radar Task'},
       {img:'buildingpower.png', label:'Building Power'},
@@ -292,7 +293,7 @@ const days = [
     points: ["Radar tasks", "Train Unit", "Train Speed", "Building Power/Speed", "Tech Power/Speed", "Generic speedups", "Overlord items (S2+)"]
   },
   {
-    tab: "Sat", name: "Saturday", theme: "Enemy buster — 4 pts", value: "4 pts",
+    tab: "Sat", name: "Saturday", theme: "Day 6 — Enemy Buster", value: "4 pts",
     icons: [
       {img:'urtruck.png', label:'UR Truck'},
       {img:'legendtask.png', label:'Legend Task'},
