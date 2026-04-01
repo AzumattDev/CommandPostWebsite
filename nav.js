@@ -93,5 +93,11 @@ NAV_LINKS.forEach(item => {
 });
 navHTML += `</div>`;
 
-document.body.insertAdjacentHTML('afterbegin', navHTML);
+if (document.body) {
+  document.body.insertAdjacentHTML('afterbegin', navHTML);
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.insertAdjacentHTML('afterbegin', navHTML);
+  });
+}
 })();
