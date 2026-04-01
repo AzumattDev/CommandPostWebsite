@@ -68,6 +68,13 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .gr-text { font-size: 0.85rem; color: var(--text2); }
 .gr-text strong { color: var(--text); font-weight: 600; }
 
+.icons-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; }
+.icon-item { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 62px; text-align: center; }
+.icon-item img { width: 48px; height: 48px; object-fit: contain; }
+.icon-label { font-size: 0.63rem; color: var(--text2); line-height: 1.2; word-break: break-word; }
+.icon-note { font-size: 0.57rem; color: var(--text3); }
+.icon-missing { width: 48px; height: 48px; background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px; }
+
 @media (max-width: 500px) {
   .tabs { gap: 3px; }
   .tab { padding: 7px 10px; font-size: 0.8rem; }
@@ -107,6 +114,7 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 const days = [
   {
     tab: "Sun", name: "Sunday", theme: "Preparation day", value: null,
+    icons: [],
     today: [
       { t: "Stack radar tasks", d: "Complete radar missions but DO NOT claim rewards. Leave them pending (red dots). Aim to reach near-limit (e.g. 34/35) by Monday morning." },
       { t: "Send squads to gather", d: "Send all squads to resource tiles (gold is worth the most). Time it so they return AFTER the daily server reset on Monday — check the gathering timer carefully." },
@@ -123,6 +131,17 @@ const days = [
   },
   {
     tab: "Mon", name: "Monday", theme: "Radar training", value: "1 pt",
+    icons: [
+      {img:'radartask.png', label:'Radar Task'},
+      {img:'stamina_green.png', label:'Stamina'},
+      {img:'heroxp.png', label:'Hero XP'},
+      {img:'dronedata.png', label:'Drone Data'},
+      {img:'dronepart.png', label:'Drone Part'},
+      {img:'gathergold.png', label:'Gather Gold'},
+      {img:'gatheriron.png', label:'Gather Iron'},
+      {img:'gatherfood.png', label:'Gather Food'},
+      {img:'chipchests.png', label:'Chip Chest', note:'Day 85+'},
+    ],
     today: [
       { t: "Claim all stacked radar rewards", d: "Immediately collect every pending radar task you saved from Sunday. Massive point burst right at the start." },
       { t: "Spend ALL stamina", d: "Use stamina on radar missions, attacks, and rallies. Overlaps with Arms Race: Drone Upgrade for double rewards." },
@@ -142,6 +161,14 @@ const days = [
   },
   {
     tab: "Tue", name: "Tuesday", theme: "Base expansion", value: "2 pts",
+    icons: [
+      {img:'buildingpower.png', label:'Building Power'},
+      {img:'buildingspeed.png', label:'Building Speed'},
+      {img:'genericspeed.png', label:'Generic Speed'},
+      {img:'urtruck.png', label:'UR Truck'},
+      {img:'legendtask.png', label:'Legend Task'},
+      {img:'survivorticket.png', label:'Survivor Recruit'},
+    ],
     today: [
       { t: "Finish buildings with speedups", d: "Use building speedups (including universal) to complete all queued constructions. Aim for 10–14 days' worth of speedups across 2–3 major buildings." },
       { t: "Unpack gift-boxed buildings", d: "Open any buildings you left in the 'gift' state. Increasing building power = big points." },
@@ -162,6 +189,14 @@ const days = [
   },
   {
     tab: "Wed", name: "Wednesday", theme: "Age of science", value: "2 pts",
+    icons: [
+      {img:'radartask.png', label:'Radar Task'},
+      {img:'techpower.png', label:'Tech Power'},
+      {img:'techspeed.png', label:'Tech Speed'},
+      {img:'genericspeed.png', label:'Generic Speed'},
+      {img:'valorbadge.png', label:'Valor Badge'},
+      {img:'dronechest.png', label:'Drone Chest'},
+    ],
     today: [
       { t: "Claim stacked radar rewards", d: "Collect all the radar tasks you've been saving since Monday — instant point injection." },
       { t: "Finish research with speedups", d: "Spend tech research speedups (and universal) to complete technologies. Don't hold completed research — it blocks your Tech Center." },
@@ -181,6 +216,13 @@ const days = [
   },
   {
     tab: "Thu", name: "Thursday", theme: "Train heroes", value: "2 pts",
+    icons: [
+      {img:'herorecruitticket.png', label:'Hero Recruit'},
+      {img:'heroxp.png', label:'Hero XP'},
+      {img:'heroshards.png', label:'Hero Shard'},
+      {img:'skillmedal.png', label:'Skill Medal'},
+      {img:'weaponshard.png', label:'Weapon Shard', note:'From S1'},
+    ],
     today: [
       { t: "Use ALL Hero XP", d: "Level up your heroes with the entire week's stock of XP items. Overlaps with Arms Race: Hero Upgrade." },
       { t: "Use Hero Shards (UR/SSR/SR)", d: "Promote hero stars. Includes Universal Shards and Overlord Universal Shards." },
@@ -201,6 +243,21 @@ const days = [
   },
   {
     tab: "Fri", name: "Friday", theme: "Total mobilization", value: "2 pts",
+    icons: [
+      {img:'radartask.png', label:'Radar Task'},
+      {img:'buildingpower.png', label:'Building Power'},
+      {img:'buildingspeed.png', label:'Building Speed'},
+      {img:'techpower.png', label:'Tech Power'},
+      {img:'techspeed.png', label:'Tech Speed'},
+      {img:'trainunit.png', label:'Train Unit'},
+      {img:'trainspeed.png', label:'Train Speed'},
+      {img:'genericspeed.png', label:'Generic Speed'},
+      {img:'overlordshard.png', label:'Overlord Shard', note:'From S2'},
+      {img:'overlordgbook.png', label:'Overlord GBook', note:'From S2'},
+      {img:'overlordcert.png', label:'Overlord Cert', note:'From S2'},
+      {img:'overlordbbadge.png', label:'Overlord BBadge', note:'From S2'},
+      {img:'overlordsbadge.png', label:'Overlord SBadge', note:'From S2'},
+    ],
     today: [
       { t: "Claim stacked radar rewards", d: "Collect all radar tasks saved from Thursday." },
       { t: "Train soldiers (main focus)", d: "Use training speedups and universal speedups to train and promote troops. This is your #1 point source today. Promoting troop tiers often gives more points than direct training." },
@@ -221,6 +278,16 @@ const days = [
   },
   {
     tab: "Sat", name: "Saturday", theme: "Enemy buster", value: "4 pts",
+    icons: [
+      {img:'urtruck.png', label:'UR Truck'},
+      {img:'legendtask.png', label:'Legend Task'},
+      {img:'buildingspeed.png', label:'Building Speed'},
+      {img:'techspeed.png', label:'Tech Speed'},
+      {img:'trainspeed.png', label:'Train Speed'},
+      {img:'healingspeed.png', label:'Healing Speed'},
+      {img:'genericspeed.png', label:'Generic Speed'},
+      {img:'unitkilled.png', label:'Unit Killed'},
+    ],
     today: [
       { t: "Check your shield!", d: "First thing: make sure your shield is active. Re-apply if needed." },
       { t: "Send UR Trucks", d: "Guaranteed points that don't depend on combat. Use Trade Contracts to refresh for orange trucks." },
@@ -256,6 +323,22 @@ function render() {
       html += `<span class="day-value ${vc}">${d.value}</span>`;
     }
     html += `</div><hr class="rule">`;
+
+    if (d.icons && d.icons.length) {
+      html += `<div class="icons-grid">`;
+      d.icons.forEach(ic => {
+        html += `<div class="icon-item">`;
+        if (ic.img) {
+          html += `<img src="images/allianceduel/${ic.img}" alt="${ic.label}" loading="lazy">`;
+        } else {
+          html += `<div class="icon-missing"></div>`;
+        }
+        html += `<span class="icon-label">${ic.label}</span>`;
+        if (ic.note) html += `<span class="icon-note">${ic.note}</span>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
 
     if (d.today.length) {
       html += `<div class="section"><span class="section-label label-today">${d.value ? 'Do today' : 'Do today (no points yet)'}</span>`;
