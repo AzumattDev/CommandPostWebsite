@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Last War: Survival — Drone Upgrade Priority Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
 <style>
 :root{--bg:#0e0f13;--surface:#16171d;--surface2:#1e1f27;--border:#2a2b36;--text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;--accent:#a78bfa;--accent-bg:rgba(167,139,250,.08);--green:#34d399;--green-bg:rgba(52,211,153,.08);--green-border:rgba(52,211,153,.25);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.08);--amber-border:rgba(251,191,36,.25);--red:#f87171;--red-bg:rgba(248,113,113,.06);--blue:#60a5fa;--blue-bg:rgba(96,165,250,.08);--blue-border:rgba(96,165,250,.25);--cyan:#22d3ee;--cyan-bg:rgba(34,211,238,.08);--cyan-border:rgba(34,211,238,.25);--radius:10px;--radius-lg:14px}
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
 h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.subtitle{color:var(--text2);font-size:.95rem;margin-bottom:2rem}
 h2{font-size:1.15rem;font-weight:600;margin-bottom:.75rem}.section{margin-bottom:2.5rem}.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-bottom:10px}.card h3{font-size:.95rem;font-weight:600;margin-bottom:4px}.card p{font-size:.88rem;color:var(--text2);line-height:1.65}
@@ -18,17 +19,14 @@ h2{font-size:1.15rem;font-weight:600;margin-bottom:.75rem}.section{margin-bottom
 .label-tip{background:var(--cyan-bg);color:var(--cyan);border:1px solid var(--cyan-border)}
 .label-warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
 .mono{font-family:'JetBrains Mono',monospace;font-size:.82rem}
-/* Systems overview */
 .sys-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}@media(max-width:500px){.sys-grid{grid-template-columns:1fr}}
 .sys-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
 .sys-card h3{font-size:.92rem;font-weight:600;margin-bottom:4px}.sys-card p{font-size:.82rem;color:var(--text2)}
 .sys-card .sys-icon{font-size:1.3rem;margin-bottom:6px}
-/* Milestone timeline */
 .milestones{position:relative;padding-left:28px;margin-bottom:1.5rem}.milestones::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
 .ms-item{position:relative;margin-bottom:1.25rem}.ms-dot{position:absolute;left:-24px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--green);background:var(--green-bg)}
 .ms-dot.major{border-color:var(--amber);background:var(--amber-bg)}.ms-lvl{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;color:var(--green)}
 .ms-lvl.major{color:var(--amber)}.ms-text{font-size:.85rem;color:var(--text2)}.ms-text strong{color:var(--text)}
-/* Chip types */
 .chip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}@media(max-width:500px){.chip-grid{grid-template-columns:1fr}}
 .chip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
 .chip-name{font-size:.95rem;font-weight:600;margin-bottom:4px}.chip-desc{font-size:.82rem;color:var(--text2)}.chip-prio{font-size:.75rem;font-weight:600;margin-top:6px;padding:2px 8px;border-radius:4px;display:inline-block}

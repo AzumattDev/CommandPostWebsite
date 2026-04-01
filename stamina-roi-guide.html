@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stamina & Resource ROI — The Command Post</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{
+  --bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838;--border2:#31334a;
+  --text:#e8e6f0;--text2:#9d9baf;--text3:#6b6980;
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,.08);
+  --green:#34d399;--green-bg:rgba(52,211,153,.06);--green-border:rgba(52,211,153,.25);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,.06);--amber-border:rgba(251,191,36,.25);
+  --red:#f87171;--red-bg:rgba(248,113,113,.06);
+  --blue:#60a5fa;--blue-bg:rgba(96,165,250,.06);--blue-border:rgba(96,165,250,.25);
+  --cyan:#22d3ee;--cyan-bg:rgba(34,211,238,.06);
+  --radius:10px;--radius-lg:14px;
+}
+.container{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.25rem;
+  background:linear-gradient(135deg,var(--amber),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.92rem;margin-bottom:2rem}
+h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
+.section{margin-bottom:2.5rem}
+.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.82rem}
+
+.decision-tool{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem}
+.decision-title{font-family:'Chakra Petch',sans-serif;font-size:1rem;font-weight:600;color:var(--amber);margin-bottom:1.25rem}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-of-type{border-bottom:none;padding-bottom:0}
+.toggle-label{font-size:.9rem;color:var(--text2)}
+.toggle-label strong{color:var(--text);font-weight:600}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:var(--text3);border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--green-bg);border-color:var(--green)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--green)}
+.select-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.styled-select{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer}
+.styled-select:focus{outline:none;border-color:var(--amber)}
+.roi-output{margin-top:1.5rem;padding:1.25rem;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);text-align:center;transition:all .3s}
+.roi-output.tier-s{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)}
+.roi-output.tier-a{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3)}
+.roi-output.tier-b{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.3)}
+.roi-output.tier-c{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25)}
+.roi-output.tier-d{background:var(--surface2);border-color:var(--border)}
+.roi-tier-label{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.roi-main{font-family:'Chakra Petch',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.roi-detail{font-size:.85rem;color:var(--text2);line-height:1.65;max-width:540px;margin:0 auto}
+
+.tier-list{margin-bottom:1.5rem}
+.tier-row{display:flex;gap:10px;margin-bottom:8px}
+.tier-badge{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700;width:34px;min-width:34px;text-align:center;display:flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 2px}
+.tier-cards{display:flex;flex-direction:column;gap:5px;flex:1}
+.tier-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px}
+.tier-item-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;gap:8px}
+.tier-item-name{font-size:.9rem;font-weight:600}
+.tier-item-cost{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);white-space:nowrap}
+.tier-item-desc{font-size:.82rem;color:var(--text2);line-height:1.55}
+.ts{color:var(--green)}.ta{color:var(--blue)}.tb{color:var(--purple)}.tc{color:var(--amber)}.td{color:var(--text3)}.tf{color:var(--red)}
+.tier-s .tier-item{background:rgba(52,211,153,.04);border-color:rgba(52,211,153,.15)}
+.tier-a .tier-item{background:rgba(96,165,250,.04);border-color:rgba(96,165,250,.15)}
+.tier-b .tier-item{background:rgba(167,139,250,.04);border-color:rgba(167,139,250,.15)}
+.tier-c .tier-item{background:rgba(251,191,36,.03);border-color:rgba(251,191,36,.12)}
+.tier-f .tier-item{background:rgba(248,113,113,.03);border-color:rgba(248,113,113,.12)}
+
+.calc-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+.calc-title{font-family:'Chakra Petch',sans-serif;font-size:.95rem;font-weight:600;color:var(--amber);margin-bottom:1.25rem}
+.calc-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:560px){.calc-fields{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.field select,.field input{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88rem}
+.field select:focus,.field input:focus{outline:none;border-color:var(--amber)}
+.check-row{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--text2);padding:6px 0}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.income-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:1.25rem}
+.income-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem;text-align:center}
+.income-card .iv{font-family:'Chakra Petch',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:2px}
+.income-card .il{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+
+.cost-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1.5rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.cost-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+.cost-table td{padding:9px 12px;border-top:1px solid var(--border)}
+.cost-good{color:var(--green);font-weight:600}.cost-bad{color:var(--red);font-weight:600}.cost-med{color:var(--amber);font-weight:600}
+
+.week-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:1.5rem}
+@media(max-width:540px){.week-cal{grid-template-columns:repeat(4,1fr)}}
+.cal-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 4px;text-align:center}
+.cal-day .cd-name{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.cal-day .cd-action{font-size:.68rem;font-weight:600;padding:2px 5px;border-radius:3px;display:inline-block;margin-bottom:4px}
+.cal-day .cd-note{font-size:.63rem;color:var(--text3);line-height:1.35}
+.action-spend{background:rgba(52,211,153,.12);color:var(--green)}
+.action-save{background:rgba(248,113,113,.08);color:var(--red)}
+.action-mix{background:rgba(251,191,36,.1);color:var(--amber)}
+.action-prep{background:rgba(96,165,250,.08);color:var(--blue)}
+
+.tip-box{background:var(--green-bg);border:1px solid var(--green-border);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.tip-box h3{font-size:.9rem;font-weight:600;color:var(--green);margin-bottom:4px}
+.tip-box p{font-size:.85rem;color:var(--text2)}
+.warn-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid var(--red);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.15rem;margin-bottom:1rem}
+.warn-box h3{font-size:.9rem;font-weight:600;color:var(--red);margin-bottom:4px}
+.warn-box p{font-size:.85rem;color:var(--text2)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-bottom:10px}
+.card h3{font-size:.95rem;font-weight:600;margin-bottom:4px}
+.card p{font-size:.88rem;color:var(--text2);line-height:1.65}
+
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+@media(max-width:540px){.rules-grid{grid-template-columns:1fr}}
+.rule-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem}
+.rule-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--amber);font-weight:600;margin-bottom:4px}
+.rule-card h3{font-size:.88rem;font-weight:600;margin-bottom:3px}
+.rule-card p{font-size:.82rem;color:var(--text2);line-height:1.55}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Stamina &amp; Resource ROI</h1>
+<p class="subtitle">Last War: Survival — Where to spend stamina for maximum return. Tier list, decision tool, income calculator.</p>
+
+<div class="section">
+  <h2>Should I spend stamina right now?</h2>
+  <div class="decision-tool">
+    <div class="decision-title">⚡ Live ROI Calculator — toggle your current situation</div>
+
+    <div class="toggle-row">
+      <span class="toggle-label"><strong>Zombie Invasion</strong> is currently active</span>
+      <label class="toggle"><input type="checkbox" id="tog-zombie" onchange="evalROI()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label"><strong>Arms Race — Drone Boost</strong> phase is active now</span>
+      <label class="toggle"><input type="checkbox" id="tog-arms" onchange="evalROI()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="select-row">
+      <span class="toggle-label">Today's <strong>Alliance Duel</strong> day</span>
+      <select class="styled-select" id="sel-duel" onchange="evalROI()">
+        <option value="none">No Duel / Not sure</option>
+        <option value="sun">Sunday — Prep day</option>
+        <option value="mon">Monday — Radar Training (1 pt)</option>
+        <option value="tue">Tuesday — Base Expansion (2 pts)</option>
+        <option value="wed">Wednesday — Age of Science (2 pts)</option>
+        <option value="thu">Thursday — Train Heroes (2 pts)</option>
+        <option value="fri">Friday — Total Mobilization (2 pts)</option>
+        <option value="sat">Saturday — Enemy Buster (4 pts)</option>
+      </select>
+    </div>
+
+    <div class="roi-output tier-d" id="roi-output">
+      <div class="roi-tier-label" style="color:var(--text3)">D-Tier ROI</div>
+      <div class="roi-main" style="color:var(--text3)">Hold Off — Save for Events</div>
+      <div class="roi-detail">No major event is active. Spending stamina now earns minimal return. Stay under 120 for passive regen but hold stamina items for the next event window.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Stamina ROI tier list</h2>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1.25rem;">Where every stamina point gives the most return — ranked by community consensus.</p>
+
+  <div class="tier-list">
+    <div class="tier-row tier-s">
+      <div class="tier-badge ts">S</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Zombie Invasion — Regular Zombie Attack</span>
+            <span class="tier-item-cost">10 stamina</span>
+          </div>
+          <div class="tier-item-desc">10 stamina → 10 Courage Medals + resources every kill. Medals exchange for hero shards, weapon shards, drone parts, and more stamina — a self-compounding loop. Best regular event in the game. Save 1,000–2,000+ stamina for this.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Arms Race — Drone Boost Phase</span>
+            <span class="tier-item-cost">0 + Battle Data</span>
+          </div>
+          <div class="tier-item-desc">Every stamina point spent AND every 10 Battle Data used in the Drone Center both earn Arms Race event points during the 4-hour Drone Boost window. The phase rotates daily — check your Arms Race tab for timing.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Triple-Dip Window</span>
+            <span class="tier-item-cost">rare overlap</span>
+          </div>
+          <div class="tier-item-desc">When Zombie Invasion, Arms Race Drone Boost, and Alliance Duel Day 1 or Day 6 all align simultaneously — this is the single highest ROI moment in the game. Every stamina point earns Courage Medals, Arms Race points, AND Duel points at once.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier-row tier-a">
+      <div class="tier-badge ta">A</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Alliance Duel — Saturday (Enemy Buster)</span>
+            <span class="tier-item-cost">4 pts/day</span>
+          </div>
+          <div class="tier-item-desc">Worth 4 Duel points vs. 1–2 for other days. Kills against your VS opponent yield 5× more points than other targets. Coordinate attacks with your alliance. Dump remaining speedups and complete secret tasks here too.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Alliance Duel — Monday (Radar Training)</span>
+            <span class="tier-item-cost">1 pt/day</span>
+          </div>
+          <div class="tier-item-desc">Claim all radar rewards you stacked on Sunday, spend stamina on missions and attacks. Also the best day for Drone Parts, Battle Data, and chip chests. Often overlaps with Arms Race Drone Boost phase.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Zombie Invasion — Boss Rally (Join)</span>
+            <span class="tier-item-cost">0 stamina to join</span>
+          </div>
+          <div class="tier-item-desc">Joining someone else's Zombie Invasion boss rally costs zero stamina and yields roughly half the boss rewards. The best stamina-per-reward ratio in the game. If your alliance has active organizers, you can farm medals almost for free.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier-row tier-b">
+      <div class="tier-badge tb">B</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Daily Combat Radar Missions (skull icon)</span>
+            <span class="tier-item-cost">10–20 stamina</span>
+          </div>
+          <div class="tier-item-desc">Rebel base attacks, elite kills, and Doom Walker missions drop Hero EXP books. Legendary (orange) and purple difficulty missions give the best rewards. Free radar mission types (treasure, survivor, drone parts) cost zero — always complete those first.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Spec Ops / Honorable Campaign</span>
+            <span class="tier-item-cost">stamina</span>
+          </div>
+          <div class="tier-item-desc">Best early-game hero EXP per stamina before Stage 30. Golden EXP medals from Honorable Campaign can instantly level a hero. Value drops once you have strong passive EXP sources (arena, training base).</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Alliance Duel — Wednesday/Friday</span>
+            <span class="tier-item-cost">2 pts/day</span>
+          </div>
+          <div class="tier-item-desc">Wednesday (Age of Science) and Friday (Total Mobilization) both reward moderate stamina use via radar missions and combat tasks. Not peak value but worth spending if you're near a chest threshold.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier-row tier-c">
+      <div class="tier-badge tc">C</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Capital War / Server Wars</span>
+            <span class="tier-item-cost">varies</span>
+          </div>
+          <div class="tier-item-desc">PvP combat events require heavy stamina investment. ROI depends heavily on your server's competitive balance and alliance coordination. High floor for top alliances, marginal for mid-tier.</div>
+        </div>
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Alliance Duel — Tuesday/Thursday (non-stamina days)</span>
+            <span class="tier-item-cost">save stamina</span>
+          </div>
+          <div class="tier-item-desc">Tuesday (Base Expansion) and Thursday (Train Heroes) are speedup/resource days. Stamina use doesn't directly drive their point categories. Save stamina for Saturday or the next Zombie Invasion window.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier-row">
+      <div class="tier-badge td">D</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Random zombie kills outside events</span>
+            <span class="tier-item-cost">10 stamina</span>
+          </div>
+          <div class="tier-item-desc">Kills zombies without Zombie Invasion event multipliers. No Courage Medal income, no event point bonus. Strictly inferior to waiting. Only acceptable if your stamina is about to cap and no event is imminent.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier-row tier-f">
+      <div class="tier-badge tf">F</div>
+      <div class="tier-cards">
+        <div class="tier-item">
+          <div class="tier-item-top">
+            <span class="tier-item-name">Stamina bar purchase (diamond refill)</span>
+            <span class="tier-item-cost">1,000+ 💎 / 100 stamina</span>
+          </div>
+          <div class="tier-item-desc">10 diamonds per stamina point on the first purchase — 8× worse than the VIP store (1.2 diamonds/stamina). Escalates with each purchase in the same day. Never buy this unless it's a genuine emergency during a triple-dip event window.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Stamina income calculator</h2>
+  <div class="calc-panel">
+    <div class="calc-title">📊 How much stamina do you actually earn per week?</div>
+    <div class="calc-fields">
+      <div class="field">
+        <label>Login frequency</label>
+        <select id="login-style" onchange="calcIncome()">
+          <option value="casual">Casual (1–2 logins/day)</option>
+          <option value="moderate">Moderate (3–5 logins/day)</option>
+          <option value="dedicated" selected>Dedicated (every 2–3 hours)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Free daily claims (2 × 50 stamina)</label>
+        <select id="free-claims" onchange="calcIncome()">
+          <option value="both" selected>Both claims every day</option>
+          <option value="once">One claim per day</option>
+          <option value="never">Never claim</option>
+        </select>
+      </div>
+    </div>
+    <label class="check-row">
+      <input type="checkbox" id="vip-store" checked onchange="calcIncome()">
+      Buy VIP Store stamina every Monday (250 stamina for 300 💎)
+    </label>
+    <div class="income-results">
+      <div class="income-card"><div class="iv" id="inc-daily" style="color:var(--amber)">424</div><div class="il">Avg daily stamina</div></div>
+      <div class="income-card"><div class="iv" id="inc-weekly" style="color:var(--green)">2,966</div><div class="il">Weekly total</div></div>
+      <div class="income-card"><div class="iv" id="inc-waste" style="color:var(--green)">0</div><div class="il">Weekly wasted (capped)</div></div>
+      <div class="income-card"><div class="iv" id="inc-vip" style="color:var(--cyan)">300 💎</div><div class="il">Weekly VIP cost</div></div>
+    </div>
+  </div>
+  <div class="tip-box">
+    <h3>The cap trap</h3>
+    <p>Passive regen stops the moment you hit 120 stamina. Going to sleep with your bar at 20 means waking up 8 hours later at exactly 116 — perfect. Going to sleep at 130 means waking up at 130 — 96 stamina regen completely lost.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Cost comparison — stamina sources</h2>
+  <table class="cost-table">
+    <thead>
+      <tr><th>Source</th><th>Amount</th><th>Cost</th><th>💎 per stamina</th><th>Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Passive regen (always under 120)</td><td class="mono">288/day</td><td>Free</td><td class="cost-good">Free</td><td class="cost-good">Always take</td></tr>
+      <tr><td>Free daily claims (2×)</td><td class="mono">100/day</td><td>Free (2 logins)</td><td class="cost-good">Free</td><td class="cost-good">Always take</td></tr>
+      <tr><td>VIP Store (weekly, Monday)</td><td class="mono">250/week</td><td>300 💎</td><td class="cost-good">1.2 💎</td><td class="cost-good">#1 priority buy</td></tr>
+      <tr><td>Zombie Invasion event store</td><td class="mono">varies</td><td>Courage Medals</td><td class="cost-good">Free (medals)</td><td class="cost-good">Buy first in store</td></tr>
+      <tr><td>Stamina bar — 1st purchase</td><td class="mono">100</td><td>1,000 💎</td><td class="cost-bad">10 💎</td><td class="cost-bad">Avoid</td></tr>
+      <tr><td>Stamina bar — 2nd+ purchase</td><td class="mono">100</td><td>Escalating</td><td class="cost-bad">10+ 💎</td><td class="cost-bad">Never</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Weekly spending calendar</h2>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Alliance Duel runs Monday–Saturday. This is your default weekly stamina rhythm.</p>
+  <div class="week-cal">
+    <div class="cal-day">
+      <div class="cd-name">Sun</div>
+      <div class="cd-action action-prep">Prep</div>
+      <div class="cd-note">Stack radar missions. Don't claim yet.</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Mon</div>
+      <div class="cd-action action-spend">Spend</div>
+      <div class="cd-note">Claim stacked radars. Dump stamina + Battle Data + Drone Parts.</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Tue</div>
+      <div class="cd-action action-save">Save</div>
+      <div class="cd-note">Building speedup day. Stack radar missions.</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Wed</div>
+      <div class="cd-action action-mix">Mix</div>
+      <div class="cd-note">Claim stacked radars. Spend Valor Badges. Moderate stamina.</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Thu</div>
+      <div class="cd-action action-save">Save</div>
+      <div class="cd-note">Hero XP/shards day. Stack radar missions.</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Fri</div>
+      <div class="cd-action action-prep">Prep</div>
+      <div class="cd-note">Claim stacked radars. Train troops. Shield up before sleep!</div>
+    </div>
+    <div class="cal-day">
+      <div class="cd-name">Sat</div>
+      <div class="cd-action action-spend">Spend</div>
+      <div class="cd-note">4-point day. Enemy kills. Dump ALL remaining resources.</div>
+    </div>
+  </div>
+  <div class="warn-box">
+    <h3>Override this calendar during Zombie Invasion</h3>
+    <p>When Zombie Invasion is active (every ~2 weeks), it trumps the Duel calendar for stamina. Spend aggressively on zombies regardless of what Duel day it is — Courage Medals have far more long-term value than standard Duel point sources.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Battle Data — timing guide</h2>
+  <div class="card">
+    <h3>What Battle Data does</h3>
+    <p>Battle Data is used in the Drone Center → Data Training (10 per use). Each use levels your Tactical Drone, providing passive combat bonuses to all squads. Unlike stamina, Battle Data has no regen — you spend it when you have it.</p>
+  </div>
+  <div class="card" style="border-color:rgba(52,211,153,.25)">
+    <h3>When to use Battle Data</h3>
+    <p><strong>Best time:</strong> During Arms Race Drone Boost phase — each 10 Battle Data spent earns Arms Race event points. <strong>Second best:</strong> Alliance Duel Day 1 (Monday, Radar Training) — the day specifically rewards drone activity. Outside these windows, using Battle Data is fine but earns no bonus points.</p>
+  </div>
+  <div class="card">
+    <h3>Where to get Battle Data</h3>
+    <p>Purple and orange (legendary) difficulty radar missions. Defeating Doom Elites on the world map. Exchanging campaign points. Special events. Do not hoard excessively — use it on the correct days rather than letting it sit.</p>
+  </div>
+  <div class="warn-box">
+    <h3>Don't train past a checkpoint without Drone Parts</h3>
+    <p>Every 5 drone levels hits a checkpoint requiring Drone Parts (scarce at higher levels). If you're approaching a checkpoint and don't have Parts, hold your Battle Data. Burning through Data to hit a checkpoint you can't pass wastes everything.</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <h2>Quick rules</h2>
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-num">01</div>
+      <h3>Stay under 120 — always</h3>
+      <p>Passive regen stops at 120. Wasting regen is equivalent to throwing away the VIP store purchase you paid for.</p>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">02</div>
+      <h3>VIP store stamina — every Monday</h3>
+      <p>250 stamina for 300 diamonds. 8× better value than the stamina bar. This is the first thing you buy from the store each week, no exceptions.</p>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">03</div>
+      <h3>Never spend stamina bar diamonds (usually)</h3>
+      <p>10 diamonds per stamina. Only acceptable if Zombie Invasion is active AND it's your last chance to hit a critical Courage Medal threshold.</p>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">04</div>
+      <h3>Rally join = free medals</h3>
+      <p>Joining a Zombie Invasion boss rally costs 0 stamina and nets ~half the rewards. Your alliance's most efficient stamina action.</p>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">05</div>
+      <h3>Free radar missions are always free</h3>
+      <p>Treasure digs, survivor rescues, drone parts collection — zero stamina. Complete every free radar mission type every day regardless of what events are active.</p>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">06</div>
+      <h3>Battle Data waits for Arms Race</h3>
+      <p>Using Battle Data outside Arms Race Drone Boost phase means leaving event points on the table. Hold it until the window opens.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function evalROI() {
+  const zombie = document.getElementById('tog-zombie').checked;
+  const arms   = document.getElementById('tog-arms').checked;
+  const duel   = document.getElementById('sel-duel').value;
+
+  let tier, title, detail;
+
+  if (zombie && arms && (duel === 'mon' || duel === 'sat')) {
+    tier = 's';
+    title = 'Triple-Dip — Spend EVERYTHING';
+    detail = 'Zombie Invasion + Arms Race Drone Boost + high-value Duel day are all active simultaneously. This is the rarest and highest ROI window in the game. Spend all stamina items, use all Battle Data, and kill every zombie in sight.';
+  } else if (zombie && arms) {
+    tier = 's';
+    title = 'S-Tier — Spend All Stamina + Battle Data';
+    detail = 'Zombie Invasion and Arms Race Drone Boost are both active. Every stamina point earns Courage Medals AND event points at the same time. Use all Battle Data in the Drone Center as well.';
+  } else if (zombie) {
+    tier = 's';
+    title = 'S-Tier — Zombie Event Active';
+    detail = '10 stamina → 10 Courage Medals + resources every kill. Spend freely. Medals compound: buy more stamina from the event exchange store and keep killing.';
+  } else if (arms) {
+    tier = 's';
+    title = 'S-Tier — Arms Race Drone Boost Active';
+    detail = 'Every stamina point and every 10 Battle Data used in the Drone Center earns event points. This window lasts 4 hours — maximize both stamina and Battle Data during it.';
+  } else if (duel === 'sat') {
+    tier = 'a';
+    title = 'A-Tier — Enemy Buster (4 pts)';
+    detail = 'Saturday Duel is the highest-point day (4 pts). Kills against your VS opponent earn 5× points. Dump all remaining speedups and secret tasks here too.';
+  } else if (duel === 'mon') {
+    tier = 'a';
+    title = 'A-Tier — Radar Training Day';
+    detail = 'Claim all stacked radar rewards from Sunday, then spend stamina on missions and attacks. Also the best day for Drone Parts, Battle Data, and drone chip chests.';
+  } else if (duel === 'wed' || duel === 'fri') {
+    tier = 'b';
+    title = 'B-Tier — Moderate Spend';
+    detail = 'Wednesday and Friday Duel days reward stamina use at moderate value. Run radar missions and complete combat tasks. Good for staying near chest thresholds.';
+  } else if (duel === 'sun') {
+    tier = 'b';
+    title = 'B-Tier — Prep Day';
+    detail = 'Complete radar missions today but do NOT claim them. Stack them for Monday\'s big claim burst. Send gathering squads timed to return after server reset Monday.';
+  } else if (duel === 'tue' || duel === 'thu') {
+    tier = 'c';
+    title = 'C-Tier — Save Stamina';
+    detail = 'Tuesday (buildings) and Thursday (heroes) don\'t primarily reward stamina use. Keep spending to maintain passive regen, but hold stamina items and tokens for Saturday or Zombie Invasion.';
+  } else {
+    tier = 'd';
+    title = 'D-Tier — Hold Off';
+    detail = 'No major event is active. Use stamina naturally to stay under 120 but don\'t spend stamina items or tokens. Save everything for the next event window.';
+  }
+
+  const colors = {s:'var(--green)',a:'var(--blue)',b:'var(--purple)',c:'var(--amber)',d:'var(--text3)'};
+  const labels = {s:'S-Tier ROI',a:'A-Tier ROI',b:'B-Tier ROI',c:'C-Tier ROI',d:'D-Tier ROI'};
+
+  const el = document.getElementById('roi-output');
+  el.className = `roi-output tier-${tier}`;
+  el.innerHTML = `
+    <div class="roi-tier-label" style="color:${colors[tier]}">${labels[tier]}</div>
+    <div class="roi-main" style="color:${colors[tier]}">${title}</div>
+    <div class="roi-detail">${detail}</div>
+  `;
+}
+
+function calcIncome() {
+  const style  = document.getElementById('login-style').value;
+  const claims = document.getElementById('free-claims').value;
+  const vip    = document.getElementById('vip-store').checked;
+
+  const hoursAtCap = {casual:4, moderate:1, dedicated:0}[style];
+  const claimAmt   = {both:100, once:50, never:0}[claims];
+
+  const weeklyRegen  = (24 - hoursAtCap) * 12 * 7;
+  const weeklyClaims = claimAmt * 7;
+  const weeklyVIP    = vip ? 250 : 0;
+  const weeklyWaste  = hoursAtCap * 12 * 7;
+  const weeklyTotal  = weeklyRegen + weeklyClaims + weeklyVIP;
+  const dailyAvg     = Math.round(weeklyTotal / 7);
+
+  document.getElementById('inc-daily').textContent = dailyAvg;
+  document.getElementById('inc-weekly').textContent = weeklyTotal.toLocaleString();
+
+  const wasteEl = document.getElementById('inc-waste');
+  wasteEl.textContent = weeklyWaste;
+  wasteEl.style.color = weeklyWaste > 0 ? 'var(--red)' : 'var(--green)';
+
+  const vipEl = document.getElementById('inc-vip');
+  vipEl.textContent = vip ? '300 💎' : '—';
+  vipEl.style.color  = vip ? 'var(--cyan)' : 'var(--text3)';
+}
+
+evalROI();
+calcIncome();
+</script>
+</body>
+</html>

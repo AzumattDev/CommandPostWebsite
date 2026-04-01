@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Last War: Survival — Squad Builder & Formation Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
 <style>
 :root {
   --bg: #0e0f13; --surface: #16171d; --surface2: #1e1f27; --surface3: #262730;
@@ -16,8 +17,6 @@
   --amber: #fbbf24; --amber-bg: rgba(251,191,36,0.08);
   --radius: 10px; --radius-lg: 14px;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
 .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
 h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--missile)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -26,7 +25,6 @@ h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
 .section { margin-bottom: 2.5rem; }
 .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 
-/* Counter Triangle */
 .counter-tri { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; }
 .tri-top { margin-bottom: 1.5rem; }
 .tri-bottom { display: flex; gap: 3rem; }
@@ -40,7 +38,6 @@ h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
 .tri-arrows { color: var(--text3); font-size: 0.8rem; margin-top: 4px; }
 .tri-legend { display: flex; gap: 1.5rem; margin-top: 1.25rem; font-size: 0.8rem; color: var(--text3); }
 
-/* Squad Tabs */
 .squad-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; }
 .sq-tab { flex: 1; padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text2); font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center; }
 .sq-tab:hover { background: var(--surface2); color: var(--text); }
@@ -48,7 +45,6 @@ h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
 .sq-tab.active-air { background: var(--air-bg); border-color: var(--air-border); color: var(--air); }
 .sq-tab.active-missile { background: var(--missile-bg); border-color: var(--missile-border); color: var(--missile); }
 
-/* Squad Content */
 .squad-panel { display: none; }
 .squad-panel.active { display: block; }
 .formation-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 12px; }
@@ -71,13 +67,11 @@ h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
 .form-notes { font-size: 0.82rem; color: var(--text3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .form-notes strong { color: var(--text2); }
 
-/* Buff table */
 .buff-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 1.5rem; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
 .buff-table th { text-align: left; padding: 10px 14px; background: var(--surface2); color: var(--text3); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .buff-table td { padding: 10px 14px; border-top: 1px solid var(--border); }
 .buff-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--green); }
 
-/* Timeline */
 .timeline { position: relative; padding-left: 28px; margin-bottom: 1.5rem; }
 .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
 .tl-item { position: relative; margin-bottom: 1.25rem; }

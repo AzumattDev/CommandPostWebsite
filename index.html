@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Last War: Survival — The Command Post</title>
 <meta name="description" content="Comprehensive interactive guides for Last War: Survival. Alliance Duel planner, waterfall training, squad formations, research paths, and more.">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
 :root {
   --bg: #0a0b0e; --bg2: #0e0f13; --surface: #14151b; --surface2: #1a1b23; --surface3: #22232e;
@@ -17,11 +17,7 @@
   --blue: #60a5fa; --blue-bg: rgba(96,165,250,.06);
   --cyan: #22d3ee; --cyan-bg: rgba(34,211,238,.06);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; overflow-x: hidden; }
 
-/* Background texture */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
@@ -34,7 +30,6 @@ body::before {
 
 .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
 
-/* Hero section */
 .hero { padding: 5rem 0 3.5rem; text-align: center; position: relative; }
 .hero-eyebrow {
   font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 500;
@@ -64,7 +59,6 @@ body::before {
 }
 .hero-stat .lbl { font-size: .78rem; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
 
-/* Section headers */
 .section-header {
   display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;
   padding-top: 2.5rem;
@@ -77,7 +71,6 @@ body::before {
   background: var(--surface); white-space: nowrap;
 }
 
-/* Guide cards */
 .guides-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px; margin-bottom: 2rem;
@@ -129,7 +122,6 @@ body::before {
 }
 .guide-card:hover .card-arrow { color: var(--text); transform: translateX(3px); }
 
-/* Color variants for icons/badges */
 .ic-purple { background: var(--purple-bg); border: 1px solid rgba(167,139,250,.2); color: var(--purple); }
 .ic-green { background: var(--green-bg); border: 1px solid rgba(52,211,153,.2); color: var(--green); }
 .ic-blue { background: var(--blue-bg); border: 1px solid rgba(96,165,250,.2); color: var(--blue); }
@@ -143,7 +135,6 @@ body::before {
 .bd-red { background: var(--red-bg); color: var(--red); }
 .bd-cyan { background: var(--cyan-bg); color: var(--cyan); }
 
-/* Footer */
 .footer {
   text-align: center; padding: 3rem 0 2rem; color: var(--text3); font-size: .82rem;
   border-top: 1px solid var(--border);
@@ -152,7 +143,6 @@ body::before {
 .footer a:hover { color: var(--green); }
 .footer-note { font-size: .72rem; color: var(--text3); margin-top: .5rem; opacity: .6; }
 
-/* Animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -182,13 +172,12 @@ body::before {
     <h1><span class="accent">The Command Post</span><br><span class="dim">Last War: Survival</span></h1>
     <p class="hero-sub">Interactive guides built by players, for players. No fluff, no ads, no paywalled info — just the strategies that actually work.</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="num">13</div><div class="lbl">Guides & Tools</div></div>
+      <div class="hero-stat"><div class="num">14</div><div class="lbl">Guides & Tools</div></div>
       <div class="hero-stat"><div class="num">S1–S5</div><div class="lbl">Seasons covered</div></div>
       <div class="hero-stat"><div class="num">100%</div><div class="lbl">Interactive</div></div>
     </div>
   </section>
 
-  <!-- WEEKLY & EVENTS -->
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Weekly Events & Planning</span>
@@ -205,6 +194,16 @@ body::before {
       <div class="card-tags"><span class="card-tag">7 days</span><span class="card-tag">tabbed</span><span class="card-tag">point values</span></div>
       <span class="card-arrow">→</span>
     </a>
+    <a class="guide-card" href="stamina-roi-guide.html">
+      <div class="card-top">
+        <div class="card-icon ic-amber">⚡</div>
+        <span class="card-badge bd-amber">Interactive</span>
+      </div>
+      <div class="card-title">Stamina &amp; Resource ROI Guide</div>
+      <div class="card-desc">Live decision tool: should you spend stamina now? Tier list for all stamina sinks, weekly income calculator, event timing calendar, and Battle Data guide.</div>
+      <div class="card-tags"><span class="card-tag">tier list</span><span class="card-tag">calculator</span><span class="card-tag">events</span></div>
+      <span class="card-arrow">→</span>
+    </a>
     <a class="guide-card" href="power-progression.html">
       <div class="card-top">
         <div class="card-icon ic-green">📈</div>
@@ -217,7 +216,6 @@ body::before {
     </a>
   </div>
 
-  <!-- TROOPS & SQUADS -->
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Troops & Squad Building</span>
@@ -246,7 +244,6 @@ body::before {
     </a>
   </div>
 
-  <!-- PROGRESSION SYSTEMS -->
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Progression Systems</span>
@@ -295,7 +292,6 @@ body::before {
     </a>
   </div>
 
-  <!-- CALCULATORS & TOOLS -->
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Calculators & Tools</span>
@@ -324,7 +320,6 @@ body::before {
     </a>
   </div>
 
-  <!-- INTERACTIVE MAPS -->
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Maps, Territory & Alliance Strategy</span>

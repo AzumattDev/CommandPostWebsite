@@ -1,10 +1,9 @@
-// Command Post - Shared Navigation
-// Add <script src="nav.js"></script> to any page to inject the nav bar
 (function(){
 const NAV_LINKS = [
   {label:'Home', href:'index.html', icon:'🏠'},
   {label:'Guides', children:[
     {label:'Alliance Duel Planner', href:'alliance-duel-planner.html'},
+    {label:'Stamina & Resource ROI', href:'stamina-roi-guide.html'},
     {label:'Power Progression', href:'power-progression.html'},
     {label:'Waterfall Training', href:'waterfall-training.html'},
     {label:'Squad Builder', href:'squad-builder.html'},
@@ -80,7 +79,6 @@ navHTML += `</div>`;
 navHTML += `<button class="cp-hamburger" onclick="document.getElementById('cpMobile').classList.toggle('open')" aria-label="Menu">☰</button>`;
 navHTML += `</div></nav>`;
 
-// Mobile menu
 navHTML += `<div class="cp-mobile-menu" id="cpMobile">`;
 NAV_LINKS.forEach(item => {
   if(item.children){
