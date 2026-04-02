@@ -81,45 +81,8 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
 </div>
 </div>
 
+<script src="data/events.js"></script>
 <script>
-// Timeline events: [day, type, title, description]
-const EVENTS = [
-  [1,'hero','Kimberly (Tank) — Rocket Shadow event','Highest DPS tank hero. Available as a recurring event from Day 1.'],
-  [1,'feature','Game starts — Pioneer Target begins','7-day starter marathon. Focus HQ rush and reaching 4.5M CP.'],
-  [1,'event','Secret Mobile Squad unlocks','Dispatch heroes on secret missions for rewards. Recurring event from Day 1.'],
-  [2,'hero','Murphy (Tank) — Tavern','Tank Guardian hero. Available to recruit from the Tavern starting Day 2.'],
-  [7,'event','Pioneer Target ends / City Clash begins','Pioneer Target concludes — claim M5-A Railgun if you hit 4.5M CP. City Clash (capture strategic points for construction boosts) becomes a recurring event.'],
-  [8,'hero','Carlie (Aircraft) — Troublemaker event','Aircraft hero, granddaughter of a legendary Guardian. Recruit her through the Troublemaker event.'],
-  [8,'hero','DVA (Aircraft) — Blade Striker event','High DPS aircraft pilot. Recruit her through the Blade Striker event.'],
-  [14,'feature','Exercise Escalation — Marshal\'s Guard Lv.4','Marshal\'s Guard difficulty increases to Lv.4.'],
-  [15,'hero','Tesla (Missile) — Magnetic Expert event','High DPS missile specialist in electromagnetism. Recruit him through the Magnetic Expert event.'],
-  [15,'hero','Swift (Missile) — Thunder event','High DPS missile hero. Recruit him through the Thunder event.'],
-  [18,'event','Desert Storm Battlefield unlocks','Capture missile silos and defeat rivals for rewards. Recurring event.'],
-  [18,'event','Alliance Duel unlocks','Weekly VS event. Alliances compete across 5 themed days for points. Start hoarding resources for daily themes.'],
-  [21,'feature','Exercise Escalation — Marshal\'s Guard Lv.5','Marshal\'s Guard difficulty increases to Lv.5.'],
-  [22,'hero','General Marshall (Tank) — Blade of Legion event','Powerful tank support hero. Recruit him through the Blade of Legion event.'],
-  [25,'event','Capitol Conquest unlocks','March toward the Capitol to seize it. Recurring event — coordinate with your alliance.'],
-  [29,'feature','Capitol War ends — Warzone Duel begins','The Capitol War phase concludes. Warzone Duel (alliance vs. alliance territory battles) begins.'],
-  [29,'hero','Williams (Tank) — Storm Hunter event','Core tank hero. Recruit him through the Storm Hunter event.'],
-  [30,'feature','Exercise Escalation — Marshal\'s Guard Lv.6','Marshal\'s Guard difficulty increases to Lv.6.'],
-  [36,'hero','Schuyler (Aircraft) — Magblade event','High DPS aircraft hero. Recruit her through the Magblade event.'],
-  [43,'hero','McGregor (Missile) — Ironclad General event','Missile tank hero. Recruit him through the Ironclad General event.'],
-  [45,'feature','Exercise Escalation — Marshal\'s Guard Lv.7','Marshal\'s Guard difficulty increases to Lv.7.'],
-  [57,'hero','Stetmann (Tank) — EM Hunter event','Core tank DPS. Recruit him through the EM Hunter event.'],
-  [60,'feature','Exercise Escalation — Marshal\'s Guard Lv.8','Marshal\'s Guard difficulty increases to Lv.8.'],
-  [64,'hero','Lucius (Aircraft) — Sky Knight event','Core aircraft hero. His inspiration buffs every unit on the battlefield. Recruit via Sky Knight event.'],
-  [71,'hero','Morrison (Aircraft) — The Reaper event','Aircraft DPS hero. Recruit him through The Reaper event.'],
-  [82,'feature','Drone Combat Boost unlocks','Drone research breakthrough. Boosts Drone performance and adds more drone skill types.'],
-  [85,'hero','Adam (Missile) — Titan event','Missile frontline hero. Recruit him through the Titan event.'],
-  [90,'feature','Exercise Escalation — Marshal\'s Guard Lv.9','Marshal\'s Guard difficulty increases to Lv.9.'],
-  [99,'hero','Fiona (Missile) — Lion Cub event','Powerful missile damage dealer. Recruit her through the Lion Cub event.'],
-  [120,'feature','Exercise Escalation — Marshal\'s Guard Lv.10','Marshal\'s Guard difficulty increases to Lv.10.'],
-  [120,'season','Season 1 — Crimson Plague begins','New virus outbreak. New map, virus mechanics, Military Strongholds, city recapture.'],
-  [176,'season','Season 2 — Polar Storm begins','Ice season. Oil resource introduced.'],
-  [232,'season','Season 3 — Golden Realm begins','Desert/Egypt theme. Spice resource.'],
-  [288,'season','Season 4 — Evernight Isle begins','Dark theme. Tactics Cards introduced. Hybrid squad era. T11 troops via Armament Institute.'],
-  [344,'season','Season 5 — Golden Wasteland (Wild West)','8 warzones on 1 map. CrystalGold economy.'],
-];
 
 let currentFilter = 'all';
 let serverStart = null;
