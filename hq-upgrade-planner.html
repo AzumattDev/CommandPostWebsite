@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HQ Upgrade Planner — The Command Post</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838;--green-bg:rgba(52,211,153,.06);--amber-bg:rgba(251,191,36,.06);--blue-bg:rgba(96,165,250,.06)}
+h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.92rem;margin-bottom:1.75rem}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem}
+.panel-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.9rem;display:flex;align-items:center;gap:8px}
+.panel-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:580px){.three-col{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;font-weight:500}
+.field select,.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.95rem}
+.field select:focus,.field input:focus{outline:none;border-color:var(--blue)}
+.sfx{position:relative}
+.sfx::after{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:.78rem;pointer-events:none}
+.sfx.pct::after{content:'%'}
+.sfx.min::after{content:'min'}
+.sfx input{padding-right:36px}
+
+.req-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.25rem}
+.req-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:520px}
+.req-table th{background:var(--surface2);padding:8px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.req-table th.r{text-align:right}
+.req-table td{padding:8px 12px;border-top:1px solid var(--border)}
+.req-table td.r{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.req-table tr:hover td{background:rgba(255,255,255,.018)}
+.req-table tr.off td{opacity:.32;text-decoration:line-through}
+.req-table tr.total-row td{background:var(--surface2);font-weight:600;border-top:2px solid var(--border2)}
+.req-table tr.total-row td.r{color:var(--text)}
+
+.bname{font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.bname:hover{color:var(--blue)}
+.lv{font-family:'JetBrains Mono',monospace;font-size:.68rem;padding:2px 7px;border-radius:4px;background:rgba(96,165,250,.08);color:var(--blue);border:1px solid rgba(96,165,250,.15);flex-shrink:0}
+.est{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace;opacity:.55;margin-left:2px}
+.nil{color:var(--text3)}
+.green{color:var(--green)}
+.amber{color:var(--amber)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.75rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;text-align:center}
+.stat .sv{font-family:'Chakra Petch',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:2px}
+.stat .sl{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+
+.tip{background:var(--amber-bg);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:.7rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:1rem}
+.tip strong{color:var(--amber)}
+.note{background:var(--blue-bg);border:1px solid rgba(96,165,250,.15);border-left:3px solid var(--blue);border-radius:0 var(--radius) var(--radius) 0;padding:.7rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:1.25rem}
+.note strong{color:var(--blue)}
+.hint{font-size:.75rem;color:var(--text3);margin-bottom:.6rem}
+.empty{text-align:center;padding:2rem 1rem;color:var(--text3);font-size:.88rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg)}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>HQ Upgrade Planner</h1>
+<p class="subtitle">See required building upgrades, total resources, and construction time — with your buffs applied. Click any building to exclude it from totals.</p>
+
+<div class="panel">
+  <div class="panel-label">1 — Your HQ Levels</div>
+  <div class="two-col">
+    <div class="field">
+      <label>Current HQ level</label>
+      <select id="hqCur" onchange="go()"></select>
+    </div>
+    <div class="field">
+      <label>Target HQ level</label>
+      <select id="hqTgt" onchange="go()"></select>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-label">2 — Construction Buffs <span style="font-size:.68rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">— Outpost → Ministry of Construction → Hats</span></div>
+  <div class="three-col">
+    <div class="field sfx pct">
+      <label>Build speed %</label>
+      <input type="number" id="bSpd" min="0" value="0" oninput="go()">
+    </div>
+    <div class="field sfx min">
+      <label>Free speedup / build</label>
+      <input type="number" id="bFree" min="0" value="0" oninput="go()">
+    </div>
+    <div class="field sfx pct">
+      <label>Resource reduction %</label>
+      <input type="number" id="bRes" min="0" max="100" value="0" oninput="go()">
+    </div>
+  </div>
+</div>
+
+<div id="output">
+  <div class="tip"><strong>Data note:</strong> Only 3 values are in-game verified (TC Lv21, DG Lv21, HQ Lv22). All others are estimates extrapolated from those points. Treat costs as planning guides and confirm exact values in-game before spending speedups. <em>est</em> markers on each row indicate estimated values.</div>
+  <div class="hint">Click a building name to exclude it from totals (e.g. already upgraded).</div>
+  <div class="req-wrap">
+    <table class="req-table">
+      <thead>
+        <tr>
+          <th>Building</th>
+          <th class="r">Iron</th>
+          <th class="r">Food</th>
+          <th class="r">Gold</th>
+          <th class="r">Oil</th>
+          <th class="r">Time</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="stats-grid" id="statGrid"></div>
+</div>
+
+<div id="emptyMsg" class="empty">Set current and target HQ levels above to see requirements.</div>
+
+<div class="note" style="margin-top:1.5rem"><strong>Build order:</strong> Always upgrade Tech Center first, then Drill Ground, then HQ itself. Starting HQ before its prereqs are done just wastes the free builder slot.</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// Resources in millions. Time in minutes.
+// v:true = in-game verified; otherwise estimated from scaling.
+const BD = {};
+function d(b,l,ir,fo,go,oi,t,v){
+  if(!BD[b])BD[b]={};
+  BD[b][l]={r:[ir,fo,go,oi],t:t,v:!!v};
+}
+
+// HQ — verified: Lv22 = 110M/110M/35M/0 · 8d14h (12360 min)
+d('HQ',15, 13,13,4,0,   1500);
+d('HQ',16, 18,18,5.5,0, 2040);
+d('HQ',17, 24,24,7.5,0, 2760);
+d('HQ',18, 33,33,10,0,  3720);
+d('HQ',19, 44,44,14,0,  5040);
+d('HQ',20, 60,60,19,0,  6780);
+d('HQ',21, 81,81,26,0,  9160);
+d('HQ',22, 110,110,35,0,12360, true);
+d('HQ',23, 149,149,47,0,16680);
+d('HQ',24, 201,201,63,0,22500);
+d('HQ',25, 271,271,85,0,30360);
+d('HQ',26, 366,366,115,4,   41040);
+d('HQ',27, 494,494,155,5.5, 55440);
+d('HQ',28, 667,667,209,7.5, 74880);
+d('HQ',29, 900,900,282,10,  101040);
+d('HQ',30, 1215,1215,381,13.5,136440);
+
+// Tech Center — verified: Lv21 = 73M/73M/23M/0 · 5d18h (8280 min)
+d('Tech Center',14, 9,9,3,0,    1020);
+d('Tech Center',15, 12,12,4,0,  1380);
+d('Tech Center',16, 16,16,5.5,0,1860);
+d('Tech Center',17, 22,22,7.5,0,2520);
+d('Tech Center',18, 30,30,10,0, 3360);
+d('Tech Center',19, 40,40,13,0, 4560);
+d('Tech Center',20, 54,54,17,0, 6120);
+d('Tech Center',21, 73,73,23,0, 8280, true);
+d('Tech Center',22, 99,99,31,0,    11160);
+d('Tech Center',23, 134,134,42,0,  15060);
+d('Tech Center',24, 181,181,57,0,  20340);
+d('Tech Center',25, 244,244,77,0,  27480);
+d('Tech Center',26, 329,329,104,3.5,37080);
+d('Tech Center',27, 444,444,140,4.8,50040);
+d('Tech Center',28, 599,599,189,6.5,67560);
+d('Tech Center',29, 809,809,255,8.8,91200);
+
+// Drill Ground — verified: Lv21 = 14M iron / 42M food / 11M gold · 3d7h (4740 min)
+// DG is food-heavy (iron:food ~1:3)
+d('Drill Ground',14, 1.6,5.5,1.5,0, 600);
+d('Drill Ground',15, 2.2,7.5,2,0,   810);
+d('Drill Ground',16, 3,10,2.5,0,   1080);
+d('Drill Ground',17, 4,13,3.5,0,   1440);
+d('Drill Ground',18, 5.5,17,4.5,0, 1920);
+d('Drill Ground',19, 7.5,23,6,0,   2580);
+d('Drill Ground',20, 10,31,8,0,    3480);
+d('Drill Ground',21, 14,42,11,0,   4740, true);
+d('Drill Ground',22, 19,57,15,0,   6420);
+d('Drill Ground',23, 26,77,20,0,   8640);
+d('Drill Ground',24, 35,104,27,0, 11640);
+d('Drill Ground',25, 47,140,36,0, 15720);
+d('Drill Ground',26, 63,189,49,3, 21240);
+d('Drill Ground',27, 85,255,66,4, 28680);
+d('Drill Ground',28, 115,344,89,5.5,38700);
+d('Drill Ground',29, 155,464,120,7.5,52200);
+
+// Prerequisites: to upgrade HQ to level N, you need TC at N-1 and DG at N-1
+function getPrereqs(n) {
+  return [
+    { b:'Tech Center', l:n-1 },
+    { b:'Drill Ground', l:n-1 },
+    { b:'HQ', l:n }
+  ].filter(p => BD[p.b] && BD[p.b][p.l]);
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const off = new Set();
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function fmtM(v) {
+  if (!v) return '<span class="nil">—</span>';
+  if (v >= 1000) return (v/1000).toFixed(2).replace(/\.?0+$/,'') + 'B';
+  if (v >= 1)    return parseFloat(v.toFixed(1)) + 'M';
+  return parseFloat((v*1000).toFixed(0)) + 'K';
+}
+function fmtT(m) {
+  if (m <= 0) return '<span class="green">Done</span>';
+  const d = Math.floor(m/1440), h = Math.floor((m%1440)/60), mn = Math.floor(m%60);
+  return (d?d+'d ':'') + (h?h+'h ':'') + (mn&&!d?mn+'m':'') || '< 1m';
+}
+function applyT(base, spd, free) {
+  return Math.max(0, base/(1+spd/100) - free);
+}
+
+// ─── INIT SELECTS ─────────────────────────────────────────────────────────────
+const curSel = document.getElementById('hqCur');
+const tgtSel = document.getElementById('hqTgt');
+for (let i=15;i<=30;i++) {
+  const a=new Option(i,i), b=new Option(i,i);
+  if(i===21) a.selected=true;
+  if(i===22) b.selected=true;
+  curSel.add(a); tgtSel.add(b);
+}
+
+// ─── SAVE / RESTORE ───────────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('cp_hq', JSON.stringify({
+    cur:curSel.value, tgt:tgtSel.value,
+    bs:document.getElementById('bSpd').value,
+    bf:document.getElementById('bFree').value,
+    br:document.getElementById('bRes').value
+  }));
+}
+(function load(){
+  const s=localStorage.getItem('cp_hq');
+  if(!s)return;
+  const p=JSON.parse(s);
+  if(p.cur) curSel.value=p.cur;
+  if(p.tgt) tgtSel.value=p.tgt;
+  if(p.bs) document.getElementById('bSpd').value=p.bs;
+  if(p.bf) document.getElementById('bFree').value=p.bf;
+  if(p.br) document.getElementById('bRes').value=p.br;
+})();
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
+function go() {
+  save();
+  const cur=+curSel.value, tgt=+tgtSel.value;
+  const spd=+document.getElementById('bSpd').value||0;
+  const free=+document.getElementById('bFree').value||0;
+  const res=+document.getElementById('bRes').value||0;
+  const rm=1-res/100;
+
+  if(tgt<=cur){
+    document.getElementById('output').style.display='none';
+    document.getElementById('emptyMsg').style.display='block';
+    document.getElementById('emptyMsg').textContent='Target must be higher than current HQ level.';
+    return;
+  }
+  document.getElementById('output').style.display='block';
+  document.getElementById('emptyMsg').style.display='none';
+
+  // Collect all required upgrades, deduplicated
+  const seen=new Set(), rows=[];
+  for(let lvl=cur+1;lvl<=tgt;lvl++) {
+    getPrereqs(lvl).forEach(p=>{
+      const k=p.b+':'+p.l;
+      if(!seen.has(k)){ seen.add(k); rows.push({...p,k}); }
+    });
+  }
+
+  // Render table rows
+  let tIr=0,tFo=0,tGo=0,tOi=0,tTm=0,bTm=0;
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML = rows.map(({b,l,k})=>{
+    const data=BD[b][l];
+    const x=off.has(k);
+    const [ir,fo,go,oi]=data.r.map(v=>v*rm);
+    const tm=applyT(data.t,spd,free);
+    if(!x){ tIr+=ir; tFo+=fo; tGo+=go; tOi+=oi; tTm+=tm; bTm+=data.t; }
+    const hasBuffs=spd||free||res;
+    const vTag = data.v ? '' : '<span class="est">est</span>';
+    const c=(v,base)=> hasBuffs&&!x ? `<span class="green">${fmtM(v)}</span>` : fmtM(base);
+    const ct=(m,base)=> hasBuffs&&!x ? `<span class="green">${fmtT(m)}</span>` : `<span>${fmtT(base)}</span>`;
+    const oilCell = data.r[3]===0 ? '<span class="nil">—</span>' : c(oi,data.r[3]);
+    return `<tr class="${x?'off':''}" data-k="${k}">
+      <td><span class="bname" onclick="toggle('${k}')">${b} <span class="lv">Lv${l}</span>${vTag}</span></td>
+      <td class="r">${c(ir,data.r[0])}</td>
+      <td class="r">${c(fo,data.r[1])}</td>
+      <td class="r">${c(go,data.r[2])}</td>
+      <td class="r">${oilCell}</td>
+      <td class="r">${ct(tm,data.t)}</td>
+    </tr>`;
+  }).join('') + `<tr class="total-row">
+    <td>Total</td>
+    <td class="r">${fmtM(tIr)}</td>
+    <td class="r">${fmtM(tFo)}</td>
+    <td class="r">${fmtM(tGo)}</td>
+    <td class="r">${tOi>0?fmtM(tOi):'<span class="nil">—</span>'}</td>
+    <td class="r">${fmtT(tTm)}</td>
+  </tr>`;
+
+  // Summary stats
+  const saved=bTm-tTm;
+  let html=`
+    <div class="stat"><div class="sv" style="color:var(--blue)">${fmtM(tIr)}</div><div class="sl">Iron</div></div>
+    <div class="stat"><div class="sv" style="color:var(--amber)">${fmtM(tFo)}</div><div class="sl">Food</div></div>
+    <div class="stat"><div class="sv" style="color:var(--amber)">${fmtM(tGo)}</div><div class="sl">Gold</div></div>`;
+  if(tOi>0) html+=`<div class="stat"><div class="sv" style="color:var(--purple)">${fmtM(tOi)}</div><div class="sl">Oil</div></div>`;
+  html+=`<div class="stat"><div class="sv" style="color:var(--green)">${fmtT(tTm)}</div><div class="sl">Total time</div></div>`;
+  if(saved>60) html+=`<div class="stat"><div class="sv green">−${fmtT(saved)}</div><div class="sl">Saved by buffs</div></div>`;
+  document.getElementById('statGrid').innerHTML=html;
+}
+
+function toggle(k){
+  off.has(k)?off.delete(k):off.add(k);
+  go();
+}
+
+go();
+</script>
+</div>
+</body>
+</html>
