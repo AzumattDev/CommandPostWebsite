@@ -8,22 +8,13 @@
 <script src="nav.js"></script>
 <style>
 :root {
-  --bg: #0e0f13; --surface: #16171d; --surface2: #1e1f27; --surface3: #262730;
-  --border: #2a2b36; --text: #e8e6f0; --text2: #9d9baf; --text3: #6b6980;
   --tank: #60a5fa; --tank-bg: rgba(96,165,250,0.08); --tank-border: rgba(96,165,250,0.25);
   --air: #a78bfa; --air-bg: rgba(167,139,250,0.08); --air-border: rgba(167,139,250,0.25);
   --missile: #f87171; --missile-bg: rgba(248,113,113,0.08); --missile-border: rgba(248,113,113,0.2);
-  --green: #34d399; --green-bg: rgba(52,211,153,0.08);
-  --amber: #fbbf24; --amber-bg: rgba(251,191,36,0.08);
-  --radius: 10px; --radius-lg: 14px;
 }
 .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
 h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--missile)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 2rem; }
-h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
-.section { margin-bottom: 2.5rem; }
-.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 
 .counter-tri { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; }
 .tri-top { margin-bottom: 1.5rem; }
@@ -91,8 +82,6 @@ h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; }
 .tip-box { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-left: 3px solid var(--green); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.15rem; margin-bottom: 1rem; }
 .tip-box h3 { font-size: 0.9rem; font-weight: 600; color: var(--green); margin-bottom: 4px; }
 .tip-box p { font-size: 0.85rem; color: var(--text2); }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 10px; }
-.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
 .card p { font-size: 0.88rem; color: var(--text2); }
 </style>
 </head>

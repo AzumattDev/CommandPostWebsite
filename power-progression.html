@@ -7,19 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="nav.js"></script>
 <style>
-:root {
-  --bg: #0e0f13; --surface: #16171d; --surface2: #1e1f27; --surface3: #262730;
-  --border: #2a2b36; --text: #e8e6f0; --text2: #9d9baf; --text3: #6b6980;
-  --accent: #a78bfa; --accent2: #7c3aed; --accent-bg: rgba(167,139,250,0.08);
-  --green: #34d399; --green-bg: rgba(52,211,153,0.1); --green-border: rgba(52,211,153,0.25);
-  --amber: #fbbf24; --amber-bg: rgba(251,191,36,0.1); --amber-border: rgba(251,191,36,0.25);
-  --red: #f87171; --red-bg: rgba(248,113,113,0.08);
-  --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.1);
-  --radius: 10px; --radius-lg: 14px;
-}
-.container { max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--accent), #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 2rem; }
 .path-toggle { display: flex; gap: 6px; background: var(--surface); border-radius: var(--radius); padding: 4px; margin-bottom: 1.75rem; border: 1px solid var(--border); }
 .path-btn { flex: 1; padding: 10px 16px; border-radius: 8px; border: none; background: transparent; color: var(--text2); font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .path-btn.active { background: var(--accent2); color: #fff; }
@@ -35,22 +23,18 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .label-dont { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
 .label-spend { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
 .label-tip { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
-.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-.card p { font-size: 0.88rem; color: var(--text2); line-height: 1.65; }
 .priority-list { list-style: none; padding: 0; margin-top: 8px; }
 .priority-list li { font-size: 0.88rem; color: var(--text2); padding: 4px 0 4px 20px; position: relative; }
 .priority-list li::before { content: ''; position: absolute; left: 4px; top: 12px; width: 6px; height: 6px; border-radius: 50%; }
 .priority-list li.p-high::before { background: var(--green); }
 .priority-list li.p-med::before { background: var(--amber); }
 .priority-list li.p-low::before { background: var(--text3); }
-.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 .golden-rules { background: linear-gradient(135deg, rgba(251,191,36,0.06), rgba(167,139,250,0.06)); border: 1px solid var(--amber-border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 2rem; }
 .golden-rules h2 { font-size: 1rem; font-weight: 600; color: var(--amber); margin-bottom: 0.75rem; }
 .rule-item { display: flex; gap: 10px; margin-bottom: 10px; }
 .rule-num { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--amber); font-weight: 600; flex-shrink: 0; margin-top: 2px; }
 .rule-text { font-size: 0.88rem; color: var(--text2); }
 .rule-text strong { color: var(--text); font-weight: 600; }
-.hidden { display: none; }
 .section-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
 @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }

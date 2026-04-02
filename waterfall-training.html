@@ -7,24 +7,9 @@
 <link rel="stylesheet" href="style.css">
 <script src="nav.js"></script>
 <style>
-:root {
-  --bg: #0e0f13; --surface: #16171d; --surface2: #1e1f27; --surface3: #262730;
-  --border: #2a2b36; --text: #e8e6f0; --text2: #9d9baf; --text3: #6b6980;
-  --accent: #34d399; --accent2: #059669; --accent-bg: rgba(52,211,153,0.08);
-  --purple: #a78bfa; --purple-bg: rgba(167,139,250,0.08);
-  --amber: #fbbf24; --amber-bg: rgba(251,191,36,0.08);
-  --red: #f87171; --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.08);
-  --radius: 10px; --radius-lg: 14px;
-}
-.container { max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+:root { --accent: #34d399; --accent2: #059669; --accent-bg: rgba(52,211,153,0.08); }
 h1 { font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), #6ee7b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem; }
-.subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 1.25rem; }
-h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text); }
-.section { margin-bottom: 2.5rem; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 10px; }
-.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
 .card p { font-size: 0.88rem; color: var(--text2); }
-.label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
 .label-concept { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(52,211,153,0.25); }
 .label-key { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
 .label-warn { background: rgba(248,113,113,0.08); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
@@ -46,7 +31,6 @@ details[open].glossary summary::before { transform: rotate(90deg); }
 .rung-table tbody tr { background: var(--surface); }
 .rung-table tbody tr:hover { background: var(--surface2); }
 .rung-table tbody tr.active-rung { background: rgba(52,211,153,0.06); border-left: 3px solid var(--accent); }
-.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
 .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
 .badge-green { background: rgba(52,211,153,0.15); color: var(--accent); }
 .badge-purple { background: var(--purple-bg); color: var(--purple); }
@@ -83,10 +67,6 @@ details[open].glossary summary::before { transform: rotate(90deg); }
 .flow-total .total-label { font-size: 0.72rem; color: var(--accent); text-transform: uppercase; font-weight: 600; }
 .flow-total .total-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
 
-.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-.warn-box { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); border-left: 3px solid var(--red); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.15rem; margin-bottom: 1rem; }
-.warn-box h3 { font-size: 0.9rem; font-weight: 600; color: var(--red); margin-bottom: 4px; }
-.warn-box p { font-size: 0.85rem; color: var(--text2); }
 .tip-box { background: var(--blue-bg); border: 1px solid rgba(96,165,250,0.2); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.15rem; margin-bottom: 1rem; }
 .tip-box h3 { font-size: 0.9rem; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
 .tip-box p { font-size: 0.85rem; color: var(--text2); }
