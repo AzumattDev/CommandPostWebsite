@@ -71,6 +71,13 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
   .score-bar { gap: 4px; }
   .score-chip { padding: 6px 8px; min-width: 60px; }
 }
+.pts-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.5rem 0 0.35rem; font-family: 'JetBrains Mono', monospace; }
+.pts-table th { text-align: left; padding: 4px 8px; background: var(--surface2); color: var(--text3); font-size: 0.68rem; font-weight: 500; }
+.pts-table td { padding: 4px 8px; border-top: 1px solid var(--border); color: var(--text2); }
+.pts-table .pts-val { color: var(--green); font-weight: 600; }
+.pts-table .pts-vs { color: var(--red); font-weight: 600; }
+.pts-table .pts-other { color: var(--amber); font-weight: 600; }
+.pts-table .pts-lost { color: var(--text3); }
 </style>
 </head>
 <body>
@@ -134,11 +141,11 @@ const days = [
       {img:'chipchests.png', label:'Chip Chest', note:'Day 85+'},
     ],
     today: [
-      { t: "Claim all stacked radar rewards", d: "First action after reset — collect every pending radar task saved from Sunday. This is your biggest single point burst of the day." },
-      { t: "Spend ALL stamina", d: "Use every stamina point on radar missions, attacks, and rallies. Overlaps with Arms Race: Drone Upgrade for double rewards." },
-      { t: "Use ALL Drone Parts + Drone Data", d: "Dump your entire week's stock of both. These are the #1 point source on Monday — don't hold any back." },
-      { t: "Collect returning gatherers", d: "Squads sent Sunday should return now — collect gold, iron, and food for gathering points. Send them back out immediately after." },
-      { t: "Open all Drone Chip Chests", d: "Open every saved skill chip chest (Legendary, Epic, Rare, Common). Available from Day 85+ only." },
+      { t: "Claim all stacked radar rewards", pts: "~25k pts/task", d: "First action after reset — collect every pending radar task saved from Sunday. This is your biggest single point burst of the day." },
+      { t: "Spend ALL stamina", pts: "~300 pts/stamina", d: "Use every stamina point on radar missions, attacks, and rallies. Overlaps with Arms Race: Drone Upgrade for double rewards." },
+      { t: "Use ALL Drone Parts + Drone Data", pts: "~10 pts/data unit", d: "Dump your entire week's stock of both. These are the #1 point source on Monday — don't hold any back." },
+      { t: "Collect returning gatherers", pts: "~40 pts/100 gathered", d: "Squads sent Sunday should return now — collect gold, iron, and food for gathering points. Send them back out immediately after." },
+      { t: "Open all Drone Chip Chests", pts: "~2k pts/chest (Day 85+)", d: "Open every saved skill chip chest (Legendary, Epic, Rare, Common). Available from Day 85+ only." },
     ],
     prep: [
       { t: "Immediately start stacking radar again", d: "The moment you've claimed Monday's rewards, start completing new radar missions without claiming them. Stack all week — they'll be claimed on Wednesday." },
@@ -164,11 +171,11 @@ const days = [
       {img:'survivorticket.png', label:'Survivor Recruit'},
     ],
     today: [
-      { t: "Blast through buildings with speedups", d: "Use building speedups to complete all queued constructions. Generic (universal) speedups count toward Building Speed here too — dump any non-specific speedups today. Aim for 10–14 days' worth across 2–3 major buildings." },
-      { t: "Unpack any gift-boxed buildings", d: "Open buildings left in gift state. Each one increases Building Power for extra points." },
-      { t: "Send UR (orange) trucks only", d: "Use Trade Contracts to refresh until you get Legendary rarity trucks. Lower rarity trucks score poorly — only send orange ones." },
-      { t: "Complete Legendary Secret Tasks", d: "Run orange tasks in the Secret Command Post. Use Secret Orders to refresh for more. Save starred tasks for Saturday." },
-      { t: "Use Survivor Recruitment Tickets", d: "Use all saved Survivor Tickets in the Tavern. Easy points that are often forgotten at higher levels." },
+      { t: "Blast through buildings with speedups", pts: "~120 pts/speedup", d: "Use building speedups to complete all queued constructions. Generic (universal) speedups count toward Building Speed here too — dump any non-specific speedups today. Aim for 10–14 days' worth across 2–3 major buildings." },
+      { t: "Unpack any gift-boxed buildings", pts: "~21 pts/power increase", d: "Open buildings left in gift state. Each one increases Building Power for extra points." },
+      { t: "Send UR (orange) trucks only", pts: "~200k pts/truck", d: "Use Trade Contracts to refresh until you get Legendary rarity trucks. Lower rarity trucks score poorly — only send orange ones." },
+      { t: "Complete Legendary Secret Tasks", pts: "~150k pts/task", d: "Run orange tasks in the Secret Command Post. Use Secret Orders to refresh for more. Save starred tasks for Saturday." },
+      { t: "Use Survivor Recruitment Tickets", pts: "~3k pts/ticket", d: "Use all saved Survivor Tickets in the Tavern. Easy points that are often forgotten at higher levels." },
       { t: "Use Armament Materials (S4+)", d: "Season 4+ only: invest Armament Materials and Cores for T11 troop upgrades." },
     ],
     prep: [
@@ -195,9 +202,9 @@ const days = [
       {img:'dronechest.png', label:'Drone Chest'},
     ],
     today: [
-      { t: "Claim stacked radar rewards", d: "First action — collect all radar tasks stacked since Monday. Instant point injection to start the day strong." },
-      { t: "Finish ALL research with speedups", d: "Spend every tech speedup to complete research. Generic (universal) speedups count toward Tech Speed too — use them all. Don't leave completed research sitting — it blocks your Tech Center." },
-      { t: "Spend ALL Valor Badges", d: "This is the only day to spend badges efficiently. Priority order: Alliance Duel research tree first (unlocks point multipliers), then Trucks and Special Forces branches." },
+      { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Monday. Instant point injection to start the day strong." },
+      { t: "Finish ALL research with speedups", pts: "~120 pts/speedup · ~21 pts/research", d: "Spend every tech speedup to complete research. Generic (universal) speedups count toward Tech Speed too — use them all. Don't leave completed research sitting — it blocks your Tech Center." },
+      { t: "Spend ALL Valor Badges", pts: "~600 pts/badge", d: "This is the only day to spend badges efficiently. Priority order: Alliance Duel research tree first (unlocks point multipliers), then Trucks and Special Forces branches." },
       { t: "Open all Drone Component Chests", d: "Open every saved Lv.1–7 component chest now. These only score on Wednesday — don't hold them past today." },
     ],
     prep: [
@@ -225,11 +232,11 @@ const days = [
       {img:'weaponshard.png', label:'Weapon Shard', note:'From S1'},
     ],
     today: [
-      { t: "Use ALL Hero XP", d: "Level up every hero with the full week's stock of XP books. Overlaps with Arms Race: Hero Upgrade for double credit." },
-      { t: "Use ALL Hero Shards", d: "Promote hero stars using every saved Universal Shard, Hero-specific Shard, and Overlord Universal Shard." },
-      { t: "Use ALL Skill Medals", d: "Upgrade hero skills with every saved medal. Increases combat power and earns Duel points." },
-      { t: "Elite Recruitment", d: "Use every saved Legendary, New Era, and Hero's Return ticket in the Tavern. Don't hold any back." },
-      { t: "Use ALL Weapon Shards (S1+)", d: "Season 1+ only: use every Exclusive Weapon Shard to upgrade hero weapons. Each shard scores separately." },
+      { t: "Use ALL Hero XP", pts: "~6 pts/660 XP", d: "Level up every hero with the full week's stock of XP books. Overlaps with Arms Race: Hero Upgrade for double credit." },
+      { t: "Use ALL Hero Shards", pts: "~20k (gold) · ~7k (purple) · ~2k (blue)", d: "Promote hero stars using every saved Universal Shard, Hero-specific Shard, and Overlord Universal Shard." },
+      { t: "Use ALL Skill Medals", pts: "~20 pts/medal", d: "Upgrade hero skills with every saved medal. Increases combat power and earns Duel points." },
+      { t: "Elite Recruitment", pts: "~3.75k pts/recruit", d: "Use every saved Legendary, New Era, and Hero's Return ticket in the Tavern. Don't hold any back." },
+      { t: "Use ALL Weapon Shards (S1+)", pts: "~20k pts/shard", d: "Season 1+ only: use every Exclusive Weapon Shard to upgrade hero weapons. Each shard scores separately." },
     ],
     prep: [
       { t: "Stack radar — do NOT claim", d: "Complete radar missions without claiming rewards. Stack as many as possible for Friday morning's burst." },
@@ -262,10 +269,11 @@ const days = [
       {img:'overlordsbadge.png', label:'Overlord SBadge', note:'From S2'},
     ],
     today: [
-      { t: "Claim stacked radar rewards", d: "First action — collect all radar tasks stacked since Thursday. Do this immediately after reset." },
-      { t: "Train troops (main focus)", d: "Use all training speedups and generic/universal speedups to train and promote troops. Your #1 point source today. Promoting existing troops to higher tiers often scores more than training from scratch." },
-      { t: "Finish leftover buildings", d: "Use any remaining construction speedups. Unpack gift boxes. Building Power and Building Speed both score today." },
-      { t: "Finish leftover research", d: "Complete any remaining tech with spare speedups. Tech Power and Tech Speed both score today." },
+      { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Thursday. Do this immediately after reset." },
+      { t: "Train troops (main focus)", pts: "~122 pts/speedup · points scale with tier", d: "Use all training speedups and generic/universal speedups to train and promote troops. Your #1 point source today. Promoting existing troops to higher tiers earns far more than training fresh — see tier table below." },
+      { t: "Troop tier points — promote, don't train from scratch", d: "<table class='pts-table'><thead><tr><th>Tier</th><th>Pts per troop trained/promoted</th></tr></thead><tbody><tr><td>T1</td><td class='pts-val'>~46</td></tr><tr><td>T2</td><td class='pts-val'>~70</td></tr><tr><td>T3</td><td class='pts-val'>~93</td></tr><tr><td>T4</td><td class='pts-val'>~117</td></tr><tr><td>T5</td><td class='pts-val'>~140</td></tr><tr><td>T6</td><td class='pts-val'>~164</td></tr><tr><td>T7</td><td class='pts-val'>~197</td></tr><tr><td>T8</td><td class='pts-val'>~211</td></tr><tr><td>T9</td><td class='pts-val'>~234</td></tr><tr><td>T10</td><td class='pts-val'>~258</td></tr></tbody></table>Points are based on the troop's <strong>arrival tier</strong>. Promoting T4→T5 earns T5 points — same as training T5 from scratch. Stack cheap low-tier troops all week, then promote them in bulk today." },
+      { t: "Finish leftover buildings", pts: "~120 pts/speedup · ~21 pts/power", d: "Use any remaining construction speedups. Unpack gift boxes. Building Power and Building Speed both score today." },
+      { t: "Finish leftover research", pts: "~120 pts/speedup · ~21 pts/research", d: "Complete any remaining tech with spare speedups. Tech Power and Tech Speed both score today." },
       { t: "Overlord upgrades (S2+)", d: "Season 2+ only: use Overlord Shards, Guidebooks, Certificates, Bronze Badges, and Star Badges. All five item types score as separate categories — use every one you have." },
     ],
     prep: [
@@ -295,12 +303,14 @@ const days = [
     ],
     today: [
       { t: "Check shield first — before anything else", d: "Verify your shield is active. Re-apply immediately if it dropped. A dead shield Saturday morning means your base gets zeroed before you can respond." },
-      { t: "Send UR Trucks", d: "Guaranteed points with zero combat risk. Use Trade Contracts to refresh for UR (orange) trucks. Only send orange — lower rarity isn't worth it." },
-      { t: "Complete all saved Legend Tasks", d: "Finish every starred legendary task you've been holding from the Secret Command Post. These were saved specifically for today." },
-      { t: "Dump ALL remaining speedups", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories. Use absolutely every speedup you have left — nothing carries over usefully." },
+      { t: "Send UR Trucks", pts: "~200k pts/truck", d: "Guaranteed points with zero combat risk. Use Trade Contracts to refresh for UR (orange) trucks. Only send orange — lower rarity isn't worth it." },
+      { t: "Complete all saved Legend Tasks", pts: "~150k pts/task", d: "Finish every starred legendary task you've been holding from the Secret Command Post. These were saved specifically for today." },
+      { t: "Dump ALL remaining speedups", pts: "~120 pts/speedup", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories. Use absolutely every speedup you have left — nothing carries over usefully." },
       { t: "Kill enemy units", d: "Unit kills score directly. Killing your VS opponent's units gives 5× more points than killing anyone else. Follow alliance coordination for attack targets and timing." },
+      { t: "Unit kill & loss point values by tier", d: "<table class='pts-table'><thead><tr><th>Tier</th><th class='pts-vs'>VS opponent kill</th><th class='pts-val'>Any kill</th><th>Lost (yours)</th></tr></thead><tbody><tr><td>T1</td><td class='pts-vs'>25</td><td class='pts-val'>5</td><td>6</td></tr><tr><td>T2</td><td class='pts-vs'>38</td><td class='pts-val'>8</td><td>8</td></tr><tr><td>T3</td><td class='pts-vs'>50</td><td class='pts-val'>10</td><td>10</td></tr><tr><td>T4</td><td class='pts-vs'>63</td><td class='pts-val'>13</td><td>13</td></tr><tr><td>T5</td><td class='pts-vs'>75</td><td class='pts-val'>15</td><td>15</td></tr><tr><td>T6</td><td class='pts-vs'>88</td><td class='pts-val'>18</td><td>18</td></tr><tr><td>T7</td><td class='pts-vs'>100</td><td class='pts-val'>20</td><td>20</td></tr><tr><td>T8</td><td class='pts-vs'>113</td><td class='pts-val'>23</td><td>20</td></tr><tr><td>T9</td><td class='pts-vs'>125</td><td class='pts-val'>25</td><td class='pts-lost'>—</td></tr><tr><td>T10</td><td class='pts-vs'>138</td><td class='pts-val'>28</td><td class='pts-lost'>—</td></tr></tbody></table>VS opponent kills are worth 5× more — always prioritize their troops over anyone else's." },
     ],
     prep: [
+      { t: "Remove your defense lineup before combat", d: "Wall → Defense Lineup → uncheck all squads. If enemies breach your base with an empty lineup, only idle drill-ground troops die instead of your best heroes. Re-enable after Duel ends.", warn: true },
       { t: "After Duel ends: reset immediately for next week", d: "Saturday night when the Duel resets — start stacking radar tasks right away. Send gatherers before you sleep. Queue your longest buildings and research to run overnight so they're ready for Tuesday and Wednesday." },
       { t: "Note what ran dry", d: "If you exhausted Drone Parts mid-week, or had nothing left for Saturday, note it now. Next week: hoard that resource more aggressively and spend less outside of its designated day." },
     ],
@@ -350,7 +360,7 @@ function render() {
 
     if (d.today.length) {
       html += `<div class="section"><span class="section-label label-today">${d.value ? 'Do today' : 'Do today (no points yet)'}</span>`;
-      d.today.forEach(c => { html += `<div class="card"><div class="card-title">${c.t}</div><div class="card-desc">${c.d}</div></div>`; });
+      d.today.forEach(c => { html += `<div class="card"><div class="card-title">${c.t}${c.pts ? ` <span class="point-chip">${c.pts}</span>` : ''}</div><div class="card-desc">${c.d}</div></div>`; });
       html += `</div>`;
     }
     if (d.prep.length) {
