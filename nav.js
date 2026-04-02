@@ -19,7 +19,8 @@ const NAV_LINKS = [
   ]},
   {label:'Tools', children:[
     {label:'Hero EXP Calculator', href:'hero-exp-calculator.html'},
-    {label:'Server Day Tracker', href:'server-day-tracker.html'},
+    {label:'Server Tracker', href:'server-tracker.html'},
+    {label:'HQ Upgrade Planner', href:'hq-upgrade-planner.html'},
   ]},
 ];
 
