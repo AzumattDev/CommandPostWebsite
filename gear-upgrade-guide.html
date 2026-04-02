@@ -156,7 +156,8 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 </div>
 
 <script>
-function showRole(r){document.querySelectorAll('.role-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+r).classList.add('active');document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if((r==='dps'&&t.textContent.includes('DPS'))||(r==='tank'&&t.textContent.includes('Tank'))||(r==='mythic'&&t.textContent.includes('Mythic')))t.classList.add('active')})}
+function showRole(r){history.replaceState(null,'','#'+r);document.querySelectorAll('.role-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+r).classList.add('active');document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');if((r==='dps'&&t.textContent.includes('DPS'))||(r==='tank'&&t.textContent.includes('Tank'))||(r==='mythic'&&t.textContent.includes('Mythic')))t.classList.add('active')})}
+(function(){const h=location.hash.slice(1);if(['dps','tank','mythic'].includes(h))showRole(h);})();
 </script>
 </body>
 </html>

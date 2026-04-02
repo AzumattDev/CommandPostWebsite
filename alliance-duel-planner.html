@@ -359,22 +359,22 @@ function render() {
     }
 
     if (d.today.length) {
-      html += `<div class="section"><span class="section-label label-today">${d.value ? 'Do today' : 'Do today (no points yet)'}</span>`;
+      html += `<div class="section" id="${d.name.toLowerCase()}-today"><span class="section-label label-today">${d.value ? 'Do today' : 'Do today (no points yet)'}</span>`;
       d.today.forEach(c => { html += `<div class="card"><div class="card-title">${c.t}${c.pts ? ` <span class="point-chip">${c.pts}</span>` : ''}</div><div class="card-desc">${c.d}</div></div>`; });
       html += `</div>`;
     }
     if (d.prep.length) {
-      html += `<div class="section"><span class="section-label label-prep">Prepare for tomorrow</span>`;
+      html += `<div class="section" id="${d.name.toLowerCase()}-prep"><span class="section-label label-prep">Prepare for tomorrow</span>`;
       d.prep.forEach(c => { html += `<div class="card${c.warn ? ' warn' : ''}"><div class="card-title">${c.t}</div><div class="card-desc">${c.d}</div></div>`; });
       html += `</div>`;
     }
     if (d.tips.length) {
-      html += `<div class="section"><span class="section-label label-tip">Strategy tips</span>`;
+      html += `<div class="section" id="${d.name.toLowerCase()}-tips"><span class="section-label label-tip">Strategy tips</span>`;
       d.tips.forEach(c => { html += `<div class="card"><div class="card-title">${c.t}</div><div class="card-desc">${c.d}</div></div>`; });
       html += `</div>`;
     }
     if (d.points.length) {
-      html += `<div class="section"><span class="section-label label-pts">Point sources</span><div class="points-bar">`;
+      html += `<div class="section" id="${d.name.toLowerCase()}-points"><span class="section-label label-pts">Point sources</span><div class="points-bar">`;
       d.points.forEach(p => { html += `<span class="point-chip">${p}</span>`; });
       html += `</div></div>`;
     }
@@ -383,12 +383,36 @@ function render() {
   }).join('');
 }
 
+function applyHash() {
+  const h = location.hash.slice(1).toLowerCase();
+  if (!h) return;
+  const dayName = h.split('-')[0];
+  const idx = days.findIndex(d => d.name.toLowerCase() === dayName);
+  if (idx >= 0) activeIdx = idx;
+}
+
+function scrollToSection() {
+  const h = location.hash.slice(1).toLowerCase();
+  if (!h.includes('-')) return;
+  const el = document.getElementById(h);
+  if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+}
+
 window.setDay = function(i) {
   activeIdx = i;
+  history.replaceState(null, '', '#' + days[i].name.toLowerCase());
   render();
 };
 
+window.addEventListener('hashchange', () => {
+  applyHash();
+  render();
+  scrollToSection();
+});
+
+applyHash();
 render();
+scrollToSection();
 </script>
 </body>
 </html>

@@ -341,6 +341,7 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 
 <script>
 function showSquad(type) {
+  history.replaceState(null, '', '#' + type);
   document.querySelectorAll('.squad-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + type).classList.add('active');
   document.querySelectorAll('.sq-tab').forEach(t => {
@@ -353,6 +354,7 @@ function showSquad(type) {
     }
   });
 }
+(function(){const h=location.hash.slice(1);if(['tank','air','missile','hybrid'].includes(h))showSquad(h);})();
 </script>
 </body>
 </html>
