@@ -26,6 +26,17 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
 .anchor-note{font-size:.78rem;color:var(--text3);margin-top:.6rem;line-height:1.5}
 .anchor-note strong{color:var(--text2)}
 
+.registry-hint{display:none;margin-top:.75rem;padding:.65rem .9rem;border-radius:8px;font-size:.8rem;line-height:1.5;align-items:center;gap:10px}
+.registry-hint.found{display:flex;background:rgba(52,211,153,.06);border:1px solid var(--green-border);color:var(--text2)}
+.registry-hint.missing{display:flex;background:rgba(251,191,36,.05);border:1px solid var(--amber-border);color:var(--text3)}
+.registry-hint strong{color:var(--text)}
+.registry-hint .rh-btn{margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid var(--green-border);background:rgba(52,211,153,.08);color:var(--green);font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.registry-hint .rh-btn:hover{background:rgba(52,211,153,.15)}
+.registry-hint .rh-btn.amber{border-color:var(--amber-border);background:rgba(251,191,36,.08);color:var(--amber)}
+.registry-hint .rh-btn.amber:hover{background:rgba(251,191,36,.15)}
+.rh-badge{font-size:.65rem;padding:2px 7px;border-radius:4px;background:rgba(52,211,153,.1);color:var(--green);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.rh-badge.unverified{background:rgba(96,165,250,.1);color:var(--blue)}
+
 .server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:1.75rem}
 .server-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1rem .85rem;cursor:pointer;transition:all .15s;position:relative}
 .server-card:hover{border-color:var(--border2);background:var(--surface2)}
@@ -86,7 +97,7 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
   <div class="add-row">
     <div class="field">
       <label>Server #</label>
-      <input type="number" id="newNum" min="1" placeholder="e.g. 2190" value="2190">
+      <input type="number" id="newNum" min="1" placeholder="e.g. 2190" value="2190" onblur="lookupRegistry()">
     </div>
     <div class="field">
       <label>Current server day</label>
@@ -98,6 +109,7 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
     </div>
     <button class="btn" onclick="addServer()">Save</button>
   </div>
+  <div class="registry-hint" id="registryHint"></div>
   <p class="anchor-note">The day count advances automatically from the moment you save it. <strong>If it ever drifts ±1,</strong> just re-enter the server number with the current in-game day to re-anchor. Server timezone differences can cause a ±1 offset near the daily rollover.</p>
 </div>
 
@@ -147,6 +159,60 @@ function liveDay(s){ return s.anchorDay + Math.floor((Date.now()-s.anchorTs)/864
 let activeIdx = 0;
 let tlFilter = 'all';
 
+// ── Registry (D1) ─────────────────────────────────────────────────────────────
+async function lookupRegistry(){
+  const num = parseInt(document.getElementById('newNum').value)||0;
+  const hint = document.getElementById('registryHint');
+  hint.className = 'registry-hint';
+  hint.innerHTML = '';
+  if(!num) return;
+
+  try {
+    const res = await fetch(`/api/servers/${num}`);
+    if(res.ok){
+      const data = await res.json();
+      // Calculate what today's server day would be from the stored start date
+      const start = new Date(data.start_date + 'T00:00:00Z');
+      const derivedDay = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
+      const badge = data.verified
+        ? '<span class="rh-badge">Verified</span>'
+        : `<span class="rh-badge unverified">${data.vote_count} vote${data.vote_count!==1?'s':''}</span>`;
+      hint.className = 'registry-hint found';
+      hint.innerHTML = `${badge}<span>Community data suggests <strong>State #${num}</strong> is on day <strong>~${derivedDay}</strong> today.</span>
+        <button class="rh-btn" onclick="useRegistryDay(${derivedDay})">Use this</button>`;
+    } else if(res.status === 404){
+      hint.className = 'registry-hint missing';
+      hint.innerHTML = `<span>No community data yet for State #${num}. Save your server and help seed the registry!</span>`;
+    }
+  } catch(e) {
+    // Silently fail — offline or worker not deployed yet
+  }
+}
+
+function useRegistryDay(day){
+  document.getElementById('newDay').value = day;
+  document.getElementById('newDay').focus();
+}
+
+function deriveStartDate(anchorTs, anchorDay){
+  // Server day 1 = anchorTs - (anchorDay-1) full days
+  const d = new Date(anchorTs - (anchorDay - 1) * 86400000);
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+async function submitToRegistry(num, anchorTs, anchorDay){
+  const start_date = deriveStartDate(anchorTs, anchorDay);
+  try {
+    await fetch('/api/servers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ server_num: num, start_date }),
+    });
+  } catch(e) {
+    // Fire-and-forget — silently fail
+  }
+}
+
 // ── Add / remove ──────────────────────────────────────────────────────────────
 function addServer(){
   const num = parseInt(document.getElementById('newNum').value)||0;
@@ -155,12 +221,16 @@ function addServer(){
   if(!num||!day) return;
   const servers = loadServers();
   const ei = servers.findIndex(s=>s.num===num);
-  const entry = {num, name, anchorTs:Date.now(), anchorDay:day};
+  const anchorTs = Date.now();
+  const entry = {num, name, anchorTs, anchorDay:day};
   if(ei>=0){ servers[ei]=entry; activeIdx=ei; }
   else { servers.push(entry); activeIdx=servers.length-1; }
   saveServers(servers);
   document.getElementById('newDay').value='';
   document.getElementById('newName').value='';
+  document.getElementById('registryHint').className='registry-hint';
+  // Contribute to the community registry silently
+  submitToRegistry(num, anchorTs, day);
   render();
 }
 
