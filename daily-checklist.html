@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Checklist — The Command Post</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838;--green-bg:rgba(52,211,153,.06);--amber-bg:rgba(251,191,36,.06)}
+h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.92rem;margin-bottom:1.75rem}
+
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+.date-label{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text3)}
+.reset-time{font-size:.72rem;color:var(--text3);margin-top:2px}
+.top-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-sm:hover{border-color:var(--border2);color:var(--text)}
+.btn-danger{border-color:rgba(248,113,113,.2);color:var(--red);background:rgba(248,113,113,.04)}
+.btn-danger:hover{background:rgba(248,113,113,.08)}
+
+.progress-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem}
+.progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--text3);margin-bottom:.5rem}
+.progress-label span:last-child{font-family:'JetBrains Mono',monospace}
+.progress-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:3px;transition:width .3s}
+
+.section{margin-bottom:1.5rem}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.section-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;border-radius:5px;display:inline-block}
+.st-essential{background:rgba(52,211,153,.1);color:var(--green);border:1px solid var(--green-border)}
+.st-alliance{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.15)}
+.st-production{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.15)}
+.st-events{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid var(--amber-border)}
+.st-custom{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.15)}
+.section-pct{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3)}
+
+.task-list{display:flex;flex-direction:column;gap:4px}
+.task{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;user-select:none}
+.task:hover{background:var(--surface2)}
+.task.done{opacity:.45}
+.task.done .task-title{text-decoration:line-through}
+.cb{width:18px;height:18px;border-radius:4px;border:2px solid var(--border2);background:transparent;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task.done .cb{background:var(--green);border-color:var(--green)}
+.cb-check{display:none;font-size:.7rem;color:#0a0b0e;font-weight:700}
+.task.done .cb-check{display:block}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:.88rem;font-weight:500;color:var(--text);line-height:1.3}
+.task-note{font-size:.75rem;color:var(--text3);margin-top:2px;line-height:1.4}
+.task-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.85rem;padding:2px 6px;border-radius:4px;opacity:0;transition:all .12s;flex-shrink:0}
+.task:hover .task-del{opacity:1}
+.task-del:hover{color:var(--red)}
+
+.add-custom{display:flex;gap:8px;margin-top:6px}
+.add-custom input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem}
+.add-custom input:focus{outline:none;border-color:var(--green)}
+.add-custom input::placeholder{color:var(--text3)}
+.btn-add{padding:9px 16px;border-radius:8px;border:1px solid var(--green-border);background:rgba(52,211,153,.08);color:var(--green);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-add:hover{background:rgba(52,211,153,.15)}
+
+.all-done{text-align:center;padding:2rem 1rem;display:none}
+.all-done .trophy{font-size:2.5rem;margin-bottom:.5rem}
+.all-done p{color:var(--text2);font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Daily Checklist</h1>
+<p class="subtitle">Your daily Last War tasks. Resets automatically each day.</p>
+
+<div class="top-bar">
+  <div>
+    <div class="date-label" id="dateLabel"></div>
+    <div class="reset-time" id="resetTime"></div>
+  </div>
+  <div class="top-actions">
+    <button class="btn-sm" onclick="checkAll()">Check all</button>
+    <button class="btn-sm btn-danger" onclick="uncheckAll()">Uncheck all</button>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-label"><span>Daily progress</span><span id="progressText">0 / 0</span></div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div id="taskContainer"></div>
+<div class="all-done" id="allDone">
+  <div class="trophy">🏆</div>
+  <p>All done for today. Come back tomorrow.</p>
+</div>
+
+</div>
+<script>
+const TODAY_KEY = () => new Date().toISOString().slice(0, 10);
+
+const DEFAULT_TASKS = [
+  { id:'e1', cat:'essential', title:'Collect daily login reward', note:'' },
+  { id:'e2', cat:'essential', title:'Complete daily missions & claim mission chest', note:'Aim for all 6 missions before reset' },
+  { id:'e3', cat:'essential', title:'Buy free shop refreshes', note:'Free refresh gives coins, materials, or speedups' },
+  { id:'e4', cat:'essential', title:'Free hero recruitment attempt', note:'Check for free recruit in Recruitment Hall' },
+  { id:'e5', cat:'essential', title:'Collect VIP points & claim reward', note:'' },
+  { id:'e6', cat:'essential', title:'Heal wounded troops in hospital', note:'Wounded troops do not train or fight' },
+
+  { id:'a1', cat:'alliance', title:'Donate resources to Alliance Tech', note:'Max out daily donation cap' },
+  { id:'a2', cat:'alliance', title:'Collect Alliance Gifts', note:'Check gift log — uncollected gifts expire' },
+  { id:'a3', cat:'alliance', title:'Complete Alliance missions', note:'' },
+  { id:'a4', cat:'alliance', title:'Check Alliance Duel tasks', note:'Mon–Sat only — match tasks to the day\'s theme' },
+
+  { id:'p1', cat:'production', title:'Collect from all resource buildings', note:'Farm, Oil Rig, Iron Mine, Gold Mine' },
+  { id:'p2', cat:'production', title:'Send gathering teams out', note:'Keep all marches busy gathering outside the base' },
+  { id:'p3', cat:'production', title:'Queue building upgrade', note:'' },
+  { id:'p4', cat:'production', title:'Queue research', note:'' },
+  { id:'p5', cat:'production', title:'Queue troop training', note:'Fill both training queues' },
+
+  { id:'v1', cat:'events', title:'Check Arms Race phase & complete tasks', note:'Phase changes daily — do not waste high-value tasks on wrong phase' },
+  { id:'v2', cat:'events', title:'Check active limited events', note:'Time-limited events expire — prioritize over routine tasks' },
+  { id:'v3', cat:'events', title:'Use stamina on missions', note:'Do not let stamina cap out overnight' },
+];
+
+const CATS = {
+  essential: { label:'Essential',  cls:'st-essential' },
+  alliance:  { label:'Alliance',   cls:'st-alliance'  },
+  production:{ label:'Build & Train', cls:'st-production' },
+  events:    { label:'Events',     cls:'st-events'    },
+  custom:    { label:'Custom',     cls:'st-custom'    },
+};
+
+function loadState() {
+  const stored = JSON.parse(localStorage.getItem('cp_checklist') || '{}');
+  if (stored.date !== TODAY_KEY()) {
+    // New day — reset checks but keep custom tasks
+    return { date: TODAY_KEY(), checked: new Set(), custom: stored.custom || [] };
+  }
+  return { date: stored.date, checked: new Set(stored.checked || []), custom: stored.custom || [] };
+}
+
+function saveState(state) {
+  localStorage.setItem('cp_checklist', JSON.stringify({
+    date: state.date,
+    checked: [...state.checked],
+    custom: state.custom,
+  }));
+}
+
+let state = loadState();
+const allTasks = () => [
+  ...DEFAULT_TASKS,
+  ...state.custom.map((t, i) => ({ id: 'c' + i, cat: 'custom', title: t, note: '' })),
+];
+
+function toggle(id) {
+  if (state.checked.has(id)) state.checked.delete(id);
+  else state.checked.add(id);
+  saveState(state);
+  render();
+}
+
+function removeCustom(idx) {
+  state.custom.splice(idx, 1);
+  // Re-map checked custom IDs
+  state.checked = new Set([...state.checked].filter(id => !id.startsWith('c')));
+  saveState(state);
+  render();
+}
+
+function checkAll() { allTasks().forEach(t => state.checked.add(t.id)); saveState(state); render(); }
+function uncheckAll() { state.checked.clear(); saveState(state); render(); }
+
+function addCustom() {
+  const inp = document.getElementById('customInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  state.custom.push(val);
+  saveState(state);
+  inp.value = '';
+  render();
+}
+
+function render() {
+  const tasks = allTasks();
+  const total = tasks.length;
+  const done = tasks.filter(t => state.checked.has(t.id)).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('progressText').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('allDone').style.display = done === total && total > 0 ? 'block' : 'none';
+
+  // Group by category
+  const groups = {};
+  tasks.forEach(t => { (groups[t.cat] = groups[t.cat] || []).push(t); });
+
+  let html = '';
+  const catOrder = ['essential','alliance','production','events','custom'];
+  catOrder.forEach(cat => {
+    const items = groups[cat];
+    if (!items && cat !== 'custom') return;
+    const catDone = (items || []).filter(t => state.checked.has(t.id)).length;
+    const catTotal = (items || []).length;
+    const info = CATS[cat];
+
+    html += `<div class="section">
+      <div class="section-header">
+        <span class="section-title ${info.cls}">${info.label}</span>
+        <span class="section-pct">${catDone}/${catTotal}</span>
+      </div>
+      <div class="task-list">`;
+
+    (items || []).forEach((t, localIdx) => {
+      const isDone = state.checked.has(t.id);
+      const isCustom = t.id.startsWith('c');
+      html += `<div class="task${isDone?' done':''}" onclick="toggle('${t.id}')">
+        <div class="cb"><span class="cb-check">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">${t.title}</div>
+          ${t.note ? `<div class="task-note">${t.note}</div>` : ''}
+        </div>
+        ${isCustom ? `<button class="task-del" onclick="event.stopPropagation();removeCustom(${localIdx})" title="Remove">✕</button>` : ''}
+      </div>`;
+    });
+
+    if (cat === 'custom') {
+      html += `<div class="add-custom">
+        <input type="text" id="customInput" placeholder="Add a custom task…" onkeydown="if(event.key==='Enter')addCustom()">
+        <button class="btn-add" onclick="addCustom()">+ Add</button>
+      </div>`;
+    }
+
+    html += `</div></div>`;
+  });
+
+  document.getElementById('taskContainer').innerHTML = html;
+}
+
+// Date label + reset countdown
+function updateHeader() {
+  const now = new Date();
+  const opts = { weekday:'long', month:'long', day:'numeric' };
+  document.getElementById('dateLabel').textContent = now.toLocaleDateString(undefined, opts);
+
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('resetTime').textContent = `Resets in ${h}h ${m}m`;
+}
+
+updateHeader();
+setInterval(updateHeader, 60000);
+render();
+</script>
+</body>
+</html>

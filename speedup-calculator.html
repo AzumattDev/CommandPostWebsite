@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speedup Calculator — The Command Post</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838;--green-bg:rgba(52,211,153,.06);--amber-bg:rgba(251,191,36,.06);--red-bg:rgba(248,113,113,.06)}
+h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:.25rem;background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);font-size:.92rem;margin-bottom:1.75rem}
+h2{font-size:1.05rem;font-weight:600;margin-bottom:.75rem}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem}
+.panel-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.9rem;display:flex;align-items:center;gap:8px}
+.panel-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.su-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.su-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.su-label{font-size:.7rem;color:var(--text3);font-weight:500}
+.su-mins{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace;opacity:.6}
+.su-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.9rem;width:100%;text-align:right}
+.su-input:focus{outline:none;border-color:var(--purple)}
+
+.target-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:500px){.target-row{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;font-weight:500}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.95rem}
+.field input:focus,.field select:focus{outline:none;border-color:var(--purple)}
+.or-divider{display:flex;align-items:center;gap:10px;margin:.75rem 0;color:var(--text3);font-size:.75rem}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+.rv{font-family:'Chakra Petch',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:2px}
+.rl{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.rv.purple{color:var(--purple)}.rv.green{color:var(--green)}.rv.red{color:var(--red)}.rv.amber{color:var(--amber)}.rv.blue{color:var(--blue)}
+
+.breakdown{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-top:1px solid var(--border);font-size:.82rem}
+.breakdown-row:first-child{border-top:none}
+.breakdown-row:hover{background:rgba(255,255,255,.018)}
+.br-label{color:var(--text2)}
+.br-count{font-family:'JetBrains Mono',monospace;color:var(--text3);font-size:.75rem}
+.br-time{font-family:'JetBrains Mono',monospace;color:var(--purple);font-size:.78rem}
+.br-zero{opacity:.3}
+
+.tip{background:var(--amber-bg);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:.7rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:1rem}
+.tip strong{color:var(--amber)}
+
+.quick-targets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.qt{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.qt:hover{background:var(--surface2);color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Speedup Calculator</h1>
+<p class="subtitle">Enter how many speedups you have, set a target time, and see if you can cover it.</p>
+
+<div class="panel">
+  <div class="panel-label">1 — Your speedups</div>
+  <div class="su-grid" id="suGrid"></div>
+</div>
+
+<div class="panel">
+  <div class="panel-label">2 — Target time</div>
+  <div class="quick-targets" id="quickTargets"></div>
+  <div class="target-row">
+    <div class="field"><label>Days</label><input type="number" id="tDays" min="0" value="0" oninput="calc()"></div>
+    <div class="field"><label>Hours</label><input type="number" id="tHours" min="0" max="23" value="0" oninput="calc()"></div>
+    <div class="field"><label>Minutes</label><input type="number" id="tMins" min="0" max="59" value="0" oninput="calc()"></div>
+  </div>
+</div>
+
+<div id="results" style="display:none">
+  <div class="results">
+    <div class="result-card"><div class="rv purple" id="r-have">—</div><div class="rl">Speedups available</div></div>
+    <div class="result-card"><div class="rv blue" id="r-target">—</div><div class="rl">Target time</div></div>
+    <div class="result-card"><div class="rv" id="r-status">—</div><div class="rl" id="r-status-label">Status</div></div>
+    <div class="result-card"><div class="rv amber" id="r-pct">—</div><div class="rl">Coverage</div></div>
+  </div>
+  <div class="breakdown" id="breakdown"></div>
+</div>
+
+<div class="tip"><strong>Tip:</strong> 8-hour and 24-hour speedups are the best value per item slot. Prioritize using 1–5 minute speedups first on long builds since they're abundant and low-value to hoard.</div>
+</div>
+
+<script>
+const SPEEDUPS = [
+  { label:'1 Minute',  mins:1    },
+  { label:'3 Minutes', mins:3    },
+  { label:'5 Minutes', mins:5    },
+  { label:'10 Minutes',mins:10   },
+  { label:'15 Minutes',mins:15   },
+  { label:'30 Minutes',mins:30   },
+  { label:'1 Hour',    mins:60   },
+  { label:'3 Hours',   mins:180  },
+  { label:'8 Hours',   mins:480  },
+  { label:'24 Hours',  mins:1440 },
+  { label:'3 Days',    mins:4320 },
+  { label:'7 Days',    mins:10080},
+];
+
+const QUICK = [
+  { label:'HQ 22',  d:0,  h:8,  m:30 },
+  { label:'HQ 25',  d:2,  h:0,  m:0  },
+  { label:'HQ 28',  d:5,  h:0,  m:0  },
+  { label:'HQ 30',  d:12, h:0,  m:0  },
+  { label:'1 week', d:7,  h:0,  m:0  },
+  { label:'2 weeks',d:14, h:0,  m:0  },
+  { label:'1 month',d:30, h:0,  m:0  },
+];
+
+// Build inputs
+const grid = document.getElementById('suGrid');
+SPEEDUPS.forEach((s, i) => {
+  grid.innerHTML += `<div class="su-item">
+    <div class="su-label">${s.label}</div>
+    <div class="su-mins">${s.mins >= 1440 ? (s.mins/1440)+'d' : s.mins >= 60 ? (s.mins/60)+'h' : s.mins+'m'} each</div>
+    <input class="su-input" type="number" min="0" value="0" id="su${i}" oninput="calc()">
+  </div>`;
+});
+
+// Quick targets
+const qt = document.getElementById('quickTargets');
+QUICK.forEach(q => {
+  qt.innerHTML += `<button class="qt" onclick="setTarget(${q.d},${q.h},${q.m})">${q.label}</button>`;
+});
+
+function setTarget(d, h, m) {
+  document.getElementById('tDays').value = d;
+  document.getElementById('tHours').value = h;
+  document.getElementById('tMins').value = m;
+  calc();
+}
+
+function fmtT(m) {
+  if(m <= 0) return '0m';
+  const d = Math.floor(m/1440), h = Math.floor((m%1440)/60), mn = Math.floor(m%60);
+  return (d?d+'d ':'') + (h?h+'h ':'') + (mn?mn+'m':'') || '0m';
+}
+
+function calc() {
+  let totalMins = 0;
+  const counts = SPEEDUPS.map((s, i) => {
+    const n = parseInt(document.getElementById('su'+i).value) || 0;
+    totalMins += n * s.mins;
+    return n;
+  });
+
+  const targetMins = (parseInt(document.getElementById('tDays').value)||0) * 1440
+                   + (parseInt(document.getElementById('tHours').value)||0) * 60
+                   + (parseInt(document.getElementById('tMins').value)||0);
+
+  document.getElementById('r-have').textContent = fmtT(totalMins);
+  document.getElementById('r-target').textContent = targetMins > 0 ? fmtT(targetMins) : '—';
+
+  const statusEl = document.getElementById('r-status');
+  const pctEl = document.getElementById('r-pct');
+
+  if(targetMins > 0) {
+    const diff = totalMins - targetMins;
+    const pct = Math.round((totalMins / targetMins) * 100);
+    pctEl.textContent = pct + '%';
+    if(diff >= 0) {
+      statusEl.textContent = '+' + fmtT(diff);
+      statusEl.className = 'rv green';
+      document.getElementById('r-status-label').textContent = 'Surplus';
+    } else {
+      statusEl.textContent = '−' + fmtT(Math.abs(diff));
+      statusEl.className = 'rv red';
+      document.getElementById('r-status-label').textContent = 'Deficit';
+    }
+  } else {
+    statusEl.textContent = '—';
+    statusEl.className = 'rv amber';
+    pctEl.textContent = '—';
+  }
+
+  // Breakdown
+  let bdHTML = '';
+  SPEEDUPS.forEach((s, i) => {
+    const n = counts[i];
+    const contrib = n * s.mins;
+    const cls = n === 0 ? 'breakdown-row br-zero' : 'breakdown-row';
+    bdHTML += `<div class="${cls}">
+      <span class="br-label">${s.label}</span>
+      <span class="br-count">×${n.toLocaleString()}</span>
+      <span class="br-time">${contrib > 0 ? fmtT(contrib) : '—'}</span>
+    </div>`;
+  });
+  document.getElementById('breakdown').innerHTML = bdHTML;
+  document.getElementById('results').style.display = 'block';
+}
+
+calc();
+</script>
+</body>
+</html>

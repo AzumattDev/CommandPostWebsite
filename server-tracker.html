@@ -73,8 +73,23 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
 .tl-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
 .tl-card.past{opacity:.5}
 .tl-card.current{border-color:var(--green-border);background:rgba(52,211,153,.03)}
-.tl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.tl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;gap:6px}
 .tl-day{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600}
+.tl-flag{background:none;border:none;color:var(--text3);font-size:.75rem;cursor:pointer;padding:2px 5px;border-radius:4px;opacity:0;transition:all .12s;margin-left:auto}
+.tl-card:hover .tl-flag{opacity:1}
+.tl-flag:hover{color:var(--amber)}
+.flag-modal{display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:1rem}
+.flag-modal.open{display:flex}
+.flag-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.flag-title{font-size:.92rem;font-weight:600;margin-bottom:.25rem}
+.flag-event{font-size:.78rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:.75rem}
+.flag-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;resize:vertical;min-height:80px;box-sizing:border-box}
+.flag-textarea:focus{outline:none;border-color:var(--amber)}
+.flag-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:.75rem}
+.flag-cancel{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:inherit;font-size:.82rem;cursor:pointer}
+.flag-submit{padding:7px 14px;border-radius:7px;border:1px solid var(--amber-border);background:rgba(251,191,36,.08);color:var(--amber);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer}
+.flag-submit:hover{background:rgba(251,191,36,.15)}
+.flag-sent{text-align:center;padding:.5rem 0;color:var(--green);font-size:.88rem}
 .tl-day.past{color:var(--text3)}.tl-day.current{color:var(--green)}.tl-day.future{color:var(--amber)}.tl-day.far{color:var(--text3)}
 .tl-badge{font-size:.65rem;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:500}
 .badge-hero{background:rgba(167,139,250,.1);color:var(--purple)}
@@ -129,6 +144,22 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
   </div>
   <div class="tl" id="tl"></div>
 </div>
+</div>
+
+<!-- Flag / correction modal -->
+<div class="flag-modal" id="flagModal">
+  <div class="flag-box">
+    <div class="flag-title">Report a correction</div>
+    <div class="flag-event" id="flagEventLabel"></div>
+    <div id="flagForm">
+      <textarea class="flag-textarea" id="flagText" placeholder="What's wrong? e.g. 'This hero unlocked on Day 45, not Day 42'" maxlength="500"></textarea>
+      <div class="flag-actions">
+        <button class="flag-cancel" onclick="closeFlagModal()">Cancel</button>
+        <button class="flag-submit" onclick="submitFlag()">Submit</button>
+      </div>
+    </div>
+    <div class="flag-sent" id="flagSent" style="display:none">Thanks — correction submitted!</div>
+  </div>
 </div>
 
 <script src="data/events.js"></script>
@@ -307,12 +338,14 @@ function renderTimeline(s){
     const badge = {hero:'badge-hero',event:'badge-event',weapon:'badge-weapon',feature:'badge-feature',season:'badge-season'}[type];
     const label = type.charAt(0).toUpperCase()+type.slice(1);
 
+    const titleEsc = title.replace(/'/g,'&#39;');
     return `<div class="tl-item">
       <div class="tl-dot ${status}"></div>
       <div class="tl-card ${status}">
         <div class="tl-header">
           <span class="tl-day ${status}">Day ${eDay}</span>
           <span class="tl-badge ${badge}">${label}</span>
+          <button class="tl-flag" onclick="event.stopPropagation();openFlagModal(${eDay},'${titleEsc}')" title="Report a correction">⚑</button>
         </div>
         <div class="tl-title">${title}</div>
         <div class="tl-desc">${desc}</div>
@@ -329,6 +362,39 @@ function setFilter(f, btn){
   const servers=loadServers();
   if(servers[activeIdx]) renderTimeline(servers[activeIdx]);
 }
+
+// ── Event corrections ─────────────────────────────────────────────────────────
+let flagDay=0, flagTitle='';
+
+function openFlagModal(day, title){
+  flagDay=day; flagTitle=title;
+  document.getElementById('flagEventLabel').textContent=`Day ${day} — ${title}`;
+  document.getElementById('flagText').value='';
+  document.getElementById('flagForm').style.display='block';
+  document.getElementById('flagSent').style.display='none';
+  document.getElementById('flagModal').classList.add('open');
+}
+
+function closeFlagModal(){
+  document.getElementById('flagModal').classList.remove('open');
+}
+
+async function submitFlag(){
+  const correction = document.getElementById('flagText').value.trim();
+  if(!correction) return;
+  try {
+    await fetch('/api/corrections',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({event_day:flagDay, event_title:flagTitle, correction})
+    });
+  } catch(e){}
+  document.getElementById('flagForm').style.display='none';
+  document.getElementById('flagSent').style.display='block';
+  setTimeout(closeFlagModal, 1800);
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFlagModal(); });
 
 render();
 </script>

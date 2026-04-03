@@ -7,6 +7,9 @@ riderModule.iml
 .vs/
 CommandPostWebsite.sln.DotSettings.user
 
+# local notes
+ADMIN-NOTES.md
+
 # wrangler files
 .wrangler
 .dev.vars*
