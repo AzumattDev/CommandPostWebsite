@@ -95,10 +95,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 .form-direction{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;align-self:stretch;text-align:center;padding:5px 0;}
 .form-back{color:var(--green);border-bottom:1px dashed rgba(52,211,153,.15);opacity:.8;}
 .form-front{color:var(--red);border-top:1px dashed rgba(248,113,113,.15);opacity:.8;}
-.form-grid{display:grid;grid-template-columns:repeat(3,110px);grid-template-rows:repeat(2,96px);gap:8px;}
-.grid-empty{background:rgba(255,255,255,.015);border-radius:8px;border:1px dashed rgba(255,255,255,.04);}
-.pos-slot{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid;transition:transform .2s,box-shadow .2s;cursor:default;}
-.pos-slot:hover{transform:scale(1.05);}
+.form-3d-wrap{perspective:600px;perspective-origin:50% 0%;display:flex;justify-content:center;padding:.25rem 0 1.75rem;}
+.form-grid{display:grid;grid-template-columns:repeat(3,114px);grid-template-rows:repeat(2,104px);gap:10px;transform:rotateX(52deg);transform-origin:center center;filter:drop-shadow(0 28px 36px rgba(0,0,0,.6));}
+.grid-empty{background:rgba(255,255,255,.008);border-radius:4px;}
+.pos-slot{border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid;transition:filter .2s;cursor:default;}
+.pos-slot:hover{filter:brightness(1.25);}
 .pos-num{font-family:'Chakra Petch',sans-serif;font-size:2rem;font-weight:700;line-height:1;}
 .pos-name{font-size:.62rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:3px;opacity:.75;}
 .pos-front{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35);color:var(--red);}
@@ -125,7 +126,7 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 .hc-missile{background:var(--missile-bg);color:var(--missile);}
 
 @media(max-width:600px){
-  .form-grid{grid-template-columns:repeat(3,86px);grid-template-rows:repeat(3,76px);gap:6px;}
+  .form-grid{grid-template-columns:repeat(3,82px);grid-template-rows:repeat(2,76px);gap:6px;}
   .pos-num{font-size:1.6rem;}
   .page-tabs{gap:4px;}
   .page-tab{padding:8px 14px;font-size:.82rem;}
@@ -398,13 +399,15 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 
     <div class="form-pad">
       <div class="form-direction form-back">↑ back — DPS &amp; support heroes</div>
-      <div class="form-grid">
-        <div class="pos-slot pos-back-l"><div class="pos-num">5</div><div class="pos-name">Back Right</div></div>
-        <div class="pos-slot pos-back"><div class="pos-num">4</div><div class="pos-name">Back</div></div>
-        <div class="pos-slot pos-back-r"><div class="pos-num">3</div><div class="pos-name">Back Left</div></div>
-        <div class="pos-slot pos-front"><div class="pos-num">2</div><div class="pos-name">Front Right</div></div>
-        <div class="grid-empty"></div>
-        <div class="pos-slot pos-front"><div class="pos-num">1</div><div class="pos-name">Front Left</div></div>
+      <div class="form-3d-wrap">
+        <div class="form-grid">
+          <div class="pos-slot pos-back-l"><div class="pos-num">5</div><div class="pos-name">Back Right</div></div>
+          <div class="pos-slot pos-back"><div class="pos-num">4</div><div class="pos-name">Back</div></div>
+          <div class="pos-slot pos-back-r"><div class="pos-num">3</div><div class="pos-name">Back Left</div></div>
+          <div class="pos-slot pos-front"><div class="pos-num">2</div><div class="pos-name">Front Right</div></div>
+          <div class="grid-empty"></div>
+          <div class="pos-slot pos-front"><div class="pos-num">1</div><div class="pos-name">Front Left</div></div>
+        </div>
       </div>
       <div class="form-direction form-front">↓ front — first contact with enemy</div>
       <div class="form-pad-label">FORMATION</div>
