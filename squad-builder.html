@@ -95,25 +95,25 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 .form-direction{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;align-self:stretch;text-align:center;padding:5px 0;}
 .form-back{color:var(--green);border-bottom:1px dashed rgba(52,211,153,.15);opacity:.8;}
 .form-front{color:var(--red);border-top:1px dashed rgba(248,113,113,.15);opacity:.8;}
-.form-grid{display:grid;grid-template-columns:repeat(3,110px);grid-template-rows:repeat(3,96px);gap:8px;}
+.form-grid{display:grid;grid-template-columns:repeat(3,110px);grid-template-rows:repeat(2,96px);gap:8px;}
 .grid-empty{background:rgba(255,255,255,.015);border-radius:8px;border:1px dashed rgba(255,255,255,.04);}
 .pos-slot{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid;transition:transform .2s,box-shadow .2s;cursor:default;}
 .pos-slot:hover{transform:scale(1.05);}
 .pos-num{font-family:'Chakra Petch',sans-serif;font-size:2rem;font-weight:700;line-height:1;}
 .pos-name{font-size:.62rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-top:3px;opacity:.75;}
 .pos-front{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35);color:var(--red);}
-.pos-flank{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.28);color:var(--amber);}
-.pos-back-r{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.25);color:var(--blue);}
-.pos-back{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:var(--green);}
+.pos-back-r{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.28);color:var(--amber);}
+.pos-back{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.25);color:var(--blue);}
+.pos-back-l{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:var(--green);}
 .form-pad-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text3);opacity:.45;padding-top:.5rem;align-self:stretch;text-align:center;border-top:1px solid var(--border);}
 
 .pos-ref-wrap{overflow-x:auto;margin-bottom:1.5rem;}
 .pos-ref-table{min-width:580px;}
 .pos-num-sm{font-family:'Chakra Petch',sans-serif;font-size:.95rem;font-weight:700;width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:2px solid;}
 .pn-front{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3);color:var(--red);}
-.pn-flank{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:var(--amber);}
-.pn-back-r{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.2);color:var(--blue);}
-.pn-back{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:var(--green);}
+.pn-back-r{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);color:var(--amber);}
+.pn-back{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.2);color:var(--blue);}
+.pn-back-l{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:var(--green);}
 .risk-badge{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;padding:2px 7px;border-radius:4px;text-transform:uppercase;white-space:nowrap;}
 .risk-high{background:rgba(248,113,113,.12);color:var(--red);}
 .risk-med{background:rgba(251,191,36,.1);color:var(--amber);}
@@ -397,17 +397,14 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
     <p style="color:var(--text2);font-size:.88rem;margin-bottom:1.5rem">Each numbered squad slot maps to a specific spot on the battlefield. Position 1 faces the enemy first. Position 5 is the safest backline slot. Numbers match what you see on your in-game formation screen.</p>
 
     <div class="form-pad">
-      <div class="form-direction form-back">↑ back — safest, first to last</div>
+      <div class="form-direction form-back">↑ back — DPS &amp; support heroes</div>
       <div class="form-grid">
+        <div class="pos-slot pos-back-l"><div class="pos-num">5</div><div class="pos-name">Back Left</div></div>
+        <div class="pos-slot pos-back"><div class="pos-num">4</div><div class="pos-name">Back</div></div>
+        <div class="pos-slot pos-back-r"><div class="pos-num">3</div><div class="pos-name">Back Right</div></div>
+        <div class="pos-slot pos-front"><div class="pos-num">2</div><div class="pos-name">Front Left</div></div>
         <div class="grid-empty"></div>
-        <div class="pos-slot pos-back"><div class="pos-num">5</div><div class="pos-name">Back</div></div>
-        <div class="pos-slot pos-back-r"><div class="pos-num">4</div><div class="pos-name">Back Right</div></div>
-        <div class="pos-slot pos-flank"><div class="pos-num">2</div><div class="pos-name">Left</div></div>
-        <div class="grid-empty"></div>
-        <div class="grid-empty"></div>
-        <div class="grid-empty"></div>
-        <div class="pos-slot pos-front"><div class="pos-num">1</div><div class="pos-name">Front</div></div>
-        <div class="pos-slot pos-flank"><div class="pos-num">3</div><div class="pos-name">Right</div></div>
+        <div class="pos-slot pos-front"><div class="pos-num">1</div><div class="pos-name">Front Right</div></div>
       </div>
       <div class="form-direction form-front">↓ front — first contact with enemy</div>
       <div class="form-pad-label">FORMATION</div>
@@ -430,45 +427,45 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <tbody>
           <tr>
             <td><span class="pos-num-sm pn-front">1</span></td>
-            <td style="font-weight:600">Front</td>
+            <td style="font-weight:600">Front Right</td>
             <td><span class="risk-badge risk-high">High</span></td>
-            <td style="color:var(--text2);font-size:.82rem">Primary tank — most hits, needs max HP/DEF</td>
+            <td style="color:var(--text2);font-size:.82rem">Primary tank — first contact, absorbs most hits</td>
             <td><span class="hero-chip hc-tank">Murphy</span></td>
             <td><span class="hero-chip hc-air">Lucius</span></td>
             <td><span class="hero-chip hc-missile">Adam</span></td>
           </tr>
           <tr>
-            <td><span class="pos-num-sm pn-flank">2</span></td>
-            <td style="font-weight:600">Left Flank</td>
-            <td><span class="risk-badge risk-med">Med</span></td>
-            <td style="color:var(--text2);font-size:.82rem">Off-tank — secondary shield, flanking defense</td>
+            <td><span class="pos-num-sm pn-front">2</span></td>
+            <td style="font-weight:600">Front Left</td>
+            <td><span class="risk-badge risk-high">High</span></td>
+            <td style="color:var(--text2);font-size:.82rem">Off-tank — second frontline, shields position 1</td>
             <td><span class="hero-chip hc-tank">Williams</span></td>
             <td><span class="hero-chip hc-air">Carlie</span></td>
             <td><span class="hero-chip hc-missile">McGregor</span></td>
           </tr>
           <tr>
-            <td><span class="pos-num-sm pn-flank">3</span></td>
-            <td style="font-weight:600">Right Flank</td>
-            <td><span class="risk-badge risk-med">Med</span></td>
-            <td style="color:var(--text2);font-size:.82rem">Primary DPS — in range early, needs some resilience</td>
+            <td><span class="pos-num-sm pn-back-r">3</span></td>
+            <td style="font-weight:600">Back Right</td>
+            <td><span class="risk-badge risk-low">Low</span></td>
+            <td style="color:var(--text2);font-size:.82rem">Primary DPS — deals damage from back row safety</td>
             <td><span class="hero-chip hc-tank">Kimberly</span></td>
             <td><span class="hero-chip hc-air">DVA</span></td>
             <td><span class="hero-chip hc-missile">Fiona</span></td>
           </tr>
           <tr>
-            <td><span class="pos-num-sm pn-back-r">4</span></td>
-            <td style="font-weight:600">Back Right</td>
+            <td><span class="pos-num-sm pn-back">4</span></td>
+            <td style="font-weight:600">Back Center</td>
             <td><span class="risk-badge risk-low">Low</span></td>
-            <td style="color:var(--text2);font-size:.82rem">Secondary DPS — sustained damage from safety</td>
+            <td style="color:var(--text2);font-size:.82rem">Secondary DPS — sustained damage, protected</td>
             <td><span class="hero-chip hc-tank">Stetmann</span></td>
             <td><span class="hero-chip hc-air">Morrison</span></td>
             <td><span class="hero-chip hc-missile">Tesla</span></td>
           </tr>
           <tr>
-            <td><span class="pos-num-sm pn-back">5</span></td>
-            <td style="font-weight:600">Back</td>
+            <td><span class="pos-num-sm pn-back-l">5</span></td>
+            <td style="font-weight:600">Back Left</td>
             <td><span class="risk-badge risk-safe">Safe</span></td>
-            <td style="color:var(--text2);font-size:.82rem">Buffer/Support — must survive the full fight</td>
+            <td style="color:var(--text2);font-size:.82rem">Buffer/Support — safest slot, must survive full fight</td>
             <td><span class="hero-chip hc-tank">Marshall</span></td>
             <td><span class="hero-chip hc-air">Schuyler</span></td>
             <td><span class="hero-chip hc-missile">Swift</span></td>
@@ -479,7 +476,7 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 
     <div class="tip-box">
       <h3>Hybrid squads: off-type hero always goes to position 2</h3>
-      <p>When you splash an off-type hero into a squad (e.g., Murphy in an Air squad), put them in <strong>slot 2 — left flank</strong>. Murphy's raw tankiness fills that off-tank role better than Carlie in late-game metas. The rest of the squad stays in standard positions.</p>
+      <p>When you splash an off-type hero into a squad (e.g., Murphy in an Air squad), put them in <strong>slot 2 — front left</strong>. Murphy's raw tankiness fills that off-tank role better than Carlie in late-game metas. The rest of the squad stays in standard positions.</p>
     </div>
     <div class="tip-box" style="border-left-color:var(--amber)">
       <h3>Code Boss exception: Marshall moves to position 1</h3>
