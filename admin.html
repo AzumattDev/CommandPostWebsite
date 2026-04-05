@@ -161,16 +161,14 @@ async function act(id, action) {
 
 /* ── Train Rotation ───────────────────────────────────── */
 
-/* Deterministic date seed — same conductor for everyone on the same calendar day */
-function dateSeed(dateStr) {
-  let h = 5381;
-  for (let i = 0; i < dateStr.length; i++) h = (Math.imul(h, 33) ^ dateStr.charCodeAt(i)) >>> 0;
-  return h;
-}
-
+/* Round-robin by calendar day — each person gets exactly one turn before anyone repeats */
 function conductorForDate(dateStr, roster) {
   if (!roster.length) return null;
-  return roster[dateSeed(dateStr) % roster.length].name;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const epoch = new Date('2020-01-01');
+  const dt = new Date(y, m - 1, d);
+  const dayNum = Math.round((dt - epoch) / 86400000);
+  return roster[dayNum % roster.length].name;
 }
 
 function localDateStr(offsetDays = 0) {
