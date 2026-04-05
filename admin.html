@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — The Command Post</title>
 <link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
 <style>
 :root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838}
 h1{font-family:'Chakra Petch',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;color:var(--amber)}
@@ -59,6 +60,13 @@ h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margi
 .btn-add{padding:8px 18px;border-radius:8px;border:1px solid var(--amber-border);background:rgba(251,191,36,.08);color:var(--amber);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;white-space:nowrap}
 .btn-add:hover{background:rgba(251,191,36,.15)}
 .roster-self-hint{font-size:.72rem;color:var(--text3);margin-top:.5rem}
+
+.time-bar{display:flex;flex-wrap:wrap;gap:10px 28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1.1rem;margin-bottom:1.5rem}
+.tc-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.tc-val{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:600;color:var(--text)}
+.tc-sub{font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--text3);margin-top:2px}
+.tc-countdown{color:var(--green)}
+.tc-countdown.near{color:var(--amber)}
 </style>
 </head>
 <body>
@@ -77,6 +85,8 @@ h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margi
 
   <!-- ── Train Rotation ────────────────────────────────── -->
   <h1>Train Rotation</h1>
+
+  <div class="time-bar" id="timebar"></div>
 
   <div id="conductorCard" class="conductor-card">
     <div class="conductor-icon">🚂</div>
@@ -120,6 +130,7 @@ function login() {
   adminToken = t;
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').style.display = 'block';
+  startClock();
   loadCorrections();
   loadRotation();
 }
@@ -252,6 +263,44 @@ async function removeRoster(id) {
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Live clock ───────────────────────────────────────── */
+let clockInterval = null;
+
+function tickClock() {
+  const el = document.getElementById('timebar');
+  if (!el) return;
+  const now = new Date();
+
+  const localTime = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const localAbbr = now.toLocaleTimeString(undefined, { timeZoneName: 'short' }).split(' ').pop();
+
+  const utcStr = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}:${String(now.getUTCSeconds()).padStart(2,'0')} UTC`;
+
+  /* Reset at 02:00 UTC — show when that lands in local time */
+  const resetToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 2, 0, 0));
+  const resetLocal = resetToday.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+  /* Countdown */
+  let next = new Date(resetToday);
+  if (next <= now) next = new Date(next.getTime() + 86400000);
+  const sec = Math.floor((next - now) / 1000);
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const countdownStr = `${h}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+  const near = h === 0 && m < 10;
+
+  el.innerHTML =
+    `<div><div class="tc-label">Your time</div><div class="tc-val">${localTime} <span style="color:var(--text3);font-size:.78rem">${localAbbr}</span></div></div>` +
+    `<div><div class="tc-label">UTC</div><div class="tc-val">${utcStr}</div></div>` +
+    `<div><div class="tc-label">Next reset</div><div class="tc-val tc-countdown${near?' near':''}">↻ ${countdownStr}</div><div class="tc-sub">02:00 UTC = ${resetLocal}</div></div>`;
+}
+
+function startClock() {
+  tickClock();
+  if (!clockInterval) clockInterval = setInterval(tickClock, 1000);
 }
 </script>
 </body>
