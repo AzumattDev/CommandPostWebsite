@@ -161,22 +161,21 @@ async function act(id, action) {
 
 /* ── Train Rotation ───────────────────────────────────── */
 
-/* Round-robin by calendar day — each person gets exactly one turn before anyone repeats */
+/* Round-robin by game day — each person gets exactly one turn before anyone repeats */
 function conductorForDate(dateStr, roster) {
   if (!roster.length) return null;
   const [y, m, d] = dateStr.split('-').map(Number);
-  const epoch = new Date('2020-01-01');
-  const dt = new Date(y, m - 1, d);
-  const dayNum = Math.round((dt - epoch) / 86400000);
+  const dayNum = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(2020, 0, 1)) / 86400000);
   return roster[dayNum % roster.length].name;
 }
 
 function localDateStr(offsetDays = 0) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  // Game reset is 02:00 UTC. Subtract 2 h so the date rolls at reset, not local midnight.
+  const d = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  d.setUTCDate(d.getUTCDate() + offsetDays);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 }
 
