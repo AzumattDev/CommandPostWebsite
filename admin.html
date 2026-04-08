@@ -6,6 +6,8 @@
 <title>Admin — The Command Post</title>
 <link rel="stylesheet" href="style.css">
 <script src="nav.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0b0e;--surface:#14151b;--surface2:#1a1b23;--border:#262838}
 h1{font-family:'Chakra Petch',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;color:var(--amber)}
@@ -67,6 +69,65 @@ h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margi
 .tc-sub{font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--text3);margin-top:2px}
 .tc-countdown{color:var(--green)}
 .tc-countdown.near{color:var(--amber)}
+
+/* ── Schedule Planner ─────────────────────────────────── */
+:root{--train-orange:#e8720c;--train-gold:#ffd700}
+.pl-sub{font-size:.88rem;color:var(--text2);margin-bottom:1.5rem}
+.pl-sub-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px}
+.pl-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1rem}
+.pl-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.pl-row:last-child{border-bottom:none}
+.pl-day{font-family:'Chakra Petch',sans-serif;font-size:.88rem;font-weight:600;color:var(--train-orange);width:3rem;flex-shrink:0}
+.pl-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:.88rem;transition:border-color .15s}
+.pl-cond-input{flex:1}
+.pl-input:focus{outline:none;border-color:var(--train-orange)}
+.pl-vip-input{border-color:rgba(255,215,0,.2)!important;background:rgba(255,215,0,.04)!important;flex:1;display:none}
+.pl-vip-input:focus{border-color:var(--train-gold)!important}
+.show-pl-vip .pl-vip-input{display:block}
+.pl-time-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+.pl-time-row label{font-size:.83rem;color:var(--text2);white-space:nowrap}
+input[type="time"]{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88rem}
+input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
+.pl-field{display:flex;flex-direction:column;gap:4px}
+.pl-field label{font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+.pl-num-input{width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem}
+.pl-textarea{width:100%;min-height:85px;resize:vertical;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;box-sizing:border-box}
+.pl-textarea:focus{outline:none;border-color:var(--accent)}
+.pl-chk{display:flex;align-items:center;gap:7px;font-size:.88rem;color:var(--text2);cursor:pointer;user-select:none}
+.pl-chk input[type="checkbox"]{accent-color:var(--train-orange);width:15px;height:15px;cursor:pointer}
+.pl-btn{padding:8px 16px;border-radius:8px;border:1px solid transparent;font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.pl-btn-primary{background:var(--train-orange);color:#fff;border-color:var(--train-orange)}
+.pl-btn-primary:hover{filter:brightness(1.12)}
+.pl-btn-ghost{background:transparent;color:var(--text2);border-color:var(--border)}
+.pl-btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.pl-btn-gold{background:rgba(255,215,0,.08);color:var(--train-gold);border-color:rgba(255,215,0,.25)}
+.pl-btn-gold:hover{background:rgba(255,215,0,.14)}
+.pl-btn-danger{background:transparent;color:var(--red);border-color:rgba(248,113,113,.2)}
+.pl-btn-danger:hover{background:rgba(248,113,113,.06)}
+.pl-btn-sm{padding:5px 11px;font-size:.76rem}
+.pl-actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.pl-pager{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.pl-pager-info{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);min-width:90px;text-align:center}
+.pl-pager button:disabled{opacity:.35;cursor:not-allowed}
+.pl-avail-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.pl-avail-rule{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:.84rem}
+.pl-avail-rule .rt{flex:1;color:var(--text2)}
+.pl-avail-rule .rx{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.85rem;padding:2px 6px;border-radius:4px;transition:all .12s}
+.pl-avail-rule .rx:hover{color:var(--red);background:rgba(248,113,113,.08)}
+.pl-canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:10px}
+#plCanvas{max-width:100%;border-radius:8px;display:block}
+.pl-canvas-hint{font-size:.72rem;color:var(--text3);text-align:center}
+.pl-fair-bars{display:flex;flex-direction:column;gap:7px}
+.pl-fair-row{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.pl-fair-name{min-width:100px;max-width:130px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-fair-track{flex:1;height:9px;background:var(--surface3);border-radius:99px;overflow:hidden}
+.pl-fair-fill{height:100%;background:linear-gradient(90deg,var(--train-orange),var(--train-gold));border-radius:99px;transition:width .3s}
+.pl-fair-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);min-width:2.5rem;text-align:right}
+.pl-blocked-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pl-blocked-chip{font-size:.72rem;padding:3px 10px;border-radius:99px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);color:var(--red);font-family:'JetBrains Mono',monospace}
+.pl-info-box{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.16);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.65rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:.75rem}
+.pl-collapse-btn{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px;margin-left:4px;border-radius:4px}
+.pl-collapse-btn:hover{color:var(--text)}
 </style>
 </head>
 <body>
@@ -110,6 +171,99 @@ h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margi
     <div class="roster-self-hint">Names highlighted in <span style="color:var(--amber)">gold</span> are you (Alliance Leader). The first name added holds that spot — remove and re-add to change it.</div>
   </div>
 
+  <!-- ── Schedule Planner ───────────────────────────── -->
+  <hr class="section-divider">
+  <h1 style="color:var(--train-orange)">📋 Schedule Planner</h1>
+  <p class="pl-sub">Build a weekly conductor schedule, randomize fairly, add VIP slots, then export to image or copy for chat. The <strong>Pre-fill from Rotation</strong> button loads the current round-robin assignment.</p>
+
+  <h2>Weekly Schedule</h2>
+  <div class="pl-panel">
+    <div id="plRows"></div>
+    <div class="pl-time-row">
+      <label>⏰ Boarding Time:</label>
+      <input type="time" id="plTime" value="10:00" oninput="plSaveState();plGenPreview()">
+      <label class="pl-chk" style="margin-left:8px">
+        <input type="checkbox" id="plVip" onchange="plToggleVip()">
+        Show VIP slot
+      </label>
+      <button class="pl-btn pl-btn-ghost pl-btn-sm" style="margin-left:auto" onclick="plPrefill()">↻ Pre-fill from Rotation</button>
+    </div>
+  </div>
+
+  <h2>Auto-Randomizer</h2>
+  <div class="pl-panel">
+    <div class="pl-field" style="margin-bottom:12px">
+      <label>Player Pool <span style="font-weight:400;color:var(--text3)">(comma or newline — leave blank to use Roster)</span></label>
+      <textarea id="plPool" class="pl-textarea" placeholder="Alice, Bob, Charlie&#10;Or one per line… (empty = use the R4 Roster)" oninput="plSavePool()"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
+      <div class="pl-field">
+        <label>Penalty Days</label>
+        <input type="number" id="plPenalty" value="7" min="0" max="30" class="pl-num-input" oninput="plRenderBlocked()">
+      </div>
+      <div class="pl-field">
+        <label>Weeks to Generate</label>
+        <input type="number" id="plWeeks" value="1" min="1" max="8" class="pl-num-input">
+      </div>
+      <label class="pl-chk">
+        <input type="checkbox" id="plAutoFair" checked>
+        Auto-Fair weighting
+      </label>
+    </div>
+    <div class="pl-info-box">
+      <strong>Auto-Fair</strong> weights towards under-assigned players. <strong>Penalty Days</strong> blocks recently-assigned players from re-selection (VIP slots are exempt). Empty pool uses the R4 Roster.
+    </div>
+  </div>
+
+  <h2>Availability Rules <button class="pl-collapse-btn" onclick="plToggleSec('plAvailBody')">▼</button></h2>
+  <div id="plAvailBody" class="pl-panel">
+    <div class="pl-info-box">Block a player from driving on a specific day of the week.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div class="pl-field" style="flex:1;min-width:120px">
+        <label>Player Name</label>
+        <input type="text" id="plAvailName" class="pl-input pl-cond-input" placeholder="Player name…">
+      </div>
+      <div class="pl-field">
+        <label>Day</label>
+        <select id="plAvailDay" class="pl-input" style="font-family:'DM Sans',sans-serif">
+          <option value="0">Monday</option><option value="1">Tuesday</option>
+          <option value="2">Wednesday</option><option value="3">Thursday</option>
+          <option value="4">Friday</option><option value="5">Saturday</option>
+          <option value="6">Sunday</option>
+        </select>
+      </div>
+      <button class="pl-btn pl-btn-ghost pl-btn-sm" onclick="plAddAvail()">＋ Block</button>
+    </div>
+    <div id="plAvailList" class="pl-avail-list"></div>
+  </div>
+
+  <div class="pl-actions-row">
+    <button class="pl-btn pl-btn-primary" onclick="plRandomize()">🎲 Randomize</button>
+    <button class="pl-btn pl-btn-ghost" id="plCopyBtn" onclick="plCopyChat()">📋 Copy for Chat</button>
+    <button class="pl-btn pl-btn-gold" id="plDlBtn" onclick="plDownload()">📥 Download PNG</button>
+    <button class="pl-btn pl-btn-danger pl-btn-sm" onclick="plClearHistory()">Clear History</button>
+  </div>
+
+  <div class="pl-pager" id="plPager" style="display:none">
+    <button class="pl-btn pl-btn-ghost pl-btn-sm" id="plPrev" onclick="plNavWeek(-1)">◀ Prev</button>
+    <span class="pl-pager-info" id="plPagerInfo">Week 1 / 1</span>
+    <button class="pl-btn pl-btn-ghost pl-btn-sm" id="plNext" onclick="plNavWeek(1)">Next ▶</button>
+  </div>
+
+  <div class="pl-canvas-wrap">
+    <canvas id="plCanvas" width="800" height="560"></canvas>
+    <div class="pl-canvas-hint">Preview updates live as you type. Right-click → "Save image as…" if download fails.</div>
+  </div>
+
+  <h2>Fairness Stats <button class="pl-collapse-btn" onclick="plToggleSec('plFairBody')">▼</button></h2>
+  <div id="plFairBody" class="pl-panel">
+    <div id="plFairBars" class="pl-fair-bars"><p style="font-size:.84rem;color:var(--text3)">No history yet — randomize to start tracking.</p></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div class="pl-sub-label">Currently Blocked (penalty)</div>
+      <div id="plBlockedList" class="pl-blocked-list"></div>
+    </div>
+  </div>
+
   <hr class="section-divider">
 
   <!-- ── Corrections ──────────────────────────────────── -->
@@ -131,6 +285,7 @@ function login() {
   document.getElementById('loginSection').style.display = 'none';
   document.getElementById('adminSection').style.display = 'block';
   startClock();
+  plInit();
   loadCorrections();
   loadRotation();
 }
@@ -302,6 +457,332 @@ function startClock() {
   tickClock();
   if (!clockInterval) clockInterval = setInterval(tickClock, 1000);
 }
+
+/* ══════════════════════════════════════════════════════════
+   SCHEDULE PLANNER
+   ══════════════════════════════════════════════════════════ */
+const PL_DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const PL_DLONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+let plGenWeeks = [], plCurWeek = 0;
+
+function plInit() {
+  plBuildRows();
+  plLoadState();
+  plLoadPool();
+  plRenderAvail();
+  plRenderFairness();
+  plRenderBlocked();
+  plGenPreview();
+}
+
+/* ── Build rows ─────────────────────────────────────────── */
+function plBuildRows() {
+  document.getElementById('plRows').innerHTML = PL_DAYS.map((d, i) => `
+    <div class="pl-row">
+      <span class="pl-day">${d}</span>
+      <input type="text" id="plC${d}" class="pl-input pl-cond-input" placeholder="${PL_DLONG[i]} conductor…"
+             oninput="plSaveState();plGenPreview()">
+      <input type="text" id="plV${d}" class="pl-input pl-vip-input" placeholder="VIP…"
+             oninput="plSaveState();plGenPreview()">
+    </div>`).join('');
+}
+
+/* ── VIP toggle ─────────────────────────────────────────── */
+function plToggleVip() {
+  const on = document.getElementById('plVip').checked;
+  document.getElementById('plRows').classList.toggle('show-pl-vip', on);
+  plSaveState(); plGenPreview();
+}
+
+/* ── Pre-fill from Rotation ─────────────────────────────── */
+function plPrefill() {
+  if (!rosterCache.length) { alert('Load the rotation first by logging in.'); return; }
+  const now = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const dow = todayUTC.getUTCDay();
+  const monday = new Date(todayUTC);
+  monday.setUTCDate(todayUTC.getUTCDate() - ((dow + 6) % 7));
+  PL_DAYS.forEach((d, i) => {
+    const day = new Date(monday);
+    day.setUTCDate(monday.getUTCDate() + i);
+    const ds = day.toISOString().split('T')[0];
+    const el = document.getElementById(`plC${d}`);
+    if (el) el.value = conductorForDate(ds, rosterCache) || '';
+  });
+  plSaveState(); plGenPreview();
+}
+
+/* ── Persistence ─────────────────────────────────────────── */
+function plGetState() {
+  return {
+    time: document.getElementById('plTime').value,
+    showVip: document.getElementById('plVip').checked,
+    conductors: PL_DAYS.map(d => document.getElementById(`plC${d}`)?.value || ''),
+    vips: PL_DAYS.map(d => document.getElementById(`plV${d}`)?.value || '')
+  };
+}
+function plSaveState() { try { localStorage.setItem('pl-schedule', JSON.stringify(plGetState())); } catch(e) {} }
+function plLoadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('pl-schedule') || 'null');
+    if (!s) return;
+    document.getElementById('plTime').value = s.time || '10:00';
+    if (s.showVip) { document.getElementById('plVip').checked = true; plToggleVip(); }
+    PL_DAYS.forEach((d, i) => {
+      const ci = document.getElementById(`plC${d}`); if (ci) ci.value = s.conductors?.[i] || '';
+      const vi = document.getElementById(`plV${d}`); if (vi) vi.value = s.vips?.[i] || '';
+    });
+  } catch(e) {}
+}
+function plSavePool() { try { localStorage.setItem('pl-pool', document.getElementById('plPool').value); } catch(e) {} }
+function plLoadPool() { try { document.getElementById('plPool').value = localStorage.getItem('pl-pool') || ''; } catch(e) {} }
+
+/* ── History ─────────────────────────────────────────────── */
+function plGetHistory() { try { return JSON.parse(localStorage.getItem('pl-history') || '[]'); } catch { return []; } }
+function plSaveHistory(h) { try { localStorage.setItem('pl-history', JSON.stringify(h)); } catch(e) {} }
+function plAddHistory(names) {
+  const h = plGetHistory(), today = new Date().toISOString().split('T')[0];
+  names.forEach(n => { if (n.trim()) h.push({ name: n.trim(), date: today }); });
+  plSaveHistory(h);
+}
+function plClearHistory() {
+  if (!confirm('Clear all planner assignment history and penalty blocks?')) return;
+  plSaveHistory([]); plRenderFairness(); plRenderBlocked();
+}
+
+/* ── Availability ────────────────────────────────────────── */
+function plGetAvail() { try { return JSON.parse(localStorage.getItem('pl-avail') || '{}'); } catch { return {}; } }
+function plSaveAvail(a) { try { localStorage.setItem('pl-avail', JSON.stringify(a)); } catch(e) {} }
+function plAddAvail() {
+  const nameEl = document.getElementById('plAvailName');
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  const day = parseInt(document.getElementById('plAvailDay').value);
+  const av = plGetAvail(), k = name.toLowerCase();
+  if (!av[k]) av[k] = { name, blockedDays: [] };
+  if (!av[k].blockedDays.includes(day)) av[k].blockedDays.push(day);
+  plSaveAvail(av); nameEl.value = ''; plRenderAvail();
+}
+function plRemoveAvail(k, day) {
+  const av = plGetAvail();
+  if (!av[k]) return;
+  av[k].blockedDays = av[k].blockedDays.filter(d => d !== day);
+  if (!av[k].blockedDays.length) delete av[k];
+  plSaveAvail(av); plRenderAvail();
+}
+function plRenderAvail() {
+  const av = plGetAvail(), rules = [];
+  Object.entries(av).forEach(([k, v]) => v.blockedDays.forEach(d => rules.push({ k, name: v.name, day: d })));
+  rules.sort((a, b) => a.day - b.day);
+  const el = document.getElementById('plAvailList');
+  if (!rules.length) { el.innerHTML = '<div style="font-size:.82rem;color:var(--text3)">No rules yet.</div>'; return; }
+  el.innerHTML = rules.map(r => `
+    <div class="pl-avail-rule">
+      <span class="rt">🚫 <strong>${escHtml(r.name)}</strong> → ${PL_DLONG[r.day]}</span>
+      <button class="rx" onclick="plRemoveAvail('${plEscA(r.k)}',${r.day})">✕</button>
+    </div>`).join('');
+}
+
+/* ── Randomize ───────────────────────────────────────────── */
+function plParsePool() {
+  const raw = document.getElementById('plPool').value;
+  const p = raw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+  return p.length ? p : rosterCache.map(r => r.name);
+}
+function plWRandom(candidates, history) {
+  const counts = {};
+  history.forEach(h => { const k = h.name.toLowerCase(); counts[k] = (counts[k] || 0) + 1; });
+  const w = candidates.map(c => 1 / ((counts[c.toLowerCase()] || 0) + 1));
+  const tot = w.reduce((a, b) => a + b, 0);
+  let r = Math.random() * tot;
+  for (let i = 0; i < candidates.length; i++) { r -= w[i]; if (r <= 0) return candidates[i]; }
+  return candidates[candidates.length - 1];
+}
+function plRandomize() {
+  const pool = plParsePool();
+  if (!pool.length) { alert('Add players to the pool, or make sure the R4 Roster has members.'); return; }
+  const penalty = parseInt(document.getElementById('plPenalty').value) || 0;
+  const weeks = Math.max(1, Math.min(8, parseInt(document.getElementById('plWeeks').value) || 1));
+  const autoFair = document.getElementById('plAutoFair').checked;
+  const showVip = document.getElementById('plVip').checked;
+  const av = plGetAvail(), history = plGetHistory();
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - penalty);
+  const cs = cutoff.toISOString().split('T')[0];
+  plGenWeeks = []; const fresh = [];
+
+  for (let w = 0; w < weeks; w++) {
+    const penBlocked = new Set();
+    if (penalty > 0) {
+      history.forEach(h => { if (h.date >= cs) penBlocked.add(h.name.toLowerCase()); });
+      fresh.forEach(n => penBlocked.add(n.toLowerCase()));
+    }
+    const eligible = pool.filter(p => !penBlocked.has(p.toLowerCase()));
+    const usedWeek = new Set(), conductors = [], vips = [];
+    for (let d = 0; d < 7; d++) {
+      const dayBlocked = new Set(Object.values(av).filter(v => v.blockedDays.includes(d)).map(v => v.name.toLowerCase()));
+      let p1 = eligible.filter(p => !usedWeek.has(p.toLowerCase()) && !dayBlocked.has(p.toLowerCase()));
+      if (!p1.length) p1 = pool.filter(p => !usedWeek.has(p.toLowerCase()) && !dayBlocked.has(p.toLowerCase()));
+      let c = '';
+      if (p1.length) { c = autoFair ? plWRandom(p1, history) : p1[Math.floor(Math.random() * p1.length)]; usedWeek.add(c.toLowerCase()); fresh.push(c); }
+      conductors.push(c);
+    }
+    if (showVip) {
+      const vUsed = new Set();
+      for (let d = 0; d < 7; d++) {
+        const dayBlocked = new Set(Object.values(av).filter(v => v.blockedDays.includes(d)).map(v => v.name.toLowerCase()));
+        let vp = pool.filter(p => !vUsed.has(p.toLowerCase()) && !dayBlocked.has(p.toLowerCase()));
+        let v = '';
+        if (vp.length) { v = autoFair ? plWRandom(vp, history) : vp[Math.floor(Math.random() * vp.length)]; vUsed.add(v.toLowerCase()); }
+        vips.push(v);
+      }
+      plGenWeeks.push({ conductors, vips });
+    } else { plGenWeeks.push({ conductors, vips: [] }); }
+  }
+
+  plAddHistory(fresh); plCurWeek = 0; plShowWeek(0); plUpdatePager(); plRenderFairness(); plRenderBlocked();
+}
+function plShowWeek(idx) {
+  if (idx < 0 || idx >= plGenWeeks.length) return;
+  plCurWeek = idx;
+  const w = plGenWeeks[idx];
+  PL_DAYS.forEach((d, i) => {
+    const ci = document.getElementById(`plC${d}`); if (ci) ci.value = w.conductors[i] || '';
+    const vi = document.getElementById(`plV${d}`); if (vi) vi.value = w.vips?.[i] || '';
+  });
+  plSaveState(); plGenPreview(); plUpdatePager();
+}
+function plNavWeek(delta) { plShowWeek(plCurWeek + delta); }
+function plUpdatePager() {
+  const p = document.getElementById('plPager');
+  if (plGenWeeks.length <= 1) { p.style.display = 'none'; return; }
+  p.style.display = 'flex';
+  document.getElementById('plPagerInfo').textContent = `Week ${plCurWeek + 1} / ${plGenWeeks.length}`;
+  document.getElementById('plPrev').disabled = plCurWeek === 0;
+  document.getElementById('plNext').disabled = plCurWeek === plGenWeeks.length - 1;
+}
+
+/* ── Fairness ────────────────────────────────────────────── */
+function plRenderFairness() {
+  const h = plGetHistory(), counts = {}, nameMap = {};
+  h.forEach(e => { const k = e.name.toLowerCase(); counts[k] = (counts[k] || 0) + 1; nameMap[k] = e.name; });
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const el = document.getElementById('plFairBars');
+  if (!entries.length) { el.innerHTML = '<p style="font-size:.84rem;color:var(--text3)">No history yet — randomize to start tracking.</p>'; return; }
+  const max = entries[0][1];
+  el.innerHTML = entries.map(([k, n]) => `
+    <div class="pl-fair-row">
+      <span class="pl-fair-name">${escHtml(nameMap[k] || k)}</span>
+      <div class="pl-fair-track"><div class="pl-fair-fill" style="width:${Math.round(n / max * 100)}%"></div></div>
+      <span class="pl-fair-num">${n}×</span>
+    </div>`).join('');
+}
+function plRenderBlocked() {
+  const penalty = parseInt(document.getElementById('plPenalty')?.value) || 0;
+  const el = document.getElementById('plBlockedList');
+  if (!el) return;
+  if (penalty === 0) { el.innerHTML = '<span style="font-size:.8rem;color:var(--text3)">Penalty disabled</span>'; return; }
+  const h = plGetHistory(), cutoff = new Date(); cutoff.setDate(cutoff.getDate() - penalty);
+  const cs = cutoff.toISOString().split('T')[0];
+  const blocked = new Set(), nameMap = {};
+  h.forEach(e => { if (e.date >= cs) { blocked.add(e.name.toLowerCase()); nameMap[e.name.toLowerCase()] = e.name; } });
+  if (!blocked.size) { el.innerHTML = '<span style="font-size:.8rem;color:var(--text3)">None currently blocked</span>'; return; }
+  el.innerHTML = [...blocked].map(k => `<span class="pl-blocked-chip">${escHtml(nameMap[k] || k)}</span>`).join('');
+}
+
+/* ── Canvas ──────────────────────────────────────────────── */
+function plGenPreview() {
+  const canvas = document.getElementById('plCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const showVip = document.getElementById('plVip')?.checked;
+  const W = 800, rowH = showVip ? 82 : 68, hdrH = 130, ftrH = 40, H = hdrH + 7 * rowH + ftrH;
+  canvas.width = W; canvas.height = H;
+  const bgG = ctx.createLinearGradient(0, 0, 0, H);
+  bgG.addColorStop(0, '#09101a'); bgG.addColorStop(1, '#060c13');
+  ctx.fillStyle = bgG; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  const tBar = ctx.createLinearGradient(0, 0, W, 0);
+  tBar.addColorStop(0, 'transparent'); tBar.addColorStop(0.25, '#e8720c');
+  tBar.addColorStop(0.75, '#ffd700'); tBar.addColorStop(1, 'transparent');
+  ctx.fillStyle = tBar; ctx.fillRect(0, 0, W, 3);
+  ctx.textAlign = 'center'; ctx.shadowColor = '#e8720c'; ctx.shadowBlur = 18;
+  ctx.fillStyle = '#ffd700'; ctx.font = 'bold 34px Orbitron, Arial';
+  ctx.fillText('🚂 Train Conductor Schedule', W / 2, 50); ctx.shadowBlur = 0;
+  const tval = document.getElementById('plTime')?.value || '10:00';
+  ctx.fillStyle = '#9d9baf'; ctx.font = '17px "Exo 2", Arial';
+  ctx.fillText(`⏰ Boarding Time: ${tval}`, W / 2, 80);
+  plCvRect(ctx, 20, 98, W - 40, 38, 8, '#e8720c');
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Exo 2", Arial';
+  ctx.textAlign = 'left'; ctx.fillText('DAY', 44, 122);
+  ctx.textAlign = 'center';
+  ctx.fillText('CONDUCTOR', showVip ? W * 0.42 : W / 2, 122);
+  if (showVip) ctx.fillText('VIP CONDUCTOR', W * 0.74, 122);
+  const conductors = PL_DAYS.map(d => document.getElementById(`plC${d}`)?.value || '');
+  const vips = PL_DAYS.map(d => document.getElementById(`plV${d}`)?.value || '');
+  PL_DLONG.forEach((day, i) => {
+    const y = hdrH + i * rowH, isLast = i === 6;
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(18,28,42,0.85)' : 'rgba(28,40,57,0.85)';
+    if (isLast) plCvRectBot(ctx, 20, y, W - 40, rowH - 1, 8);
+    else ctx.fillRect(20, y, W - 40, rowH - 1);
+    ctx.fillStyle = 'rgba(232,114,14,0.12)'; ctx.fillRect(20, y + rowH - 2, W - 40, 1);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#ffd700'; ctx.font = `bold ${showVip ? 14 : 16}px "Exo 2", Arial`;
+    ctx.fillText(PL_DAYS[i].toUpperCase(), 44, y + (showVip ? 29 : 35));
+    const cond = conductors[i];
+    ctx.textAlign = 'center';
+    if (cond) { ctx.fillStyle = '#e8e6f0'; ctx.font = `${showVip ? 18 : 20}px "Exo 2", Arial`; ctx.fillText(cond, showVip ? W * 0.42 : W / 2, y + (showVip ? 29 : 35)); }
+    else { ctx.fillStyle = '#3d3e55'; ctx.font = `italic ${showVip ? 14 : 16}px "Exo 2", Arial`; ctx.fillText('(Not assigned)', showVip ? W * 0.42 : W / 2, y + (showVip ? 29 : 35)); }
+    if (showVip && vips[i]) { ctx.fillStyle = '#ffd700'; ctx.font = 'bold 14px "Exo 2", Arial'; ctx.fillText(`⭐ ${vips[i]}`, W * 0.74, y + 29); }
+  });
+  ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,215,102,0.5)'; ctx.font = '12px "Exo 2", Arial';
+  ctx.fillText('commandpost.guide', W / 2, H - 12);
+}
+function plCvRect(ctx, x, y, w, h, r, fill) {
+  ctx.fillStyle = fill; ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.fill();
+}
+function plCvRectBot(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y); ctx.closePath(); ctx.fill();
+}
+function plDownload() {
+  plGenPreview();
+  try { const a = document.createElement('a'); a.href = document.getElementById('plCanvas').toDataURL('image/png'); a.download = 'train-conductor-schedule.png'; a.click(); }
+  catch(e) { alert('Download failed — right-click the preview and "Save image as…"'); }
+}
+
+/* ── Copy for chat ───────────────────────────────────────── */
+function plCopyChat() {
+  const conductors = PL_DAYS.map(d => document.getElementById(`plC${d}`)?.value || '');
+  const vips = PL_DAYS.map(d => document.getElementById(`plV${d}`)?.value || '');
+  const showVip = document.getElementById('plVip').checked;
+  const time = document.getElementById('plTime').value;
+  const wk = plGenWeeks.length > 1 ? ` — Week ${plCurWeek + 1}` : '';
+  let text = `🚂 Train Conductor${wk}\n⏰ ${time}\n\n`;
+  PL_DLONG.forEach((day, i) => {
+    let line = `${PL_DAYS[i]}: ${conductors[i] || '(empty)'}`;
+    if (showVip && vips[i]) line += ` ⭐ VIP: ${vips[i]}`;
+    text += line + '\n';
+  });
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('plCopyBtn');
+    const orig = btn.innerHTML; btn.innerHTML = '✅ Copied!';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  }).catch(() => { alert('Copy failed:\n\n' + text); });
+}
+
+/* ── Collapse ────────────────────────────────────────────── */
+function plToggleSec(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+function plEscA(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 </script>
 </body>
 </html>

@@ -31,3 +31,12 @@ CREATE TABLE IF NOT EXISTS train_roster (
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT    DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS coalition_plans (
+  server      TEXT NOT NULL PRIMARY KEY,  
+  label       TEXT DEFAULT '',             -- e.g. "S3 Capitol War"
+  alliance    TEXT DEFAULT '',             -- coordinating alliance tag
+  plan_data   TEXT NOT NULL,              -- JSON blob: alliances, assignments, bases, tactic
+  updated_by  TEXT DEFAULT '',            -- alliance tag of last uploader
+  updated_at  TEXT NOT NULL               -- ISO datetime, UTC
+);

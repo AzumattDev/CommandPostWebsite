@@ -1,6 +1,10 @@
 (function(){
 const NAV_LINKS = [
   {label:'Home', href:'index.html', icon:'🏠'},
+  {label:'Events', children:[
+    {label:'Desert Storm Planner', href:'desert-storm-planner.html'},
+    {label:'Canyon Storm Planner', href:'canyon-storm-planner.html'},
+  ]},
   {label:'Guides', children:[
     {label:'Alliance Duel Planner', href:'alliance-duel-planner.html'},
     {label:'Stamina & Resource ROI', href:'stamina-roi-guide.html'},
@@ -13,6 +17,7 @@ const NAV_LINKS = [
     {label:'Drone Priority', href:'drone-upgrade-guide.html'},
   ]},
   {label:'Territory', children:[
+    {label:'Capital War Planner', href:'capital-war-planner.html'},
     {label:'Hex Warzone Planner', href:'hex-warzone-planner.html'},
     {label:'City Capture Planner', href:'city-capture-planner.html'},
     {label:'Hive Strategy', href:'hive-strategy-guide.html'},
@@ -29,6 +34,9 @@ const NAV_LINKS = [
 // Search index — title, url, keywords
 const SEARCH_INDEX = [
   { title:'Home', url:'index.html', tags:'home overview' },
+  { title:'Capital War Planner', url:'capital-war-planner.html', tags:'capital war planner cannon assault rally burn squad garrison president occupation' },
+  { title:'Desert Storm Planner', url:'desert-storm-planner.html', tags:'desert storm planner tactical map drag drop phase plan auto assign' },
+  { title:'Canyon Storm Planner', url:'canyon-storm-planner.html', tags:'canyon storm planner rulebringers dawnbreakers faction viro lab phase plan' },
   { title:'Alliance Duel Planner', url:'alliance-duel-planner.html', tags:'alliance duel vs daily planner monday tuesday wednesday thursday friday saturday points' },
   { title:'Stamina & Resource ROI', url:'stamina-roi-guide.html', tags:'stamina resource roi return investment guide' },
   { title:'Power Progression', url:'power-progression.html', tags:'power progression milestones hq guide' },

@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War — Capital War Planner</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{
+  --cw-gold:#f0c040;--cw-gold-bg:rgba(240,192,64,.07);--cw-gold-border:rgba(240,192,64,.28);
+  --cw-cannon:#c084ff;--cw-cannon-bg:rgba(192,132,255,.07);--cw-cannon-border:rgba(192,132,255,.25);
+  --cw-flex:#34d399;--cw-flex-bg:rgba(52,211,153,.07);--cw-flex-border:rgba(52,211,153,.25);
+  --cw-perim:#4a9be8;--cw-perim-bg:rgba(74,155,232,.07);--cw-perim-border:rgba(74,155,232,.22);
+  --cw-second:#fbbf24;--cw-second-bg:rgba(251,191,36,.07);--cw-second-border:rgba(251,191,36,.25);
+  --type-heavy:#f87171;--type-mid:#fb923c;--type-support:#60a5fa;--type-flex-c:#34d399;
+  --mud-outer:#3e3730;--mud-zone:#7a6f60;
+}
+
+/* ── Profile bar ──────────────────────────────────────────── */
+.profile-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.65rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.pb-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);white-space:nowrap}
+.pb-select{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:.85rem;font-weight:600;min-width:200px;cursor:pointer}
+.pb-select:focus{outline:none;border-color:var(--cw-gold)}
+.pb-btns{display:flex;gap:6px;margin-left:auto}
+.pb-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
+.pb-btn:hover{background:var(--surface2);color:var(--text)}
+.pb-btn-new{background:var(--cw-gold-bg);border-color:var(--cw-gold-border);color:var(--cw-gold)}
+.pb-btn-new:hover{background:rgba(240,192,64,.15)}
+.pb-btn-del{color:var(--red);border-color:rgba(248,113,113,.2)}
+.pb-btn-del:hover{background:var(--red-bg)}
+.new-profile-form{background:var(--surface2);border:1px solid var(--cw-gold-border);border-radius:var(--radius-lg);padding:.85rem 1rem;margin-bottom:.75rem;display:none;gap:.75rem;flex-wrap:wrap;align-items:flex-end}
+.new-profile-form.show{display:flex}
+.npf-field{display:flex;flex-direction:column;gap:4px}
+.npf-field label{font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.npf-field input{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem}
+.npf-field input:focus{outline:none;border-color:var(--cw-gold)}
+
+/* ── War clock ────────────────────────────────────────────── */
+.war-clock{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.8rem 1.1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:1.75rem;flex-wrap:wrap}
+.wc-seg{display:flex;flex-direction:column;gap:2px}
+.wc-lbl{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.wc-val{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--text)}
+.wc-sub{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--text3);margin-top:1px}
+.wc-divider{width:1px;height:34px;background:var(--border);flex-shrink:0}
+.wc-countdown{color:var(--cw-gold)}
+.wc-live-wrap{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:6px;padding:5px 12px}
+.wc-live-badge{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:700;color:var(--green);animation:livepulse 1.4s ease-in-out infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wc-cfg-btn{margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);cursor:pointer;transition:all .15s}
+.wc-cfg-btn:hover{color:var(--text);border-color:var(--border2)}
+.wc-cfg{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .9rem;margin-bottom:.75rem;display:none;gap:1rem;flex-wrap:wrap;align-items:flex-end}
+.wc-cfg.show{display:flex}
+.wcf-field{display:flex;flex-direction:column;gap:3px}
+.wcf-field label{font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.wcf-field select,.wcf-field input{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem}
+.wcf-field select:focus,.wcf-field input:focus{outline:none;border-color:var(--cw-gold)}
+
+/* ── Timeline strip ───────────────────────────────────────── */
+.war-timeline{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.75rem 1rem;margin-bottom:1rem}
+.tl-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
+.tl-lbl{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+.tl-track{display:flex;flex:1;height:17px;border-radius:5px;overflow:hidden;gap:1px}
+.tl-seg{display:flex;align-items:center;justify-content:center;font-size:.54rem;font-family:'JetBrains Mono',monospace;font-weight:700;padding:0 4px;white-space:nowrap}
+.tl-gold{background:rgba(240,192,64,.18);border:1px solid rgba(240,192,64,.35);color:var(--cw-gold);flex:4}
+.tl-red{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.25);color:var(--red);flex:2}
+.tl-purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple);flex:2}
+.tl-meta{display:flex;gap:1rem;flex-wrap:wrap}
+.tl-chip{font-size:.7rem;color:var(--text3);display:flex;align-items:center;gap:5px}
+.tl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.cw-hero{padding:1.75rem 0 1rem}
+.cw-hero h1{font-family:'Chakra Petch',sans-serif;font-size:clamp(1.3rem,3.5vw,1.9rem);font-weight:700;margin-bottom:.3rem}
+.cw-hero h1 .acc{color:var(--cw-gold)}
+.cw-hero .sub{font-size:.88rem;color:var(--text2)}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.planner-layout{display:grid;grid-template-columns:300px 1fr;gap:1rem;align-items:start}
+@media(max-width:860px){.planner-layout{grid-template-columns:1fr}}
+.sidebar{display:flex;flex-direction:column;gap:.75rem;position:sticky;top:58px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.1rem}
+.panel-title{font-family:'JetBrains Mono',monospace;font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.panel-title .count{font-size:.67rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px}
+
+/* ── Add alliance form ────────────────────────────────────── */
+.add-tag-row{display:flex;gap:5px;margin-bottom:.4rem}
+.add-tag-row input[type=text]{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;text-transform:uppercase;min-width:0}
+.add-tag-row input:focus{outline:none;border-color:var(--cw-gold)}
+.add-tag-row input[type=text]:first-child{width:80px;flex-shrink:0}
+.add-tag-row input[type=text]:nth-child(2){flex:1}
+.add-tag-row button{padding:7px 10px;background:var(--cw-gold-bg);border:1px solid var(--cw-gold-border);border-radius:8px;color:var(--cw-gold);font-family:'Chakra Petch',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.add-tag-row button:hover{background:rgba(240,192,64,.16)}
+.add-meta-row{display:grid;grid-template-columns:1fr 1fr 70px;gap:4px;margin-bottom:.75rem}
+.add-meta-row select,.add-meta-row input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.75rem;width:100%}
+.add-meta-row select:focus,.add-meta-row input:focus{outline:none;border-color:var(--cw-gold)}
+
+/* ── Alliance chips ───────────────────────────────────────── */
+.alliance-list{display:flex;flex-direction:column;gap:4px;max-height:380px;overflow-y:auto}
+.alliance-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:grab;transition:all .15s;user-select:none}
+.alliance-chip:hover{border-color:rgba(240,192,64,.4);background:var(--surface3)}
+.alliance-chip.dragging{opacity:.3;cursor:grabbing}
+.chip-top{display:flex;align-items:center;gap:6px}
+.atype-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-tag{font-family:'Chakra Petch',sans-serif;font-weight:700;color:var(--text);font-size:.92rem;letter-spacing:.02em;flex-shrink:0}
+.chip-fullname{font-size:.72rem;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-asgn-dot{font-size:.6rem;color:var(--green);flex-shrink:0}
+.chip-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 4px;border-radius:4px;flex-shrink:0}
+.chip-remove:hover{color:var(--red);background:var(--red-bg)}
+.chip-meta{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.chip-meta select{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:2px 5px;color:var(--text);font-size:.7rem;font-family:'DM Sans',sans-serif;flex:1;min-width:0}
+.atype-badge{font-size:.54rem;font-family:'JetBrains Mono',monospace;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.at-heavy{background:rgba(248,113,113,.12);color:var(--type-heavy);border:1px solid rgba(248,113,113,.25)}
+.at-mid{background:rgba(251,146,60,.1);color:var(--type-mid);border:1px solid rgba(251,146,60,.22)}
+.at-support{background:rgba(96,165,250,.1);color:var(--type-support);border:1px solid rgba(96,165,250,.2)}
+.at-flex{background:rgba(52,211,153,.08);color:var(--type-flex-c);border:1px solid rgba(52,211,153,.2)}
+.chip-notes{font-size:.65rem;color:var(--text3);margin-top:3px;padding:0 2px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Tactic / actions ─────────────────────────────────────── */
+.tactic-btns{display:flex;flex-direction:column;gap:5px}
+.tac-btn{padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;text-align:left;transition:all .15s;width:100%}
+.tac-btn:hover{background:var(--surface2);color:var(--text)}
+.tac-btn.active{background:var(--cw-gold-bg);border-color:var(--cw-gold-border);color:var(--cw-gold)}
+.tac-btn strong{display:block;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.82rem;margin-bottom:2px}
+.tac-btn span{font-size:.7rem;color:var(--text3);line-height:1.4}
+.tac-btn.active span{color:rgba(240,192,64,.6)}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.cw-btn{padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.cw-btn:hover{background:var(--surface2);color:var(--text)}
+.cw-btn-primary{background:var(--cw-gold);color:#0c0d10;border-color:var(--cw-gold)}
+.cw-btn-primary:hover{filter:brightness(1.08)}
+.cw-btn-danger{color:var(--red);border-color:rgba(248,113,113,.2)}
+.cw-btn-danger:hover{background:var(--red-bg)}
+
+/* ── Canvas container ─────────────────────────────────────── */
+#bgCanvasContainer{position:relative;display:inline-block;line-height:0;user-select:none}
+
+/* ── Node assignment cards (Capitol + Cannons) ─────────────── */
+.node-assign-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:.75rem}
+.node-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.5rem .7rem;min-height:58px;transition:border-color .12s,transform .1s;cursor:default}
+.node-card.nc-capitol{border-color:rgba(232,114,12,.5);background:linear-gradient(140deg,rgba(70,32,4,.35) 0%,var(--surface) 60%)}
+.node-card.nc-cannon{border-color:rgba(192,132,255,.38);background:linear-gradient(140deg,rgba(30,10,55,.35) 0%,var(--surface) 60%)}
+.node-card.drag-over{border-color:var(--cw-gold);transform:scale(1.02);box-shadow:0 0 10px rgba(240,192,64,.2)}
+.nc-head{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.nc-num{width:17px;height:17px;background:linear-gradient(135deg,#f07020,#b04010);border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',sans-serif;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
+.nc-name{font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;color:var(--text);flex:1}
+.nc-name.nc-cannon-lbl{color:rgba(192,132,255,.95)}
+.nc-slots{font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.node-tags{display:flex;flex-direction:column;gap:2px}
+.node-atag{font-size:.62rem;font-family:'Chakra Petch',sans-serif;font-weight:700;background:rgba(25,90,180,.85);border:1px solid rgba(80,150,240,.5);border-radius:4px;padding:1px 6px;color:#fff;cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .12s;line-height:1.45}
+.node-atag:hover{background:rgba(160,20,20,.85);border-color:rgba(220,60,60,.6)}
+.node-atag.at-heavy{border-color:rgba(248,113,113,.6)}
+.node-atag.at-flex{border-color:rgba(52,211,153,.5)}
+.node-empty{font-size:.58rem;color:var(--text3);font-style:italic;font-family:'DM Sans',sans-serif}
+
+/* ── Off-map zones ────────────────────────────────────────── */
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-bottom:.75rem}
+.zone-slot{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.65rem .8rem;min-height:70px;transition:all .15s}
+.zone-slot.z-flex{border-color:var(--cw-flex-border)}
+.zone-slot.z-perim{border-color:var(--cw-perim-border)}
+.zone-slot.z-second{border-color:var(--cw-second-border)}
+.zone-slot.drag-over{border-color:var(--cw-gold);transform:scale(1.02)}
+.zone-head{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.zone-emoji{font-size:.9rem}
+.zone-name{font-family:'Chakra Petch',sans-serif;font-size:.73rem;font-weight:600;color:var(--text);flex:1}
+.zone-slots{font-size:.55rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.zone-desc{font-size:.62rem;color:var(--text3);margin-bottom:4px;line-height:1.35}
+.zone-tags{display:flex;flex-direction:column;gap:2px}
+.zone-atag{font-size:.7rem;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer;padding:2px 3px;border-radius:3px;transition:all .1s}
+.zone-atag:hover{background:var(--red-bg);color:var(--red)}
+.zt-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.zone-empty{font-size:.68rem;color:var(--text3);font-style:italic}
+
+/* ── Battle plan ──────────────────────────────────────────── */
+.battle-plan{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.battle-plan pre{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2);white-space:pre-wrap;line-height:1.9;margin:0}
+.phase-badge{display:inline-block;font-size:.65rem;font-family:'JetBrains Mono',monospace;font-weight:700;padding:3px 9px;border-radius:4px;margin-bottom:.45rem;text-transform:uppercase;letter-spacing:.04em}
+.ph-cannon{background:var(--cw-cannon-bg);color:var(--cw-cannon);border:1px solid var(--cw-cannon-border)}
+.ph-assault{background:var(--cw-gold-bg);color:var(--cw-gold);border:1px solid var(--cw-gold-border)}
+.ph-defense{background:var(--cw-perim-bg);color:var(--cw-perim);border:1px solid var(--cw-perim-border)}
+.ph-flex{background:var(--cw-flex-bg);color:var(--cw-flex);border:1px solid var(--cw-flex-border)}
+
+/* ── Rules ────────────────────────────────────────────────── */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-bottom:.75rem}
+.rule-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .75rem;font-size:.79rem;color:var(--text2);display:flex;gap:7px;line-height:1.55}
+.rule-item .ri{flex-shrink:0}
+.rule-item strong{color:var(--text);font-weight:600}
+
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem}
+
+/* ── Base placement ───────────────────────────────────────── */
+.map-tool-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.65rem;cursor:pointer;transition:all .15s}
+.map-tool-btn:hover{background:var(--surface2);color:var(--text)}
+.pt-lbl{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3);white-space:nowrap}
+.pt-sel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:.8rem;font-weight:600;flex:1;min-width:120px;max-width:200px}
+.pt-sel:focus{outline:none;border-color:var(--cw-flex)}
+.pt-check{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--text2);cursor:pointer;white-space:nowrap}
+.pt-check input{cursor:pointer;accent-color:var(--cw-perim)}
+/* ── Canvas base grid ─────────────────────────────────────── */
+.bg-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.5rem}
+.bg-zoom-row{display:flex;align-items:center;gap:4px}
+.gz-btn{padding:1px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.8rem;cursor:pointer;line-height:1.6;transition:all .12s}
+.gz-btn:hover{background:var(--surface2);color:var(--text)}
+.gz-val{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);min-width:32px;text-align:center}
+.bg-scroll-wrap{width:100%;overflow:hidden;border-radius:6px;border:1px solid var(--border);background:#0e1209;margin-bottom:.5rem;height:520px}
+.bg-scroll-wrap canvas{display:block;cursor:grab}
+.bg-legend{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.4rem}
+.bg-leg-item{display:flex;align-items:center;gap:4px;font-size:.65rem;color:var(--text3)}
+.bg-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+/* Base list (grouped) */
+.bli-group{margin-bottom:.5rem}
+.bli-group-header{display:flex;align-items:center;gap:6px;padding:3px 4px;margin-bottom:2px;border-bottom:1px solid var(--border)}
+.bli-group-tag{font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:700}
+.bli-group-name{font-size:.65rem;color:var(--text3);flex:1}
+.bli-group-count{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.base-list-item{display:flex;align-items:center;gap:5px;padding:3px 4px;border-radius:5px;transition:background .1s}
+.base-list-item:hover{background:var(--surface2)}
+.bli-ref{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3);min-width:22px;text-align:center;flex-shrink:0}
+.bli-name{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text);font-size:.72rem;font-family:'DM Sans',sans-serif;min-width:0;flex:1}
+.bli-name:focus{outline:none;border-color:var(--cw-gold)}
+.bli-toggle{padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:.62rem;cursor:pointer;transition:all .12s;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.bli-toggle:hover{background:var(--surface2);color:var(--text)}
+.bli-toggle.shielded{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.4);color:#93c5fd}
+.bli-toggle.active{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.4);color:#fbbf24}
+.bli-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.72rem;padding:2px 4px;border-radius:4px;flex-shrink:0}
+.bli-remove:hover{color:var(--red);background:var(--red-bg)}
+/* Cloud sync */
+.cloud-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.55rem 1rem;margin-bottom:.75rem;display:none;align-items:center;gap:.75rem;flex-wrap:wrap}
+.cloud-bar.show{display:flex}
+.cloud-status{font-size:.68rem;font-family:'JetBrains Mono',monospace;color:var(--text3);flex:1;min-width:0}
+.cloud-status.ok{color:var(--green)}.cloud-status.err{color:var(--red)}.cloud-status.busy{color:var(--cw-gold)}
+</style>
+</head>
+<body>
+<div class="container" style="max-width:1140px">
+
+<div class="cw-hero">
+  <h1>🏛️ <span class="acc">Capital War</span> Coalition Planner</h1>
+  <p class="sub">Assign top 10–15 alliances to cannons, Capitol defense, perimeter, and flex roles. Generate a Discord-ready battle plan for your coalition.</p>
+</div>
+
+<!-- Profile bar -->
+<div class="profile-bar">
+  <span class="pb-label">Server / Event</span>
+  <select class="pb-select" id="profileSelect" onchange="cwSwitchProfile(this.value)">
+    <option value="">— Select or create a profile —</option>
+  </select>
+  <div class="pb-btns">
+    <button class="pb-btn pb-btn-new" onclick="cwShowNewForm()">＋ New</button>
+    <button class="pb-btn pb-btn-del" onclick="cwDeleteProfile()" id="pbDel" disabled>🗑 Delete</button>
+  </div>
+</div>
+<div class="new-profile-form" id="newProfileForm">
+  <div class="npf-field">
+    <label>Your Alliance</label>
+    <input type="text" id="npfAlliance" placeholder="LHZN" maxlength="8" style="width:90px;text-transform:uppercase">
+  </div>
+  <div class="npf-field">
+    <label>Server #</label>
+    <input type="number" id="npfServer" placeholder="2190" min="1" max="99999" style="width:80px">
+  </div>
+  <div class="npf-field">
+    <label>Label (optional)</label>
+    <input type="text" id="npfNotes" placeholder="S5 Capital War" maxlength="30" style="width:160px">
+  </div>
+  <button class="cw-btn cw-btn-primary" onclick="cwCreateProfile()" style="align-self:flex-end">Create</button>
+  <button class="cw-btn" onclick="cwHideNewForm()" style="align-self:flex-end">Cancel</button>
+</div>
+
+<!-- Cloud sync bar -->
+<div class="cloud-bar" id="cwCloudBar">
+  <span class="pb-label">☁ Cloud Sync</span>
+  <button class="cw-btn" onclick="cwSharePlan(this)">📤 Share Plan</button>
+  <button class="cw-btn" onclick="cwLoadPlan(this)">📥 Load Plan</button>
+  <span class="cloud-status" id="cloudStatus">Local only — share to let coalition members load this plan.</span>
+</div>
+
+<!-- War clock -->
+<div class="war-clock">
+  <div class="wc-seg">
+    <div class="wc-lbl">UTC Time</div>
+    <div class="wc-val" id="wcUtcTime">--:--:--</div>
+    <div class="wc-sub" id="wcUtcDate">---</div>
+  </div>
+  <div class="wc-divider"></div>
+  <div class="wc-seg">
+    <div class="wc-lbl">Local Time</div>
+    <div class="wc-val" id="wcLocalTime" style="color:var(--text2)">--:--:--</div>
+    <div class="wc-sub" id="wcLocalTz">---</div>
+  </div>
+  <div class="wc-divider"></div>
+  <div id="wcCountdownWrap">
+    <div class="wc-seg">
+      <div class="wc-lbl">Next Capitol War</div>
+      <div class="wc-val wc-countdown" id="wcCountdown">calculating…</div>
+      <div class="wc-sub" id="wcEventLabel">loading…</div>
+    </div>
+  </div>
+  <div class="wc-divider"></div>
+  <div id="wcInvasionWrap">
+    <div class="wc-seg">
+      <div class="wc-lbl">Invasion Right Contest</div>
+      <div class="wc-val" style="color:var(--cw-perim)" id="wcInvasionVal">calculating…</div>
+      <div class="wc-sub" id="wcInvasionLabel">loading…</div>
+    </div>
+  </div>
+  <button class="wc-cfg-btn" onclick="document.getElementById('wcCfg').classList.toggle('show')">⚙ Schedule</button>
+</div>
+<div class="wc-cfg" id="wcCfg">
+  <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:var(--cw-gold);width:100%;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:2px;letter-spacing:.06em">CAPITOL WAR</div>
+  <div class="wcf-field"><label>Battle Day</label>
+    <select id="wcsDay" onchange="cwSaveClock()">
+      <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option>
+      <option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6" selected>Saturday</option>
+    </select></div>
+  <div class="wcf-field"><label>Battle Start (UTC)</label><input type="time" id="wcsTime" value="15:00" onchange="cwSaveClock()"></div>
+  <div class="wcf-field"><label>Duration (hrs)</label><input type="number" id="wcsDur" value="8" min="1" max="24" style="width:60px" onchange="cwSaveClock()"></div>
+  <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:var(--cw-perim);width:100%;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:2px;margin-top:6px;letter-spacing:.06em">INVASION RIGHT CONTEST</div>
+  <div class="wcf-field"><label>Contest Day</label>
+    <select id="wciDay" onchange="cwSaveClock()">
+      <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option>
+      <option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6" selected>Saturday</option>
+    </select></div>
+  <div class="wcf-field"><label>Contest Start (UTC)</label><input type="time" id="wciTime" value="03:00" onchange="cwSaveClock()"></div>
+  <div class="wcf-field"><label>Duration (hrs)</label><input type="number" id="wciDur" value="2" min="1" max="24" style="width:60px" onchange="cwSaveClock()"></div>
+  <div style="font-size:.65rem;color:var(--text3);align-self:flex-end;padding-bottom:4px;width:100%">Both default to Sat — adjust to your server's actual schedule.</div>
+</div>
+
+<!-- Timeline -->
+<div class="war-timeline">
+  <div class="tl-row">
+    <span class="tl-lbl">8-hr war</span>
+    <div class="tl-track">
+      <div class="tl-seg tl-gold">HOLD · 4h max</div>
+      <div class="tl-seg tl-red">ATK 1 · 2h</div>
+      <div class="tl-seg tl-purple">ATK 2 · 2h</div>
+    </div>
+  </div>
+  <div class="tl-meta">
+    <div class="tl-chip"><span class="tl-dot" style="background:rgba(240,192,64,.55)"></span>Win = 4 total hours Capitol occupied</div>
+    <div class="tl-chip"><span class="tl-dot" style="background:rgba(125,112,96,.8)"></span>Mud = square zone, no shields, slow march</div>
+    <div class="tl-chip"><span class="tl-dot" style="background:rgba(192,132,255,.55)"></span>4 cannons at mud corners — capture first</div>
+    <div class="tl-chip"><span class="tl-dot" style="background:rgba(96,165,250,.45)"></span>Top 3 alliances (Lv6 city holders) · Week 3+</div>
+  </div>
+</div>
+
+<!-- Planner -->
+<div class="planner-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Alliance roster -->
+    <div class="panel">
+      <div class="panel-title">Alliance Roster <span class="count" id="cwCount">0 alliances</span></div>
+      <div class="add-tag-row">
+        <input type="text" id="cwTagInput" placeholder="TAG" maxlength="6" title="Alliance tag (short)">
+        <input type="text" id="cwNameInput" placeholder="Full name (optional)" maxlength="24">
+        <button onclick="cwAddAlliance()">＋</button>
+      </div>
+      <div class="add-meta-row">
+        <select id="cwTypeInput" title="Alliance tier">
+          <option value="heavy">Heavy — Top hitters</option>
+          <option value="mid" selected>Mid — Reliable force</option>
+          <option value="support">Support — Shielded/perimeter</option>
+          <option value="flex">Flex — Roaming offense</option>
+        </select>
+        <select id="cwRoleInput" title="Default role">
+          <option value="unassigned">— Unassigned —</option>
+          <option value="capitol">Capitol Guard</option>
+          <option value="can_nw">Cannon NW</option>
+          <option value="can_ne">Cannon NE</option>
+          <option value="can_sw">Cannon SW</option>
+          <option value="can_se">Cannon SE</option>
+          <option value="flex">Flex / Roam</option>
+          <option value="perimeter">Perimeter</option>
+          <option value="second">Second Line</option>
+        </select>
+        <input type="number" id="cwMembersInput" placeholder="# mbrs" min="1" max="200" title="Estimated active members">
+      </div>
+      <div class="alliance-list" id="cwAllianceList"></div>
+    </div>
+
+    <!-- Tactic -->
+    <div class="panel">
+      <div class="panel-title">Defense Strategy</div>
+      <div class="tactic-btns">
+        <button class="tac-btn active" id="tac-balanced" onclick="cwSetTactic('balanced')">
+          <strong>Balanced Defense</strong>
+          <span>Top alliances on cannons · primary on Capitol · perimeter shielded</span>
+        </button>
+        <button class="tac-btn" id="tac-cannon-heavy" onclick="cwSetTactic('cannon-heavy')">
+          <strong>Cannon Heavy</strong>
+          <span>Max alliances on cannons · thin perimeter · cannon fire dominance</span>
+        </button>
+        <button class="tac-btn" id="tac-layered" onclick="cwSetTactic('layered')">
+          <strong>Layered Defense</strong>
+          <span>Strong perimeter + second line · fewer cannon operators but shielded depth</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="panel">
+      <div class="panel-title">Actions</div>
+      <div class="action-btns">
+        <button class="cw-btn cw-btn-primary" onclick="cwAutoAssign()">⚡ Auto-Assign</button>
+        <button class="cw-btn cw-btn-danger" onclick="cwClearAll()">🗑 Clear</button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- MAIN -->
+  <div id="cwMain">
+
+    <!-- Unified Map + Base Grid -->
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title" style="flex-wrap:wrap;gap:4px">
+        Capitol War Map
+        <span class="count" id="basesCount">0 bases</span>
+        <span style="font-size:.54rem;font-weight:400;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-left:4px;opacity:.7">· drag → assign · click = place · right-click = remove</span>
+      </div>
+      <!-- Placement toolbar -->
+      <div class="bg-toolbar">
+        <span class="pt-lbl">Alliance:</span>
+        <select class="pt-sel" id="placeAllianceSel" onchange="cwSetPlaceAlliance(this.value)">
+          <option value="">— unlinked —</option>
+        </select>
+        <label class="pt-check"><input type="checkbox" id="placeShieldedChk" onchange="cwPlaceShielded=this.checked"> Bubble</label>
+        <span class="pt-lbl" title="Bases placed per click">×</span>
+        <div class="bg-zoom-row">
+          <button class="gz-btn" onclick="bgChangePlaceCount(-1)">−</button>
+          <span class="gz-val" id="placeCountLabel">1</span>
+          <button class="gz-btn" onclick="bgChangePlaceCount(1)">+</button>
+        </div>
+        <span class="pt-lbl" title="Columns per row">W</span>
+        <div class="bg-zoom-row">
+          <button class="gz-btn" onclick="bgChangePlaceWidth(-1)">−</button>
+          <span class="gz-val" id="placeWidthLabel">5</span>
+          <button class="gz-btn" onclick="bgChangePlaceWidth(1)">+</button>
+        </div>
+        <div class="bg-zoom-row">
+          <button class="gz-btn" onclick="bgZoom(-1)">−</button>
+          <span class="gz-val" id="bgZoomLabel">12px</span>
+          <button class="gz-btn" onclick="bgZoom(1)">+</button>
+        </div>
+        <button class="map-tool-btn" onclick="bgScrollToCapitol()">⌖ Center</button>
+        <button class="map-tool-btn" onclick="cwClearBases()" style="color:var(--red)">✕ Clear</button>
+      </div>
+      <!-- Canvas -->
+      <div class="bg-scroll-wrap" id="bgScrollWrap">
+        <div id="bgCanvasContainer">
+          <canvas id="baseGridCanvas"></canvas>
+        </div>
+      </div>
+      <!-- Capitol & Cannon assignments (grid cards, drag alliances here) -->
+      <div class="panel-title" style="margin-top:.5rem">Capitol &amp; Cannon Assignments</div>
+      <div class="node-assign-grid" id="cwCapCannonGrid"></div>
+      <!-- Legend -->
+      <div class="bg-legend" style="margin-top:.4rem">
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:rgba(28,36,22,.9);border:1px solid rgba(255,255,255,.08)"></span>Outside mud</span>
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:#5a4f42;border:1px solid rgba(52,211,153,.7)"></span>Mud zone</span>
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:rgba(232,114,12,.35);border:1px solid #e8720c"></span>Capitol (7)</span>
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:rgba(192,132,255,.25);border:1px solid #c084ff"></span>Cannon</span>
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:rgba(96,165,250,.18);border:2px solid #93c5fd;box-shadow:0 0 5px rgba(96,200,255,.7)"></span>Bubble/shielded</span>
+        <span class="bg-leg-item"><span class="bg-leg-dot" style="background:rgba(251,191,36,.5);border:1px solid #fbbf24"></span>Active base</span>
+      </div>
+      <!-- Off-Map zone assignments -->
+      <div class="panel-title" style="margin-top:.5rem">Off-Map Zone Assignments</div>
+      <div class="zone-grid" id="cwZoneGrid"></div>
+      <!-- Base list grouped by alliance -->
+      <div id="cwBasesList" style="margin-top:.5rem;max-height:260px;overflow-y:auto"></div>
+    </div>
+
+    <!-- Battle plan -->
+    <div class="battle-plan" id="cwBattlePlan">
+      <pre style="color:var(--text3)">Add alliances and assign them to positions to generate the coalition battle plan.</pre>
+    </div>
+
+    <!-- Rules -->
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title">Capital War — Coalition Strategy Notes</div>
+      <div class="rules-grid">
+        <div class="rule-item"><span class="ri">💥</span><span><strong>4 corner cannons</strong> fire at enemy Capitol when held — accelerates capture progress. Capture these first, not Capitol.</span></div>
+        <div class="rule-item"><span class="ri">🏛️</span><span><strong>Capitol defense</strong>: Primary alliance holds the Capitol. HQ26+ players can clear mud and send squads to Capitol.</span></div>
+        <div class="rule-item"><span class="ri">⚡</span><span><strong>Flex/Roam</strong>: Most mobile alliance. No fixed cannon. Eliminates priority threats and disrupts enemy advances across the mud.</span></div>
+        <div class="rule-item"><span class="ri">🛡️</span><span><strong>Perimeter</strong>: Stay shielded outside the mud. Act as support garrison for players entering mud. Block enemy base placements.</span></div>
+        <div class="rule-item"><span class="ri">🔒</span><span><strong>Second line</strong>: Just behind perimeter. Prevent enemy advances, block shortcuts to mud edge. Fill defensive gaps.</span></div>
+        <div class="rule-item"><span class="ri">☣️</span><span>Mud zone = <strong>square area</strong>. No shields, slow march. Only non-participating or non-mud players stay near the outer perimeter.</span></div>
+        <div class="rule-item"><span class="ri">👥</span><span>Players unable to be online during the event form the <strong>second defensive line</strong> — position just outside the mud.</span></div>
+        <div class="rule-item"><span class="ri">⭐</span><span><strong>R5 rally: +5% · R4 Officer rally: +5%</strong>. Always use the highest-rank player as rally leader. R5 contact per alliance is key.</span></div>
+        <div class="rule-item"><span class="ri">📏</span><span><strong>Keep enemy march times long</strong> — fill perimeter gaps. Dense coverage = slower enemy advances = more time to respond.</span></div>
+        <div class="rule-item"><span class="ri">🏙️</span><span>Only <strong>top 3 alliances</strong> holding Lv6 cities formally participate, but all allied alliances contribute to the defense.</span></div>
+        <div class="rule-item"><span class="ri">🎯</span><span><strong>Cannon priority order</strong>: assign top-tier alliances. Even one cannon lost lets the enemy accelerate their Capitol capture.</span></div>
+        <div class="rule-item"><span class="ri">📢</span><span>Coordinate on Discord. Share this plan before the event. Confirm each alliance's R5 has seen their assignment.</span></div>
+      </div>
+    </div>
+
+    <div class="export-row">
+      <button class="cw-btn cw-btn-primary" onclick="cwExportTxt()">📄 Export as TXT</button>
+      <button class="cw-btn" onclick="cwExportClip(this)">📋 Copy for Discord</button>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /container -->
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════════════════ */
+const CW_NODES=[
+  {id:'capitol', name:'Capitol',   x:50,y:50,cap:2,type:'capitol'},
+  {id:'can_nw',  name:'NW Cannon', x:20,y:10,cap:3,type:'cannon'},
+  {id:'can_ne',  name:'NE Cannon', x:80,y:10,cap:3,type:'cannon'},
+  {id:'can_sw',  name:'SW Cannon', x:20,y:90,cap:3,type:'cannon'},
+  {id:'can_se',  name:'SE Cannon', x:80,y:90,cap:3,type:'cannon'},
+];
+const CW_ZONES=[
+  {id:'flex',     name:'Flex / Roam',   emoji:'⚡',cap:3, type:'flex',    cls:'z-flex',
+   desc:'Free movement — eliminate priority threats, disrupt enemy advances'},
+  {id:'perimeter',name:'Perimeter',     emoji:'🛡️',cap:20,type:'perim',   cls:'z-perim',
+   desc:'Outer ring — stay shielded, support mud-zone players, block enemy bases'},
+  {id:'second',   name:'Second Line',   emoji:'🔒',cap:20,type:'second',  cls:'z-second',
+   desc:'Behind perimeter — fill gaps, block enemy advances toward mud edge'},
+];
+const ALL_NODES=[...CW_NODES,...CW_ZONES];
+
+const ROLE_OPTIONS=[
+  {v:'unassigned',l:'— Unassigned —'},
+  {v:'capitol',   l:'Capitol Guard'},
+  {v:'can_nw',    l:'Cannon NW'},
+  {v:'can_ne',    l:'Cannon NE'},
+  {v:'can_sw',    l:'Cannon SW'},
+  {v:'can_se',    l:'Cannon SE'},
+  {v:'flex',      l:'Flex / Roam'},
+  {v:'perimeter', l:'Perimeter'},
+  {v:'second',    l:'Second Line'},
+];
+const ROLE_NODE_MAP={capitol:'capitol',can_nw:'can_nw',can_ne:'can_ne',can_sw:'can_sw',can_se:'can_se',flex:'flex',perimeter:'perimeter',second:'second'};
+
+const ATYPE_COLOR={heavy:'var(--type-heavy)',mid:'var(--type-mid)',support:'var(--type-support)',flex:'var(--type-flex-c)'};
+const ATYPE_LABEL={heavy:'Heavy',mid:'Mid',support:'Support',flex:'Flex'};
+
+/* ══════════════════════════════════════════════════════════════
+   PROFILES
+══════════════════════════════════════════════════════════════ */
+const PKEY='cw_coalition_v1',AKEY='cw_coal_active';
+let profiles={},activeId=null;
+
+function defaultProfile(){
+  return {alliance:'',server:'',label:'',cwAlliances:[],cwAssignments:Object.fromEntries(ALL_NODES.map(n=>[n.id,[]])),cwTactic:'balanced',cwUID:1,cwBases:[],cwBaseUID:100};
+}
+function loadProfiles(){
+  try{profiles=JSON.parse(localStorage.getItem(PKEY)||'{}');}catch(e){profiles={};}
+  try{activeId=localStorage.getItem(AKEY)||null;}catch(e){activeId=null;}
+  if(activeId&&!profiles[activeId]) activeId=null;
+}
+function saveProfiles(){
+  try{localStorage.setItem(PKEY,JSON.stringify(profiles));localStorage.setItem(AKEY,activeId||'');}catch(e){}
+}
+function renderProfileBar(){
+  const sel=document.getElementById('profileSelect');
+  sel.innerHTML='<option value="">— Select or create a profile —</option>';
+  Object.entries(profiles).forEach(([id,p])=>{
+    const o=document.createElement('option');
+    o.value=id;
+    o.textContent=`${p.alliance||'?'} · S${p.server||'?'}${p.label?' — '+p.label:''}`;
+    if(id===activeId) o.selected=true;
+    sel.appendChild(o);
+  });
+  document.getElementById('pbDel').disabled=!activeId;
+  cwUpdateCloudBar();
+}
+function cwShowNewForm(){document.getElementById('newProfileForm').classList.add('show');document.getElementById('npfAlliance').focus();}
+function cwHideNewForm(){document.getElementById('newProfileForm').classList.remove('show');}
+function cwCreateProfile(){
+  const alliance=(document.getElementById('npfAlliance').value||'').trim().toUpperCase();
+  const server=(document.getElementById('npfServer').value||'').trim();
+  const label=(document.getElementById('npfNotes').value||'').trim();
+  if(!alliance&&!server){alert('Enter your alliance tag or server number.');return;}
+  const id='cp_'+Date.now();
+  profiles[id]=Object.assign(defaultProfile(),{alliance,server,label});
+  activeId=id;
+  saveProfiles();
+  renderProfileBar();
+  cwHideNewForm();
+  loadActiveProfile();
+  renderAll();
+  ['npfAlliance','npfServer','npfNotes'].forEach(id=>document.getElementById(id).value='');
+}
+function cwSwitchProfile(id){
+  activeId=id||null;
+  saveProfiles();
+  renderProfileBar();
+  loadActiveProfile();
+  renderAll();
+}
+function cwDeleteProfile(){
+  if(!activeId) return;
+  const p=profiles[activeId];
+  if(!confirm(`Delete "${p.alliance||'—'} · S${p.server||'?'}"? Cannot be undone.`)) return;
+  delete profiles[activeId];
+  activeId=Object.keys(profiles)[0]||null;
+  saveProfiles();
+  renderProfileBar();
+  loadActiveProfile();
+  renderAll();
+}
+
+let cwAlliances=[],cwAssignments={},cwTactic='balanced',cwUID=1,cwDragId=null,cwBases=[],cwBaseUID=100,cwPlaceAllianceId=null,cwPlaceShielded=false;
+
+function loadActiveProfile(){
+  ALL_NODES.forEach(n=>cwAssignments[n.id]=[]);
+  cwAlliances=[];cwTactic='balanced';cwUID=1;cwBases=[];cwBaseUID=100;
+  if(!activeId||!profiles[activeId]) return;
+  const p=profiles[activeId];
+  cwAlliances=JSON.parse(JSON.stringify(p.cwAlliances||[]));
+  const s=p.cwAssignments||{};
+  ALL_NODES.forEach(n=>cwAssignments[n.id]=(s[n.id]||[]).slice());
+  cwTactic=p.cwTactic||'balanced';
+  cwUID=p.cwUID||1;
+  cwBases=JSON.parse(JSON.stringify(p.cwBases||[]));
+  cwBaseUID=p.cwBaseUID||100;
+  ['balanced','cannon-heavy','layered'].forEach(x=>document.getElementById('tac-'+x).classList.toggle('active',x===cwTactic));
+}
+function saveActiveProfile(){
+  if(!activeId) return;
+  profiles[activeId]=Object.assign(profiles[activeId]||defaultProfile(),{
+    cwAlliances:JSON.parse(JSON.stringify(cwAlliances)),
+    cwAssignments:Object.fromEntries(ALL_NODES.map(n=>[n.id,(cwAssignments[n.id]||[]).slice()])),
+    cwTactic,cwUID,cwBases:JSON.parse(JSON.stringify(cwBases)),cwBaseUID
+  });
+  saveProfiles();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAR CLOCK
+══════════════════════════════════════════════════════════════ */
+let cwsDay=6,cwsHour=15,cwsMin=0,cwsDur=8;
+let cwiDay=6,cwiHour=3,cwiMin=0,cwiDur=2;
+function loadClock(){
+  try{const s=JSON.parse(localStorage.getItem('cw_clock2')||'{}');
+    cwsDay=s.d??6;cwsHour=s.h??15;cwsMin=s.m??0;cwsDur=s.dur??8;
+    cwiDay=s.id??6;cwiHour=s.ih??3;cwiMin=s.im??0;cwiDur=s.idur??2;
+  }catch(e){}
+  document.getElementById('wcsDay').value=cwsDay;
+  document.getElementById('wcsTime').value=String(cwsHour).padStart(2,'0')+':'+String(cwsMin).padStart(2,'0');
+  document.getElementById('wcsDur').value=cwsDur;
+  document.getElementById('wciDay').value=cwiDay;
+  document.getElementById('wciTime').value=String(cwiHour).padStart(2,'0')+':'+String(cwiMin).padStart(2,'0');
+  document.getElementById('wciDur').value=cwiDur;
+}
+function cwSaveClock(){
+  cwsDay=parseInt(document.getElementById('wcsDay').value);
+  const t=document.getElementById('wcsTime').value.split(':');
+  cwsHour=parseInt(t[0])||15;cwsMin=parseInt(t[1])||0;
+  cwsDur=parseInt(document.getElementById('wcsDur').value)||8;
+  cwiDay=parseInt(document.getElementById('wciDay').value);
+  const ti=document.getElementById('wciTime').value.split(':');
+  cwiHour=parseInt(ti[0])||3;cwiMin=parseInt(ti[1])||0;
+  cwiDur=parseInt(document.getElementById('wciDur').value)||2;
+  try{localStorage.setItem('cw_clock2',JSON.stringify({d:cwsDay,h:cwsHour,m:cwsMin,dur:cwsDur,id:cwiDay,ih:cwiHour,im:cwiMin,idur:cwiDur}));}catch(e){}
+}
+function cwTick(){
+  const now=new Date();
+  const p2=n=>String(n).padStart(2,'0');
+  document.getElementById('wcUtcTime').textContent=`${p2(now.getUTCHours())}:${p2(now.getUTCMinutes())}:${p2(now.getUTCSeconds())}`;
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('wcUtcDate').textContent=`${DAYS[now.getUTCDay()]} ${now.getUTCFullYear()}-${p2(now.getUTCMonth()+1)}-${p2(now.getUTCDate())} UTC`;
+  document.getElementById('wcLocalTime').textContent=`${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+  try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;document.getElementById('wcLocalTz').textContent=tz.replace('_',' ');}catch(e){document.getElementById('wcLocalTz').textContent='Local';}
+  // Local event time helper
+  const tzOff=-now.getTimezoneOffset();
+  function toLocal(h,m){const t=(h*60+m+tzOff+1440)%1440;return p2(Math.floor(t/60))+':'+p2(t%60);}
+  function evtLocalStr(h,m){const l=toLocal(h,m);return l===p2(h)+':'+p2(m)?'':` · Local ${l}`;}
+  const curDay=now.getUTCDay(),curMin=now.getUTCHours()*60+now.getUTCMinutes()+now.getUTCSeconds()/60;
+  const evtStart=cwsHour*60+cwsMin,evtEnd=evtStart+cwsDur*60;
+  // ── Capitol War countdown ──
+  const wrap=document.getElementById('wcCountdownWrap');
+  if(curDay===cwsDay&&curMin>=evtStart&&curMin<evtEnd){
+    const el=Math.floor(curMin-evtStart),rem=Math.ceil(evtEnd-curMin);
+    wrap.innerHTML=`<div class="wc-live-wrap"><div class="wc-lbl">Capitol War</div><div class="wc-live-badge">⚔ LIVE NOW</div><div class="wc-sub">Elapsed ${p2(Math.floor(el/60))}h ${p2(el%60)}m · Remaining ${p2(Math.floor(rem/60))}h ${p2(rem%60)}m</div></div>`;
+  } else {
+    let days=(cwsDay-curDay+7)%7;
+    if(days===0&&curMin>=evtEnd) days=7;
+    const ms=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+days,cwsHour,cwsMin,0)).getTime()-now.getTime();
+    const s=Math.floor(ms/1000);
+    const evtLabel=`${DAYS[cwsDay]} ${p2(cwsHour)}:${p2(cwsMin)} UTC${evtLocalStr(cwsHour,cwsMin)}`;
+    const lbl=document.getElementById('wcEventLabel');if(lbl) lbl.textContent=evtLabel;
+    wrap.innerHTML=`<div class="wc-seg"><div class="wc-lbl">Next Capitol War</div><div class="wc-val wc-countdown">${Math.floor(s/86400)?Math.floor(s/86400)+'d ':''} ${p2(Math.floor((s%86400)/3600))}h ${p2(Math.floor(s%3600/60))}m ${p2(s%60)}s</div><div class="wc-sub">${evtLabel}</div></div>`;
+  }
+
+  // ── Invasion Right Contest countdown ──
+  const invWrap=document.getElementById('wcInvasionWrap');
+  const invStart=cwiHour*60+cwiMin,invEnd=invStart+cwiDur*60;
+  if(curDay===cwiDay&&curMin>=invStart&&curMin<invEnd){
+    const el=Math.floor(curMin-invStart),rem=Math.ceil(invEnd-curMin);
+    invWrap.innerHTML=`<div class="wc-live-wrap" style="background:rgba(74,155,232,.1);border-color:rgba(74,155,232,.3)"><div class="wc-lbl">Invasion Right</div><div class="wc-live-badge" style="color:var(--cw-perim)">⚔ ACTIVE</div><div class="wc-sub">Elapsed ${p2(Math.floor(el/60))}h ${p2(el%60)}m · Remaining ${p2(Math.floor(rem/60))}h ${p2(rem%60)}m</div></div>`;
+  } else {
+    let invDays=(cwiDay-curDay+7)%7;
+    if(invDays===0&&curMin>=invEnd) invDays=7;
+    const invMs=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+invDays,cwiHour,cwiMin,0)).getTime()-now.getTime();
+    const invS=Math.floor(invMs/1000);
+    const invLabel=`${DAYS[cwiDay]} ${p2(cwiHour)}:${p2(cwiMin)} UTC${evtLocalStr(cwiHour,cwiMin)}`;
+    const invLbl=document.getElementById('wcInvasionLabel');if(invLbl) invLbl.textContent=invLabel;
+    invWrap.innerHTML=`<div class="wc-seg"><div class="wc-lbl">Invasion Right Contest</div><div class="wc-val" style="color:var(--cw-perim)">${Math.floor(invS/86400)?Math.floor(invS/86400)+'d ':''} ${p2(Math.floor((invS%86400)/3600))}h ${p2(Math.floor(invS%3600/60))}m ${p2(invS%60)}s</div><div class="wc-sub">${invLabel}</div></div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MAP BUILD
+══════════════════════════════════════════════════════════════ */
+function buildMap(){
+  const grid=document.getElementById('cwCapCannonGrid');
+  if(!grid) return;
+  CW_NODES.forEach(n=>{
+    const isCapitol=n.type==='capitol';
+    const el=document.createElement('div');
+    el.className=`node-card ${isCapitol?'nc-capitol':'nc-cannon'}`;
+    el.id='node-'+n.id;
+    if(isCapitol){
+      el.innerHTML=`<div class="nc-head">
+        <div class="nc-num">7</div>
+        <span class="nc-name">Capitol</span>
+        <span class="nc-slots" id="nslots-${n.id}">0/${n.cap}</span>
+      </div>
+      <div class="node-tags" id="ntags-${n.id}"><div class="node-empty">Drag alliance here</div></div>`;
+    } else {
+      const dir=n.name.replace(' Cannon','');
+      el.innerHTML=`<div class="nc-head">
+        <span class="nc-name nc-cannon-lbl">${dir} Cannon</span>
+        <span class="nc-slots" id="nslots-${n.id}">0/${n.cap}</span>
+      </div>
+      <div class="node-tags" id="ntags-${n.id}"><div class="node-empty">Drag alliances</div></div>`;
+    }
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over')});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');cwDrop(n.id)});
+    grid.appendChild(el);
+  });
+}
+
+function buildZones(){
+  document.getElementById('cwZoneGrid').innerHTML=CW_ZONES.map(z=>`
+    <div class="zone-slot ${z.cls}" id="zone-${z.id}"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="event.preventDefault();this.classList.remove('drag-over');cwDrop('${z.id}')">
+      <div class="zone-head"><span class="zone-emoji">${z.emoji}</span><span class="zone-name">${z.name}</span><span class="zone-slots" id="zslots-${z.id}">0/${z.cap}</span></div>
+      <div class="zone-desc">${z.desc}</div>
+      <div class="zone-tags" id="ztags-${z.id}"><div class="zone-empty">Drag alliances here</div></div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════════ */
+function renderAll(){
+  renderSidebar();
+  renderMapNodes();
+  renderZones();
+  renderBases();
+  renderPlan();
+  updatePlaceAllianceSel();
+  saveActiveProfile();
+}
+
+function renderSidebar(){
+  const list=document.getElementById('cwAllianceList');
+  const asgn=getAssignedSet();
+  document.getElementById('cwCount').textContent=`${cwAlliances.length} alliances`;
+  if(!cwAlliances.length){
+    list.innerHTML=activeId
+      ?'<div style="font-size:.8rem;color:var(--text3)">No alliances yet — add alliance tags above.</div>'
+      :'<div style="font-size:.8rem;color:var(--text3)">Create or select a profile first.</div>';
+    return;
+  }
+  const roleOpts=ROLE_OPTIONS.map(r=>`<option value="${r.v}">${r.l}</option>`).join('');
+  list.innerHTML=cwAlliances.map(a=>{
+    const col=ATYPE_COLOR[a.type]||'var(--text3)';
+    const isAsgn=asgn.has(a.id);
+    return `<div class="alliance-chip" id="chip-${a.id}"
+      draggable="${!!activeId}"
+      ondragstart="cwDragStart(${a.id})"
+      ondragend="cwDragEnd(${a.id})">
+      <div class="chip-top">
+        <span class="atype-dot" style="background:${col}"></span>
+        <span class="chip-tag">${esc(a.tag)}</span>
+        ${a.fullname?`<span class="chip-fullname">${esc(a.fullname)}</span>`:''}
+        ${isAsgn?'<span class="chip-asgn-dot">●</span>':''}
+        <button class="chip-remove" onclick="cwRemoveAlliance(${a.id})">✕</button>
+      </div>
+      <div class="chip-meta">
+        <select onchange="cwSetRole(${a.id},this.value)" title="Role">${ROLE_OPTIONS.map(r=>`<option value="${r.v}"${a.role===r.v?' selected':''}>${r.l}</option>`).join('')}</select>
+        <span class="atype-badge at-${a.type}">${ATYPE_LABEL[a.type]}</span>
+        ${a.members?`<span style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace">${a.members}mbr</span>`:''}
+      </div>
+      ${a.notes?`<div class="chip-notes">${esc(a.notes)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderMapNodes(){
+  CW_NODES.forEach(n=>{
+    const ids=cwAssignments[n.id]||[];
+    const sl=document.getElementById('nslots-'+n.id);
+    const tg=document.getElementById('ntags-'+n.id);
+    if(sl) sl.textContent=`${ids.length}/${n.cap}`;
+    if(tg){
+      if(!ids.length){tg.innerHTML='<div class="node-empty">Drag alliances</div>';return;}
+      tg.innerHTML=ids.map(id=>{
+        const a=cwAlliances.find(x=>x.id===id);
+        if(!a) return '';
+        return `<div class="node-atag at-${a.type}" onclick="cwUnassign('${n.id}',${id})" title="Click to unassign">${esc(a.tag)}</div>`;
+      }).join('');
+    }
+  });
+  // Redraw canvas so assignment tags update on Capitol/Cannon tiles
+  bgRender();
+}
+
+function renderZones(){
+  CW_ZONES.forEach(z=>{
+    const ids=cwAssignments[z.id]||[];
+    const sl=document.getElementById('zslots-'+z.id);
+    const tg=document.getElementById('ztags-'+z.id);
+    if(sl) sl.textContent=`${ids.length}/${z.cap}`;
+    if(tg){
+      if(!ids.length){tg.innerHTML='<div class="zone-empty">Drag alliances here</div>';return;}
+      const col=ATYPE_COLOR;
+      tg.innerHTML=ids.map(id=>{
+        const a=cwAlliances.find(x=>x.id===id);
+        if(!a) return '';
+        return `<div class="zone-atag" onclick="cwUnassign('${z.id}',${id})" title="Click to unassign">
+          <span class="zt-dot" style="background:${col[a.type]||'var(--text3)'}"></span>
+          <strong style="font-family:'Chakra Petch',sans-serif;font-size:.72rem">${esc(a.tag)}</strong>
+          ${a.fullname?`<span style="font-size:.65rem;color:var(--text3)">${esc(a.fullname)}</span>`:''}
+          ${a.members?`<span style="font-size:.6rem;color:var(--text3);margin-left:auto;font-family:'JetBrains Mono',monospace">${a.members}mbr</span>`:''}
+        </div>`;
+      }).join('');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BATTLE PLAN
+══════════════════════════════════════════════════════════════ */
+function renderPlan(){
+  const el=document.getElementById('cwBattlePlan');
+  const any=ALL_NODES.some(n=>(cwAssignments[n.id]||[]).length>0);
+  if(!cwAlliances.length||!any){
+    el.innerHTML='<pre style="color:var(--text3)">Add alliances and assign them to positions to generate the coalition battle plan.</pre>';
+    return;
+  }
+  el.innerHTML=buildPlan();
+}
+
+function buildPlan(){
+  const asgn=getAssignedSet();
+  const unasn=cwAlliances.filter(a=>!asgn.has(a.id));
+  const listOf=(nId,sep=' + ')=>{
+    const ids=cwAssignments[nId]||[];
+    if(!ids.length) return '❌ UNASSIGNED';
+    return ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);return a?a.tag+(a.notes?' ('+a.notes+')':''):'?';}).join(sep);
+  };
+  const listOfFull=(nId)=>{
+    const ids=cwAssignments[nId]||[];
+    if(!ids.length) return '❌ UNASSIGNED';
+    return ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);if(!a) return '';return`   • ${a.tag}${a.fullname?' ('+a.fullname+')':''}${a.members?' — ~'+a.members+' members':''}${a.notes?' | '+a.notes:''}`}).join('\n');
+  };
+  const prof=activeId?profiles[activeId]:null;
+
+  let h='';
+  h+=`<div class="phase-badge ph-cannon">💥 Cannon Assignments</div>\n<pre>`;
+  h+=`OBJECTIVE: Capture and hold all 4 corner cannons.\n`;
+  h+=`Held cannons fire at enemy Capitol — this is your force multiplier.\n\n`;
+  h+=`NW Cannon:  ${listOf('can_nw')}\n`;
+  h+=`NE Cannon:  ${listOf('can_ne')}\n`;
+  h+=`SW Cannon:  ${listOf('can_sw')}\n`;
+  h+=`SE Cannon:  ${listOf('can_se')}\n`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-assault">🏛️ Capitol Defense</div>\n<pre>`;
+  h+=`${listOf('capitol')} — Primary Capitol hold.\n`;
+  const capIds=cwAssignments.capitol||[];
+  if(capIds.length){
+    h+=`\nHigh-power players (HQ26+) should clear the mud zone and send squads to Capitol.\n`;
+    h+=`If troops are returning home, other alliances near Capitol fill the gap.\n`;
+    h+=`R5/R4 Officer rallies = +5% damage bonus — always lead with highest rank.\n`;
+  }
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-flex">⚡ Flex / Roam</div>\n<pre>`;
+  h+=`${listOf('flex')} — Free movement across the battlefield.\n`;
+  h+=`Do NOT hard focus any cannon unless critically needed.\n`;
+  h+=`Priority: eliminate enemy top hitters on tiles closest to Capitol.\n`;
+  h+=`Disrupt enemy advance and clean up the inner mud zone.\n`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-defense">🛡️ Perimeter &amp; Second Line</div>\n<pre>`;
+  h+=`PERIMETER:\n${listOfFull('perimeter')}\n\n`;
+  h+=`Rules:\n`;
+  h+=`  • Stay SHIELDED unless actively fighting off an enemy breach\n`;
+  h+=`  • Act as support garrison for players entering the mud zone\n`;
+  h+=`  • Take out any enemy commander on the outer edge of the mud\n`;
+  h+=`  • Only players NOT planning to jump into the mud should stay near the perimeter\n\n`;
+  h+=`SECOND LINE:\n${listOfFull('second')}\n\n`;
+  h+=`Rules:\n`;
+  h+=`  • Position just behind perimeter — prevent enemy advances\n`;
+  h+=`  • Block enemy base placements near the mud edge\n`;
+  h+=`  • Keep continuous coverage — no gaps in the defensive ring\n`;
+  if(unasn.length){
+    h+=`\nGAP FILL (${unasn.length} unassigned):\n`;
+    h+=unasn.map(a=>`  • ${a.tag}${a.fullname?' ('+a.fullname+')':''} — fill any gap in perimeter coverage`).join('\n');
+    h+='\n';
+  }
+  h+=`\n📋 GENERAL RULES\n`;
+  h+=`  • Keep enemy march times long — fill all gaps\n`;
+  h+=`  • Confirm each alliance R5 has seen their assignment before the event\n`;
+  h+=`  • Mud zone = square area. No shields. Slow march. Pre-stage 10+ min early.\n`;
+  h+=`  • Win = 4 total hours of Capitol occupation. Every minute counts.`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-cannon">📊 Point Scoring Priority</div>\n<pre>`;
+  h+=`Kill in Capitol or Cannon combat:  +12 pts / Lv.1 troop  ← PRIORITY\n`;
+  h+=`Kill on Contaminated Land (mud):    +6 pts / Lv.1 troop\n\n`;
+  h+=`Cannon positions are worth 2× the mud zone:\n`;
+  h+=`  • 2× kill points vs fighting in the mud zone\n`;
+  h+=`  • Held cannons deal passive damage to enemy Capitol\n`;
+  h+=`  • Denies enemy the same kill-point multiplier\n\n`;
+  h+=`Attack priority order:\n`;
+  h+=`  1. Secure all 4 corner cannons immediately at battle start\n`;
+  h+=`  2. Capitol assault rallies (highest rank player leads)\n`;
+  h+=`  3. Flex disruption — eliminate enemy top hitters near Capitol\n`;
+  h+=`  4. Mud zone skirmishing (lowest point value — avoid trading here)\n\n`;
+  h+=`Earn Invasion Right points BEFORE the battle window:\n`;
+  h+=`  • Points can only be earned during the active battle period\n`;
+  h+=`  • Individual points >50,000 required for Winning Streak rewards\n`;
+  h+=`  • Coordinate R5 rallies — rally leader rank = +5% damage bonus`;
+  h+=`</pre>`;
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DRAG & DROP
+══════════════════════════════════════════════════════════════ */
+function cwDragStart(id){cwDragId=id;setTimeout(()=>{const c=document.getElementById('chip-'+id);if(c)c.classList.add('dragging')},0);}
+function cwDragEnd(id){cwDragId=null;const c=document.getElementById('chip-'+id);if(c)c.classList.remove('dragging');}
+function cwDrop(nId){
+  if(cwDragId===null) return;
+  const n=ALL_NODES.find(x=>x.id===nId);if(!n) return;
+  const ids=cwAssignments[nId]||[];
+  if(ids.includes(cwDragId)) return;
+  if(ids.length>=n.cap){alert(`${n.name} is full (${n.cap}/${n.cap})`);return;}
+  ALL_NODES.forEach(ni=>{cwAssignments[ni.id]=(cwAssignments[ni.id]||[]).filter(i=>i!==cwDragId)});
+  cwAssignments[nId].push(cwDragId);
+  renderAll();
+}
+function cwUnassign(nId,aid){
+  cwAssignments[nId]=(cwAssignments[nId]||[]).filter(i=>i!==aid);
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ALLIANCE MANAGEMENT
+══════════════════════════════════════════════════════════════ */
+function cwAddAlliance(){
+  if(!activeId){alert('Create or select a profile first.');return;}
+  const tag=(document.getElementById('cwTagInput').value||'').trim().toUpperCase();
+  if(!tag) return;
+  const fullname=(document.getElementById('cwNameInput').value||'').trim();
+  const type=document.getElementById('cwTypeInput').value;
+  const role=document.getElementById('cwRoleInput').value;
+  const members=parseInt(document.getElementById('cwMembersInput').value)||0;
+  cwAlliances.push({id:cwUID++,tag,fullname,type,role,members,notes:''});
+  ['cwTagInput','cwNameInput','cwMembersInput'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('cwTagInput').focus();
+  renderAll();
+}
+function cwRemoveAlliance(id){
+  cwAlliances=cwAlliances.filter(a=>a.id!==id);
+  ALL_NODES.forEach(n=>{cwAssignments[n.id]=(cwAssignments[n.id]||[]).filter(i=>i!==id)});
+  renderAll();
+}
+function cwSetRole(id,role){const a=cwAlliances.find(x=>x.id===id);if(a){a.role=role;renderAll();}}
+
+/* ══════════════════════════════════════════════════════════════
+   TACTIC / AUTO-ASSIGN / CLEAR
+══════════════════════════════════════════════════════════════ */
+function cwSetTactic(t){
+  cwTactic=t;
+  ['balanced','cannon-heavy','layered'].forEach(x=>document.getElementById('tac-'+x).classList.toggle('active',x===t));
+  renderAll();
+}
+
+function cwAutoAssign(){
+  ALL_NODES.forEach(n=>cwAssignments[n.id]=[]);
+  const order={heavy:4,mid:3,flex:2,support:1};
+  const sorted=[...cwAlliances].sort((a,b)=>(order[b.type]||0)-(order[a.type]||0));
+  const assigned=new Set();
+
+  // Role-matched pass (respects user role preference)
+  for(const a of sorted){
+    if(a.role==='unassigned') continue;
+    const nId=ROLE_NODE_MAP[a.role];if(!nId) continue;
+    const n=ALL_NODES.find(x=>x.id===nId);
+    if(n&&(cwAssignments[nId]||[]).length<n.cap&&!assigned.has(a.id)){cwAssignments[nId].push(a.id);assigned.add(a.id);}
+  }
+
+  // Auto-fill remaining by tactic
+  const cannonIds=['can_nw','can_ne','can_sw','can_se'];
+  const tacOrder={
+    'balanced':     ['capitol','can_nw','can_ne','can_sw','can_se','flex','perimeter','second'],
+    'cannon-heavy': ['can_nw','can_ne','can_sw','can_se','can_nw','can_ne','can_sw','can_se','capitol','flex','perimeter','second'],
+    'layered':      ['capitol','can_nw','can_ne','perimeter','can_sw','can_se','second','flex'],
+  };
+  const fillOrder=tacOrder[cwTactic]||tacOrder.balanced;
+
+  for(const a of sorted){
+    if(assigned.has(a.id)) continue;
+    // flex type gets flex zone
+    if(a.type==='flex'){
+      const n=ALL_NODES.find(x=>x.id==='flex');
+      if(n&&(cwAssignments.flex||[]).length<n.cap){cwAssignments.flex.push(a.id);assigned.add(a.id);continue;}
+    }
+    // support type gets perimeter
+    if(a.type==='support'){
+      const n=ALL_NODES.find(x=>x.id==='perimeter');
+      if(n&&(cwAssignments.perimeter||[]).length<n.cap){cwAssignments.perimeter.push(a.id);assigned.add(a.id);continue;}
+    }
+    // others fill by tactic order
+    for(const nId of fillOrder){
+      const n=ALL_NODES.find(x=>x.id===nId);
+      if(n&&(cwAssignments[nId]||[]).length<n.cap){cwAssignments[nId].push(a.id);assigned.add(a.id);break;}
+    }
+  }
+  renderAll();
+}
+
+function cwClearAll(){ALL_NODES.forEach(n=>cwAssignments[n.id]=[]);renderAll();}
+
+/* ══════════════════════════════════════════════════════════════
+   EXPORT
+══════════════════════════════════════════════════════════════ */
+function planTextPlain(){
+  const asgn=getAssignedSet();
+  const unasn=cwAlliances.filter(a=>!asgn.has(a.id));
+  const listOf=(nId,sep=' + ')=>{const ids=cwAssignments[nId]||[];return ids.length?ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);return a?a.tag+(a.notes?' ('+a.notes+')':''):'?'}).join(sep):'UNASSIGNED'};
+  const prof=activeId?profiles[activeId]:null;
+  return [
+    '=== CAPITAL WAR COALITION BATTLE PLAN ===',
+    prof?`Server: S${prof.server||'?'} | Coordinating Alliance: ${prof.alliance||'?'}${prof.label?' | '+prof.label:''}`:null,
+    `Strategy: ${cwTactic.toUpperCase()}`,
+    '',
+    '--- CANNON ASSIGNMENTS ---',
+    `NW Cannon:  ${listOf('can_nw')}`,
+    `NE Cannon:  ${listOf('can_ne')}`,
+    `SW Cannon:  ${listOf('can_sw')}`,
+    `SE Cannon:  ${listOf('can_se')}`,
+    '',
+    '--- CAPITOL DEFENSE ---',
+    `Capitol:    ${listOf('capitol')}`,
+    'Primary hold. High-power (HQ26+) players clear mud and send squads to Capitol.',
+    '',
+    '--- FLEX / ROAM ---',
+    `Flex:       ${listOf('flex')}`,
+    'Free movement. Eliminate priority threats. Disrupt enemy advances.',
+    '',
+    '--- PERIMETER & SECOND LINE ---',
+    `Perimeter:  ${listOf('perimeter',' · ')}`,
+    `Second:     ${listOf('second',' · ')}`,
+    '',
+    '--- KEY RULES ---',
+    '• Only players NOT jumping into mud should be near outer perimeter',
+    '• Perimeter stays SHIELDED unless actively fighting a breach',
+    '• Keep enemy march times LONG — fill all perimeter gaps',
+    '• Mud zone = square area, no shields, slow march speed',
+    '• Cannons = 4 corners of mud zone — capture FIRST',
+    '• Win = 4 total hours Capitol occupied',
+    '• Confirm every alliance R5 has seen this plan before the event',
+    ...(unasn.length?['',`Unassigned alliances (${unasn.length}): ${unasn.map(a=>a.tag).join(', ')} — fill perimeter gaps`]:[]),
+    '',
+    'Generated by Command Post — commandpost.pages.dev',
+  ].filter(l=>l!==null).join('\n');
+}
+function cwExportTxt(){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(planTextPlain());a.download='capital-war-coalition-plan.txt';a.click();}
+function cwExportClip(btn){navigator.clipboard.writeText(planTextPlain()).then(()=>{const o=btn.textContent;btn.textContent='✓ Copied!';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent=o;btn.style.color=''},1800)});}
+
+/* ══════════════════════════════════════════════════════════════
+   BASE GRID CANVAS
+══════════════════════════════════════════════════════════════ */
+// Grid: 120×120 tiles. Mud zone 48×48 centered. Each base occupies 3×3 tiles.
+const BG_W=120,BG_H=120;
+const BG_MUD={x1:36,y1:36,x2:84,y2:84};   // 48×48 mud zone
+const BG_CAP={cx:60,cy:60};                 // Capitol center (6×6 block: cols 57-62, rows 57-62)
+// Cannons: 3×3 tiles touching Capitol's diagonal corners (no gap)
+// Capitol: cols 57-62, rows 57-62. Cannons butt up against its corners.
+const BG_CANNONS=[
+  {id:'can_nw',x:48,y:48,lbl:'NW'},
+  {id:'can_ne',x:69,y:48,lbl:'NE'},
+  {id:'can_sw',x:48,y:69,lbl:'SW'},
+  {id:'can_se',x:69,y:69,lbl:'SE'}
+];
+const ATYPE_RGB={heavy:[248,113,113],mid:[251,146,60],support:[96,165,250],flex:[52,211,153]};
+const BG_TILE=8; // base world pixels per tile
+let bgHQImg=null,bgCapImg=null;
+let bgViewX=0,bgViewY=0,bgViewScale=1.5;
+let bgPanning=false,bgPanMoved=false,bgPanX=0,bgPanY=0;
+let bgPlaceCount=1;
+let bgPlaceWidth=5; // bases per row before wrapping down
+
+function bgLoadImages(){
+  bgHQImg=new Image();
+  bgHQImg.onload=()=>bgRender();
+  bgHQImg.src='images/headquarters.png';
+  bgCapImg=new Image();
+  bgCapImg.onload=()=>bgRender();
+  bgCapImg.src='images/capital.png';
+}
+
+function bgInit(){
+  const canvas=document.getElementById('baseGridCanvas');
+  if(!canvas) return;
+
+  function sizeCanvas(){
+    const wrap=document.getElementById('bgScrollWrap');
+    if(!wrap) return;
+    canvas.width=wrap.clientWidth||800;
+    canvas.height=parseInt(getComputedStyle(wrap).height)||520;
+    bgRender();
+  }
+  sizeCanvas();
+  new ResizeObserver(()=>sizeCanvas()).observe(document.getElementById('bgScrollWrap'));
+
+  // ── Left-drag pan ────────────────────────────────────────────
+  canvas.addEventListener('mousedown',e=>{
+    if(e.button!==0) return;
+    bgPanning=true; bgPanMoved=false;
+    bgPanX=e.clientX; bgPanY=e.clientY;
+    canvas.style.cursor='grabbing';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!bgPanning) return;
+    const dx=e.clientX-bgPanX, dy=e.clientY-bgPanY;
+    if(Math.abs(dx)+Math.abs(dy)>3) bgPanMoved=true;
+    if(bgPanMoved){
+      bgViewX+=dx; bgViewY+=dy;
+      bgPanX=e.clientX; bgPanY=e.clientY;
+      bgRender();
+    }
+  });
+  window.addEventListener('mouseup',e=>{
+    if(!bgPanning) return;
+    bgPanning=false;
+    canvas.style.cursor='grab';
+    if(!bgPanMoved) bgHandleClick.call(canvas,e);
+  });
+
+  // ── Wheel zoom (centered on cursor) ─────────────────────────
+  canvas.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=canvas.getBoundingClientRect();
+    const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+    const factor=e.deltaY<0?1.15:1/1.15;
+    const newScale=Math.max(0.35,Math.min(4.0,bgViewScale*factor));
+    bgViewX=sx-(sx-bgViewX)*(newScale/bgViewScale);
+    bgViewY=sy-(sy-bgViewY)*(newScale/bgViewScale);
+    bgViewScale=newScale;
+    const lbl=document.getElementById('bgZoomLabel');
+    if(lbl) lbl.textContent=Math.round(BG_TILE*bgViewScale)+'px';
+    bgRender();
+  },{passive:false});
+
+  // ── Touch pan ────────────────────────────────────────────────
+  canvas.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1) return;
+    const t=e.touches[0];
+    bgPanning=true; bgPanMoved=false;
+    bgPanX=t.clientX; bgPanY=t.clientY;
+    e.preventDefault();
+  },{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    if(!bgPanning||e.touches.length!==1) return;
+    const t=e.touches[0];
+    const dx=t.clientX-bgPanX, dy=t.clientY-bgPanY;
+    if(Math.abs(dx)+Math.abs(dy)>3) bgPanMoved=true;
+    if(bgPanMoved){
+      bgViewX+=dx; bgViewY+=dy;
+      bgPanX=t.clientX; bgPanY=t.clientY;
+      bgRender();
+    }
+    e.preventDefault();
+  },{passive:false});
+  canvas.addEventListener('touchend',e=>{
+    if(!bgPanning) return;
+    bgPanning=false;
+    if(!bgPanMoved&&e.changedTouches.length===1){
+      const t=e.changedTouches[0];
+      bgHandleClick.call(canvas,{clientX:t.clientX,clientY:t.clientY});
+    }
+    e.preventDefault();
+  },{passive:false});
+
+  canvas.addEventListener('contextmenu',bgHandleRightClick);
+  requestAnimationFrame(bgScrollToCapitol);
+}
+
+function bgScrollToCapitol(){
+  const canvas=document.getElementById('baseGridCanvas');
+  if(!canvas||!canvas.width) return;
+  bgViewX=canvas.width/2-BG_CAP.cx*BG_TILE*bgViewScale;
+  bgViewY=canvas.height/2-BG_CAP.cy*BG_TILE*bgViewScale;
+  bgRender();
+}
+
+function bgZoom(delta){
+  const canvas=document.getElementById('baseGridCanvas');
+  if(!canvas) return;
+  const factor=delta>0?1.25:1/1.25;
+  const cx=canvas.width/2, cy=canvas.height/2;
+  const newScale=Math.max(0.35,Math.min(4.0,bgViewScale*factor));
+  bgViewX=cx-(cx-bgViewX)*(newScale/bgViewScale);
+  bgViewY=cy-(cy-bgViewY)*(newScale/bgViewScale);
+  bgViewScale=newScale;
+  const lbl=document.getElementById('bgZoomLabel');
+  if(lbl) lbl.textContent=Math.round(BG_TILE*bgViewScale)+'px';
+  bgRender();
+}
+
+function bgRender(){
+  const canvas=document.getElementById('baseGridCanvas');
+  if(!canvas||!canvas.width) return;
+  const ts=BG_TILE;
+  const effTs=ts*bgViewScale;
+  const ctx=canvas.getContext('2d');
+
+  // Clear viewport
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#0e1209';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Apply pan/zoom transform
+  ctx.save();
+  ctx.setTransform(bgViewScale,0,0,bgViewScale,bgViewX,bgViewY);
+
+  const W=BG_W*ts, H=BG_H*ts;
+
+  /* ── Terrain fills ───────────────────────────────────────── */
+  // Outer perimeter (dark green terrain)
+  ctx.fillStyle='#141c10'; ctx.fillRect(0,0,W,H);
+
+  // Subtle diagonal hatch on outer terrain
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,0.018)'; ctx.lineWidth=0.5;
+  for(let i=-H;i<W+H;i+=ts*6){
+    ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+H,H);ctx.stroke();
+  }
+  ctx.restore();
+
+  // Mud zone (brownish)
+  const mw=(BG_MUD.x2-BG_MUD.x1)*ts, mh=(BG_MUD.y2-BG_MUD.y1)*ts;
+  const mx=BG_MUD.x1*ts, my=BG_MUD.y1*ts;
+  ctx.fillStyle='#4a4038'; ctx.fillRect(mx,my,mw,mh);
+
+  // Inner Capitol zone — slightly darker mud containing Capitol + cannons
+  {
+    const izN=13*ts; // 13 tiles from Capitol center each way (covers cannons at ±10.5 tiles)
+    ctx.fillStyle='#3e3530';
+    ctx.fillRect(BG_CAP.cx*ts-izN, BG_CAP.cy*ts-izN, izN*2, izN*2);
+  }
+
+  // Mud zone inner texture
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,0.025)'; ctx.lineWidth=0.5;
+  for(let x=BG_MUD.x1;x<=BG_MUD.x2;x+=3){
+    ctx.beginPath();ctx.moveTo(x*ts,my);ctx.lineTo(x*ts,my+mh);ctx.stroke();
+  }
+  for(let y=BG_MUD.y1;y<=BG_MUD.y2;y+=3){
+    ctx.beginPath();ctx.moveTo(mx,y*ts);ctx.lineTo(mx+mw,y*ts);ctx.stroke();
+  }
+  ctx.restore();
+
+  /* ── 1-tile grid (outer only, very faint) ────────────────── */
+  if(effTs>=6){
+    ctx.strokeStyle='rgba(255,255,255,0.035)'; ctx.lineWidth=0.5;
+    for(let x=0;x<=BG_W;x++){ctx.beginPath();ctx.moveTo(x*ts,0);ctx.lineTo(x*ts,H);ctx.stroke();}
+    for(let y=0;y<=BG_H;y++){ctx.beginPath();ctx.moveTo(0,y*ts);ctx.lineTo(W,y*ts);ctx.stroke();}
+  }
+
+  /* ── 3-tile snap grid ────────────────────────────────────── */
+  ctx.strokeStyle='rgba(255,255,255,0.085)'; ctx.lineWidth=0.5;
+  for(let x=0;x<=BG_W;x+=3){ctx.beginPath();ctx.moveTo(x*ts,0);ctx.lineTo(x*ts,H);ctx.stroke();}
+  for(let y=0;y<=BG_H;y+=3){ctx.beginPath();ctx.moveTo(0,y*ts);ctx.lineTo(W,y*ts);ctx.stroke();}
+
+  /* ── 30-tile sector markers (orientation guides) ─────────── */
+  if(effTs>=5){
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1;
+    for(let x=30;x<BG_W;x+=30){ctx.beginPath();ctx.moveTo(x*ts,0);ctx.lineTo(x*ts,H);ctx.stroke();}
+    for(let y=30;y<BG_H;y+=30){ctx.beginPath();ctx.moveTo(0,y*ts);ctx.lineTo(W,y*ts);ctx.stroke();}
+    // Coordinate labels at 30-tile intervals
+    ctx.fillStyle='rgba(255,255,255,0.2)';
+    ctx.font=`${Math.max(7,Math.floor(ts*0.85))}px monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    for(let x=30;x<BG_W;x+=30) ctx.fillText(x,x*ts,2);
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(let y=30;y<BG_H;y+=30) ctx.fillText(y,W-2,y*ts);
+  }
+
+  /* ── Mud zone border ─────────────────────────────────────── */
+  ctx.strokeStyle='rgba(52,211,153,0.65)'; ctx.lineWidth=2;
+  ctx.strokeRect(mx+1,my+1,mw-2,mh-2);
+
+  // "MUD ZONE" label
+  if(effTs>=5){
+    ctx.save();
+    ctx.fillStyle='rgba(52,211,153,0.18)';
+    ctx.font=`bold ${Math.max(8,Math.floor(ts*2.2))}px monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('MUD ZONE',BG_CAP.cx*ts,(BG_MUD.y2-3)*ts);
+    ctx.fillStyle='rgba(255,255,255,0.07)';
+    ctx.font=`${Math.max(6,Math.floor(ts*1.1))}px monospace`;
+    ctx.fillText('NO SHIELDS · SLOW MARCH',BG_CAP.cx*ts,(BG_MUD.y2-1)*ts);
+    ctx.restore();
+  }
+
+  /* ── Capitol (6×6 tiles) ─────────────────────────────────── */
+  const capPx=(BG_CAP.cx-3)*ts, capPy=(BG_CAP.cy-3)*ts, capSz=6*ts;
+  ctx.fillStyle='rgba(232,114,12,0.15)'; ctx.fillRect(capPx,capPy,capSz,capSz);
+  // Capitol image
+  if(bgCapImg&&bgCapImg.complete&&bgCapImg.naturalWidth>0){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(capPx,capPy,capSz,capSz); ctx.clip();
+    ctx.drawImage(bgCapImg,capPx,capPy,capSz,capSz);
+    ctx.restore();
+  }
+  ctx.strokeStyle='rgba(232,114,12,0.9)'; ctx.lineWidth=2;
+  ctx.strokeRect(capPx,capPy,capSz,capSz);
+  // Level "7" badge (bottom-left corner)
+  if(effTs>=4){
+    const badgeSz=Math.max(4,ts*1.1);
+    const badgeX=capPx+ts*0.15, badgeY=capPy+capSz-badgeSz-ts*0.1;
+    ctx.fillStyle='rgba(200,90,10,0.92)';
+    ctx.beginPath();
+    ctx.roundRect(badgeX,badgeY,badgeSz,badgeSz,ts*0.15);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font=`bold ${Math.max(4,Math.floor(badgeSz*0.72))}px sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('7',badgeX+badgeSz/2,badgeY+badgeSz/2);
+  }
+
+  /* ── Cannon markers (3×3 tiles each) ────────────────────── */
+  BG_CANNONS.forEach(c=>{
+    ctx.fillStyle='rgba(192,132,255,0.2)';
+    ctx.fillRect(c.x*ts,c.y*ts,3*ts,3*ts);
+    ctx.strokeStyle='rgba(192,132,255,0.9)'; ctx.lineWidth=1.5;
+    ctx.strokeRect(c.x*ts,c.y*ts,3*ts,3*ts);
+    if(effTs>=4){
+      ctx.fillStyle='rgba(200,160,255,1)';
+      ctx.font=`bold ${Math.max(5,Math.floor(ts*0.85))}px monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(c.lbl,(c.x+1.5)*ts,(c.y+1.5)*ts);
+    }
+  });
+
+  /* ── North indicator ─────────────────────────────────────── */
+  if(effTs>=5){
+    const nx=W-ts*2.5, ny=ts*2.5, nr=ts*1.5;
+    ctx.fillStyle='rgba(0,0,0,0.5)';
+    ctx.beginPath();ctx.arc(nx,ny,nr+2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(248,113,113,0.9)';
+    ctx.font=`bold ${Math.max(7,Math.floor(nr*1.1))}px monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('N',nx,ny);
+  }
+
+  /* ── Placed bases ────────────────────────────────────────── */
+  cwBases.forEach(b=>{
+    if(b.tileCol===undefined) return;
+    const a=cwAlliances.find(x=>x.id===b.allianceId);
+    const [r,g,bl]=a&&ATYPE_RGB[a.type]?ATYPE_RGB[a.type]:[180,180,180];
+    const bx=b.tileCol*ts, by=b.tileRow*ts, bw=3*ts, bh=3*ts;
+    const bcx=(b.tileCol+1.5)*ts, bcy=(b.tileRow+1.5)*ts;
+
+    // ── Background tint ─────────────────────────────────────
+    ctx.fillStyle=`rgba(${r},${g},${bl},${b.shielded?0.18:0.35})`;
+    ctx.fillRect(bx,by,bw,bh);
+
+    // ── HQ building image ───────────────────────────────────
+    if(bgHQImg&&bgHQImg.complete&&bgHQImg.naturalWidth>0&&effTs>=6){
+      // Clip to tile so it doesn't bleed
+      ctx.save();
+      ctx.beginPath(); ctx.rect(bx,by,bw,bh); ctx.clip();
+      const pad=Math.max(0.5,ts*0.08);
+      ctx.drawImage(bgHQImg,bx+pad,by+pad,bw-pad*2,bh-pad*2);
+      ctx.restore();
+    }
+
+    // ── Border ──────────────────────────────────────────────
+    if(b.shielded){
+      // Glowing blue border — contained within the tile, no overflow
+      ctx.save();
+      ctx.shadowColor='rgba(96,200,255,0.9)';
+      ctx.shadowBlur=Math.max(2,ts*0.9);
+      ctx.strokeStyle='rgba(147,215,255,0.95)';
+      ctx.lineWidth=Math.max(1.5,ts*0.22);
+      const inset=ctx.lineWidth/2;
+      ctx.strokeRect(bx+inset,by+inset,bw-ctx.lineWidth,bh-ctx.lineWidth);
+      ctx.restore();
+      // Inner blue fill wash
+      ctx.fillStyle='rgba(96,165,250,0.14)';
+      ctx.fillRect(bx,by,bw,bh);
+    } else {
+      ctx.strokeStyle=`rgba(${r},${g},${bl},0.75)`;
+      ctx.lineWidth=0.5;
+      ctx.strokeRect(bx,by,bw,bh);
+    }
+
+    // ── Shield corner pip ───────────────────────────────────
+    if(b.shielded&&effTs>=5){
+      const pipSz=Math.max(4,ts*0.85);
+      ctx.fillStyle='rgba(30,80,200,0.88)';
+      ctx.fillRect(bx,by,pipSz,pipSz);
+      if(effTs>=8){
+        ctx.fillStyle='rgba(180,225,255,1)';
+        ctx.font=`${Math.floor(pipSz*0.78)}px sans-serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('🛡',bx+pipSz/2,by+pipSz/2);
+      }
+    }
+
+    // ── Alliance tag — bottom strip inside tile ─────────────
+    if(effTs>=5){
+      const tag=a?a.tag.slice(0,4):(b.label||'?').slice(0,4);
+      const fs=Math.max(4,Math.floor(ts*0.72));
+      ctx.font=`bold ${fs}px Chakra Petch,sans-serif`;
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      const lx=bcx, ly=by+bh-Math.max(1,ts*0.08);
+      const tw=ctx.measureText(tag).width;
+      ctx.fillStyle='rgba(0,0,0,0.65)';
+      ctx.fillRect(lx-tw/2-2,ly-fs-1,tw+4,fs+2);
+      ctx.fillStyle=b.shielded?'rgba(160,220,255,1)':`rgba(${r},${g},${bl},1)`;
+      ctx.fillText(tag,lx,ly);
+    }
+  });
+
+  /* ── Assigned alliance tags on Capitol & Cannon tiles ─────── */
+  if(effTs>=5){
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    // Capitol
+    const capIds=cwAssignments['capitol']||[];
+    capIds.forEach((id,i)=>{
+      const a=cwAlliances.find(x=>x.id===id);if(!a) return;
+      const [r,g,bl]=ATYPE_RGB[a.type]||[180,180,180];
+      const tag=a.tag.slice(0,4);
+      const fs=Math.max(4,Math.floor(ts*0.62));
+      ctx.font=`bold ${fs}px Chakra Petch,sans-serif`;
+      const tw=ctx.measureText(tag).width;
+      const ty=(BG_CAP.cy-1.0+i*1.3)*ts;
+      ctx.fillStyle=`rgba(20,70,180,0.82)`;
+      ctx.fillRect(BG_CAP.cx*ts-tw/2-3,ty-fs*0.6,tw+6,fs*1.2);
+      ctx.fillStyle='#fff'; ctx.fillText(tag,BG_CAP.cx*ts,ty);
+    });
+    // Cannons
+    BG_CANNONS.forEach(c=>{
+      const ids=cwAssignments[c.id]||[];
+      ids.forEach((id,i)=>{
+        const a=cwAlliances.find(x=>x.id===id);if(!a) return;
+        const tag=a.tag.slice(0,4);
+        const fs=Math.max(4,Math.floor(ts*0.58));
+        ctx.font=`bold ${fs}px Chakra Petch,sans-serif`;
+        const tw=ctx.measureText(tag).width;
+        const cx2=(c.x+1.5)*ts, cy2=(c.y+0.7+i*1.1)*ts;
+        ctx.fillStyle='rgba(20,70,180,0.82)';
+        ctx.fillRect(cx2-tw/2-2,cy2-fs*0.55,tw+4,fs*1.1);
+        ctx.fillStyle='#fff'; ctx.fillText(tag,cx2,cy2);
+      });
+    });
+  }
+  ctx.restore();
+}
+
+function bgHandleClick(e){
+  const rect=this.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-bgViewX)/bgViewScale;
+  const wy=(e.clientY-rect.top-bgViewY)/bgViewScale;
+  const tileCol=Math.floor(wx/BG_TILE);
+  const tileRow=Math.floor(wy/BG_TILE);
+  // Click on existing base → toggle shield
+  const hit=cwBases.find(b=>b.tileCol!==undefined&&tileCol>=b.tileCol&&tileCol<b.tileCol+3&&tileRow>=b.tileRow&&tileRow<b.tileRow+3);
+  if(hit){cwToggleBaseShield(hit.id);return;}
+  // Place new base(s)
+  if(!activeId){alert('Create or select a profile first.');return;}
+  const snapCol=Math.floor(tileCol/3)*3, snapRow=Math.floor(tileRow/3)*3;
+  if(snapCol<0||snapCol>BG_W-3||snapRow<0||snapRow>BG_H-3) return;
+  bgPlaceBasesFrom(snapCol,snapRow,bgPlaceCount);
+  bgRender(); renderBasesList(); saveActiveProfile();
+}
+
+function bgHandleRightClick(e){
+  e.preventDefault();
+  const rect=this.getBoundingClientRect();
+  const wx=(e.clientX-rect.left-bgViewX)/bgViewScale;
+  const wy=(e.clientY-rect.top-bgViewY)/bgViewScale;
+  const tileCol=Math.floor(wx/BG_TILE);
+  const tileRow=Math.floor(wy/BG_TILE);
+  const b=cwBases.find(base=>base.tileCol!==undefined&&tileCol>=base.tileCol&&tileCol<base.tileCol+3&&tileRow>=base.tileRow&&tileRow<base.tileRow+3);
+  if(b) cwRemoveBase(b.id);
+}
+
+function bgIsBlockedCell(sc,sr){
+  if(sc>=(BG_CAP.cx-3)&&sc<(BG_CAP.cx+3)&&sr>=(BG_CAP.cy-3)&&sr<(BG_CAP.cy+3)) return true;
+  if(BG_CANNONS.some(c=>sc===c.x&&sr===c.y)) return true;
+  return false;
+}
+function bgPlaceBasesFrom(startCol,startRow,count){
+  let placed=0;
+  outer:for(let dr=0;dr<40;dr++){
+    for(let dc=0;dc<bgPlaceWidth;dc++){
+      const sc=startCol+dc*3, sr=startRow+dr*3;
+      if(sc<0||sc>BG_W-3||sr<0||sr>BG_H-3) continue;
+      if(bgIsBlockedCell(sc,sr)) continue;
+      if(cwBases.find(b=>b.tileCol===sc&&b.tileRow===sr)) continue;
+      cwBases.push({id:cwBaseUID++,tileCol:sc,tileRow:sr,shielded:cwPlaceShielded,allianceId:cwPlaceAllianceId,label:''});
+      if(++placed>=count) break outer;
+    }
+  }
+}
+function bgChangePlaceCount(delta){
+  bgPlaceCount=Math.max(1,Math.min(20,bgPlaceCount+delta));
+  const lbl=document.getElementById('placeCountLabel');
+  if(lbl) lbl.textContent=bgPlaceCount;
+}
+function bgChangePlaceWidth(delta){
+  bgPlaceWidth=Math.max(1,Math.min(20,bgPlaceWidth+delta));
+  const lbl=document.getElementById('placeWidthLabel');
+  if(lbl) lbl.textContent=bgPlaceWidth;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BASE PLACEMENT
+══════════════════════════════════════════════════════════════ */
+function cwSetPlaceAlliance(val){
+  cwPlaceAllianceId=parseInt(val)||null;
+}
+function updatePlaceAllianceSel(){
+  const sel=document.getElementById('placeAllianceSel');if(!sel) return;
+  const prev=sel.value;
+  sel.innerHTML='<option value="">— unlinked —</option>'+
+    cwAlliances.map(a=>`<option value="${a.id}">${esc(a.tag)}${a.fullname?' – '+esc(a.fullname.slice(0,20)):''} (${ATYPE_LABEL[a.type]})</option>`).join('');
+  sel.value=prev;
+  cwPlaceAllianceId=parseInt(sel.value)||null;
+}
+function cwToggleBaseShield(id){
+  const b=cwBases.find(x=>x.id===id);
+  if(b){b.shielded=!b.shielded;renderBases();saveActiveProfile();}
+}
+function cwRemoveBase(id){
+  cwBases=cwBases.filter(x=>x.id!==id);renderBases();saveActiveProfile();
+}
+function cwSetBaseLabel(id,val){
+  const b=cwBases.find(x=>x.id===id);
+  if(b){b.label=val.trim();renderBases();saveActiveProfile();}
+}
+function cwClearBases(){if(!cwBases.length) return;cwBases=[];renderBases();saveActiveProfile();}
+
+function renderBases(){
+  bgRender();
+  renderBasesList();
+}
+
+function renderBasesList(){
+  const list=document.getElementById('cwBasesList');
+  const countEl=document.getElementById('basesCount');
+  if(countEl) countEl.textContent=cwBases.length+(cwBases.length===1?' base':' bases');
+  if(!list) return;
+
+  // Group by alliance (unlinked at end)
+  const groups=new Map();
+  cwBases.forEach(b=>{
+    const key=b.allianceId||'__none__';
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(b);
+  });
+
+  let html='';
+  // Alliance groups first
+  for(const [key,bases] of groups){
+    if(key==='__none__') continue;
+    const a=cwAlliances.find(x=>x.id===parseInt(key));
+    if(!a) continue;
+    const col=ATYPE_COLOR[a.type];
+    html+=`<div class="bli-group">
+      <div class="bli-group-header">
+        <span class="bli-group-tag" style="color:${col}">${esc(a.tag)}</span>
+        <span class="bli-group-name">${esc(a.fullname||'')}</span>
+        <span class="bli-group-count">${bases.length} base${bases.length!==1?'s':''}</span>
+      </div>`;
+    bases.forEach(b=>{ html+=baseListRow(b); });
+    html+=`</div>`;
+  }
+  // Unlinked group
+  const unlinked=groups.get('__none__')||[];
+  if(unlinked.length){
+    html+=`<div class="bli-group"><div class="bli-group-header"><span class="bli-group-tag" style="color:var(--text3)">Unlinked</span><span class="bli-group-count">${unlinked.length}</span></div>`;
+    unlinked.forEach(b=>{ html+=baseListRow(b); });
+    html+=`</div>`;
+  }
+  list.innerHTML=html;
+}
+
+function baseListRow(b){
+  const coord=b.tileCol!==undefined?`(${b.tileCol},${b.tileRow})`:'—';
+  return `<div class="base-list-item">
+    <span class="bli-ref">${coord}</span>
+    <input class="bli-name" type="text" value="${esc(b.label)}" placeholder="Player name (optional)"
+           onchange="cwSetBaseLabel(${b.id},this.value)" maxlength="16">
+    <button class="bli-toggle ${b.shielded?'shielded':'active'}" onclick="cwToggleBaseShield(${b.id})">${b.shielded?'🛡 Bubble':'⚔ Active'}</button>
+    <button class="bli-remove" onclick="cwRemoveBase(${b.id})">✕</button>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HELPERS & INIT
+══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   CLOUD SYNC
+══════════════════════════════════════════════════════════════ */
+function cwUpdateCloudBar(){
+  const prof=activeId?profiles[activeId]:null;
+  const bar=document.getElementById('cwCloudBar');
+  if(bar) bar.classList.toggle('show',!!(prof&&prof.server));
+}
+async function cwSharePlan(btn){
+  const prof=activeId?profiles[activeId]:null;
+  if(!prof||!prof.server){alert('Profile needs a server number to share.');return;}
+  const status=document.getElementById('cloudStatus');
+  const orig=btn.textContent;btn.disabled=true;
+  status.textContent='Uploading…';status.className='cloud-status busy';
+  try{
+    const payload={
+      server:String(prof.server),label:prof.label||'',alliance:prof.alliance||'',
+      updated_by:prof.alliance||'anon',
+      plan_data:JSON.stringify({cwAlliances:prof.cwAlliances,cwAssignments:prof.cwAssignments,cwTactic:prof.cwTactic,cwBases:prof.cwBases||[]})
+    };
+    const r=await fetch('/api/coalition',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j=await r.json();
+    if(j.ok){status.textContent=`✓ Shared at ${j.updated_at} UTC`;status.className='cloud-status ok';}
+    else{status.textContent='Error: '+(j.error||'unknown');status.className='cloud-status err';}
+  }catch(e){status.textContent='Network error — is the site deployed with D1?';status.className='cloud-status err';}
+  btn.disabled=false;btn.textContent=orig;
+}
+async function cwLoadPlan(btn){
+  const prof=activeId?profiles[activeId]:null;
+  if(!prof||!prof.server){alert('Profile needs a server number to load.');return;}
+  const status=document.getElementById('cloudStatus');
+  const orig=btn.textContent;btn.disabled=true;
+  status.textContent='Loading…';status.className='cloud-status busy';
+  try{
+    const r=await fetch(`/api/coalition?server=${encodeURIComponent(prof.server)}`);
+    if(r.status===404){status.textContent=`No cloud plan found for server ${prof.server}.`;status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
+    const j=await r.json();
+    let data;try{data=JSON.parse(j.plan_data);}catch{status.textContent='Corrupt plan data.';status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
+    if(!confirm(`Load cloud plan from ${j.updated_by||'?'} (${j.updated_at||'?'} UTC)? This overwrites your local assignments.`)){btn.disabled=false;btn.textContent=orig;return;}
+    profiles[activeId].cwAlliances=data.cwAlliances||[];
+    profiles[activeId].cwAssignments=data.cwAssignments||{};
+    profiles[activeId].cwTactic=data.cwTactic||'balanced';
+    profiles[activeId].cwBases=data.cwBases||[];
+    saveProfiles();loadActiveProfile();renderAll();
+    status.textContent=`✓ Loaded from ${j.updated_by||'?'} · ${j.updated_at||'?'} UTC`;status.className='cloud-status ok';
+  }catch(e){status.textContent='Network error';status.className='cloud-status err';}
+  btn.disabled=false;btn.textContent=orig;
+}
+
+function getAssignedSet(){return new Set(ALL_NODES.flatMap(n=>cwAssignments[n.id]||[]));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+(function init(){
+  ALL_NODES.forEach(n=>cwAssignments[n.id]=[]);
+  buildMap();
+  buildZones();
+  loadProfiles();
+  renderProfileBar();
+  loadActiveProfile();
+  loadClock();
+  renderAll();
+  bgLoadImages();
+  bgInit();
+  cwTick();
+  setInterval(cwTick,1000);
+})();
+</script>
+</body>
+</html>

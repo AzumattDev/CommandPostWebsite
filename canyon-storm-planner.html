@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Last War — Canyon Storm Planner</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root{--cs-rb:#7c3aed;--cs-db:#0e7490;--cs-vl:#9333ea;--cs-pt:#d97706}
+
+.cs-hero{padding:2rem 0 1rem}
+.cs-hero h1{font-family:'Chakra Petch',sans-serif;font-size:clamp(1.3rem,3.5vw,1.9rem);font-weight:700;margin-bottom:.25rem}
+.cs-hero h1 .acc-rb{color:var(--cs-rb)}.cs-hero h1 .acc-db{color:var(--cs-db)}
+.cs-hero .sub{font-size:.88rem;color:var(--text2)}
+
+.planner-layout{display:grid;grid-template-columns:300px 1fr;gap:1rem;align-items:start}
+@media(max-width:860px){.planner-layout{grid-template-columns:1fr}}
+
+.sidebar{display:flex;flex-direction:column;gap:.75rem;position:sticky;top:58px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.1rem}
+.panel-title{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.panel-title .count{font-size:.7rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px}
+
+/* Faction selector */
+.faction-btns{display:flex;gap:6px;margin-bottom:.75rem}
+.fac-btn{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2)}
+.fac-btn:hover{background:var(--surface2)}
+.fac-btn.active-rb{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.4);color:var(--cs-rb)}
+.fac-btn.active-db{background:rgba(14,116,144,.12);border-color:rgba(14,116,144,.4);color:var(--cs-db)}
+
+.add-row{display:flex;gap:6px;margin-bottom:.75rem}
+.add-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem}
+.add-row input:focus{outline:none;border-color:var(--accent)}
+.add-row button{padding:7px 12px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;color:var(--cs-rb);font-family:'Chakra Petch',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.add-row button.db-mode{background:rgba(14,116,144,.1);border-color:rgba(14,116,144,.3);color:var(--cs-db)}
+.add-row button:hover{filter:brightness(1.15)}
+
+.player-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}
+.player-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:.82rem;cursor:grab;transition:all .15s;user-select:none}
+.player-chip:hover{border-color:var(--accent)}
+.player-chip.dragging{opacity:.35;cursor:grabbing}
+.player-chip.is-sub{border-style:dashed;opacity:.8}
+.player-chip.alliance-b{border-color:rgba(14,116,144,.35)}
+.player-chip-top{display:flex;align-items:center;gap:6px}
+.role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-name{flex:1;font-family:'Chakra Petch',sans-serif;font-weight:600;color:var(--text);font-size:.83rem}
+.chip-controls{display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap}
+.chip-controls select,.chip-controls input{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:2px 5px;color:var(--text);font-size:.72rem;font-family:'DM Sans',sans-serif}
+.chip-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 4px;border-radius:4px;margin-left:auto}
+.chip-remove:hover{color:var(--red);background:var(--red-bg)}
+.sub-label,.ally-label{font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-left:1px}
+.chip-sub-chk{accent-color:var(--cs-rb)}
+.alliance-badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;padding:1px 5px;border-radius:3px;font-weight:700}
+.badge-a{background:rgba(96,165,250,.12);color:var(--blue);border:1px solid rgba(96,165,250,.25)}
+.badge-b{background:rgba(14,116,144,.12);color:#06b6d4;border:1px solid rgba(14,116,144,.25)}
+
+.tactic-btns{display:flex;flex-direction:column;gap:5px}
+.tac-btn{padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;text-align:left;transition:all .15s}
+.tac-btn:hover{background:var(--surface2);color:var(--text)}
+.tac-btn.active{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.3);color:var(--purple)}
+.tac-btn.active.db-tac{background:rgba(14,116,144,.08);border-color:rgba(14,116,144,.3);color:var(--cyan)}
+.tac-btn strong{display:block;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.84rem;margin-bottom:2px}
+.tac-btn span{font-size:.74rem;color:var(--text3)}
+
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.cs-btn{padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.cs-btn:hover{background:var(--surface2);color:var(--text)}
+.cs-btn-rb{background:var(--cs-rb);color:#fff;border-color:var(--cs-rb)}
+.cs-btn-rb:hover{filter:brightness(1.1)}
+.cs-btn-db{background:var(--cs-db);color:#fff;border-color:var(--cs-db)}
+.cs-btn-db:hover{filter:brightness(1.1)}
+.cs-btn-danger{color:var(--red);border-color:rgba(248,113,113,.2)}
+.cs-btn-danger:hover{background:var(--red-bg)}
+
+/* Map */
+.map-outer{position:relative;width:100%;padding-bottom:66%;background:radial-gradient(ellipse at 50% 30%,#2d2418 0%,#161008 40%,#080604 100%);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);margin-bottom:.75rem}
+.map-grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:5% 5%;pointer-events:none}
+.bnode{position:absolute;transform:translate(-50%,-50%);background:rgba(8,10,16,.9);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 7px;min-width:68px;max-width:90px;text-align:center;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px)}
+.bnode:hover{border-color:rgba(167,139,250,.5);background:rgba(20,22,32,.92)}
+.bnode.drag-over{border-color:var(--purple);background:rgba(124,58,237,.1);transform:translate(-50%,-50%) scale(1.06)}
+.bnode.locked{border-color:rgba(251,191,36,.25);background:rgba(25,18,5,.9)}
+.bnode.high-value{border-color:rgba(147,51,234,.4);background:rgba(20,8,30,.9)}
+.bnode-head{font-size:.6rem;font-family:'Chakra Petch',sans-serif;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bnode-emoji{font-size:.95rem;line-height:1.3}
+.bnode-unlock{font-size:.5rem;color:var(--amber);font-family:'JetBrains Mono',monospace}
+.bnode-cap{font-size:.55rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.bnode-players{display:flex;flex-direction:column;gap:1px;margin-top:2px}
+.bnode-player{font-size:.57rem;color:var(--green);font-family:'Chakra Petch',sans-serif;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;padding:1px 3px;border-radius:3px;background:rgba(52,211,153,.08)}
+.bnode-player:hover{background:rgba(248,113,113,.15);color:var(--red)}
+.bnode-player.is-sub{color:var(--amber);background:rgba(251,191,36,.08)}
+.bnode-player.ally-b{color:#06b6d4;background:rgba(14,116,144,.1)}
+.pts-badge{position:absolute;top:-6px;right:-4px;background:rgba(147,51,234,.8);color:#fff;font-size:.5rem;font-family:'JetBrains Mono',monospace;padding:1px 4px;border-radius:3px;font-weight:700}
+
+/* Assignment grid */
+.assign-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:.75rem}
+.assign-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.7rem .8rem}
+.assign-card.locked{border-color:rgba(251,191,36,.2)}
+.assign-card.high-value{border-color:rgba(147,51,234,.3)}
+.ac-head{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.ac-emoji{font-size:1rem}.ac-name{font-family:'Chakra Petch',sans-serif;font-size:.77rem;font-weight:600;color:var(--text);flex:1}
+.ac-pts{font-size:.55rem;font-family:'JetBrains Mono',monospace;padding:1px 4px;border-radius:3px}
+.pts-high{background:rgba(147,51,234,.12);color:var(--purple);border:1px solid rgba(147,51,234,.25)}
+.pts-med{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+.pts-low{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.ac-players{display:flex;flex-direction:column;gap:2px}
+.ac-player{font-size:.74rem;color:var(--text2);display:flex;align-items:center;gap:4px}
+.ac-role-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ac-empty{font-size:.72rem;color:var(--text3);font-style:italic}
+.ac-slots{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:4px}
+
+/* HQ abilities */
+.hq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:.75rem}
+.hq-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem .85rem}
+.hq-name{font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:700;color:var(--purple);margin-bottom:3px}
+.hq-faction{font-size:.65rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-bottom:4px}
+.hq-energy{font-size:.72rem;color:var(--amber);font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.hq-desc{font-size:.78rem;color:var(--text2);line-height:1.5}
+
+/* Phase plan */
+.phase-plan{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.phase-plan pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text2);white-space:pre-wrap;line-height:1.75;margin:0}
+.phase-badge{display:inline-block;font-size:.68rem;font-family:'JetBrains Mono',monospace;font-weight:700;padding:3px 8px;border-radius:4px;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.04em}
+.ph1-badge{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.25)}
+.ph2-badge{background:rgba(251,191,36,.08);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.ph3-badge{background:rgba(147,51,234,.08);color:var(--purple);border:1px solid rgba(147,51,234,.2)}
+
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-bottom:.75rem}
+.rule-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .75rem;font-size:.8rem;color:var(--text2);display:flex;gap:7px}
+
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem}
+</style>
+</head>
+<body>
+<div class="container" style="max-width:1100px">
+<div class="cs-hero">
+  <h1>🏔️ <span class="acc-rb">Canyon Storm</span> — Tactical Planner</h1>
+  <p class="sub">Select your faction, add players, assign roles, drag onto the map, then generate a phase-by-phase battle plan.</p>
+</div>
+
+<div class="planner-layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <div class="panel">
+      <div class="panel-title">Faction</div>
+      <div class="faction-btns">
+        <button class="fac-btn active-rb" id="fac-rb" onclick="csFaction('rb')">⚔️ Rulebringers<br><span style="font-size:.7rem;font-weight:400;color:var(--text3)">1 alliance · 20 players</span></button>
+        <button class="fac-btn" id="fac-db" onclick="csFaction('db')">🛡️ Dawnbreakers<br><span style="font-size:.7rem;font-weight:400;color:var(--text3)">2 alliances · 40 players</span></button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        Players
+        <span class="count" id="csPlayerCount">0 / 20</span>
+      </div>
+      <div class="add-row">
+        <input type="text" id="csPlayerInput" placeholder="Player name…" maxlength="20" onkeydown="if(event.key==='Enter')csAddPlayer()">
+        <button id="csAddBtn" onclick="csAddPlayer()">＋ Add</button>
+      </div>
+      <div class="player-list" id="csPlayerList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Tactic Mode</div>
+      <div class="tactic-btns" id="csTacticBtns"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Actions</div>
+      <div class="action-btns">
+        <button class="cs-btn cs-btn-rb" id="csAutoBtn" onclick="csAutoAssign()">⚡ Auto-Assign</button>
+        <button class="cs-btn cs-btn-danger" onclick="csClearAssignments()">🗑 Clear Map</button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- Main -->
+  <div id="csMainArea">
+
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title">Map — Drag players onto buildings. Click a name to remove.</div>
+      <div class="map-outer" id="csMap">
+        <div class="map-grid-overlay"></div>
+        <!-- building nodes injected by JS -->
+      </div>
+      <div class="panel-title" style="margin-top:.5rem">Assignment Overview</div>
+      <div class="assign-grid" id="csAssignGrid"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title">Phase Battle Plan</div>
+      <div id="csPhasePlan" class="phase-plan">
+        <pre style="color:var(--text3)">Add players and assign them to buildings to generate the battle plan.</pre>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title">HQ Special Abilities</div>
+      <div class="hq-grid">
+        <div class="hq-card">
+          <div class="hq-name">Seismic Tower</div>
+          <div class="hq-faction">Rulebringers only · 500K Energy</div>
+          <div class="hq-desc">Teleport + 1,000 AoE damage, then 300/3s. 30s CD / 300s total.</div>
+        </div>
+        <div class="hq-card">
+          <div class="hq-name">Field Hospital</div>
+          <div class="hq-faction">All factions · 500K Energy</div>
+          <div class="hq-desc">Teleport + heal 300 HP &amp; 150 units/3s nearby. 30s CD / 300s total.</div>
+        </div>
+        <div class="hq-card">
+          <div class="hq-name">Artillery Turret</div>
+          <div class="hq-faction">Dawnbreakers only · 750K Energy</div>
+          <div class="hq-desc">Teleport + 300/2s to nearest enemy. 30s CD / 300s total.</div>
+        </div>
+        <div class="hq-card" style="border-color:rgba(147,51,234,.3)">
+          <div class="hq-name" style="color:var(--purple)">Judicator</div>
+          <div class="hq-faction">Rulebringers only · 1M Energy</div>
+          <div class="hq-desc">5,000 AoE damage. −30s own TP per kill. +60s enemy TP. 2 min CD.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:.75rem">
+      <div class="panel-title">Game Rules — Canyon Storm</div>
+      <div class="rules-grid">
+        <div class="rule-item"><span>⏱️</span><span>30-minute battle. Point lead at end wins.</span></div>
+        <div class="rule-item"><span>🏠</span><span>Base HP = 6,000. Destroyed after 10 hits.</span></div>
+        <div class="rule-item"><span>⚡</span><span>Power Tower gives RB a shield — hold at all costs.</span></div>
+        <div class="rule-item"><span>🦠</span><span>Viro Lab = 120 pts/sec. Highest value building — unlocks at 12:00.</span></div>
+        <div class="rule-item"><span>🔒</span><span>Serum Factories unlock at 5:00. Defense Systems at 8:00.</span></div>
+        <div class="rule-item"><span>🚫</span><span>Max 5 players per building. Teleport CD = 3 min base.</span></div>
+        <div class="rule-item"><span>🔄</span><span>Substitutes: switch in when a player runs out of troops.</span></div>
+        <div class="rule-item"><span>📢</span><span>Communicate! Call for help when any building is attacked.</span></div>
+      </div>
+    </div>
+
+    <div class="export-row">
+      <button class="cs-btn cs-btn-rb" id="csExportBtn" onclick="csExportTxt()">📄 Export as TXT</button>
+      <button class="cs-btn" onclick="csExportClipboard()">📋 Copy Plan</button>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /container -->
+
+<script>
+/* ── Data ─────────────────────────────────────────────────────── */
+const CS_BUILDINGS = [
+  {id:'dc1',  name:'Data Center 1',     emoji:'💻', x:22, y:22, cap:5, pts:20, unlock:0},
+  {id:'dc2',  name:'Data Center 2',     emoji:'💻', x:78, y:22, cap:5, pts:20, unlock:0},
+  {id:'sf1',  name:'Serum Factory 1',   emoji:'🧪', x:18, y:42, cap:5, pts:20, unlock:5},
+  {id:'pt',   name:'Power Tower',       emoji:'⚡', x:50, y:38, cap:5, pts:50, unlock:0},
+  {id:'ds1',  name:'Defense System 1',  emoji:'🛡️', x:82, y:42, cap:5, pts:20, unlock:8},
+  {id:'ds2',  name:'Defense System 2',  emoji:'🛡️', x:18, y:58, cap:5, pts:20, unlock:8},
+  {id:'vl',   name:'Viro Lab',          emoji:'🦠', x:50, y:56, cap:5, pts:120, unlock:12},
+  {id:'sf2',  name:'Serum Factory 2',   emoji:'🧪', x:82, y:58, cap:5, pts:20, unlock:5},
+  {id:'sw1',  name:'Sample Warehouse 1',emoji:'📦', x:22, y:75, cap:5, pts:15, unlock:0},
+  {id:'sw2',  name:'Sample Warehouse 2',emoji:'📦', x:38, y:75, cap:5, pts:15, unlock:0},
+  {id:'sw3',  name:'Sample Warehouse 3',emoji:'📦', x:62, y:75, cap:5, pts:15, unlock:0},
+  {id:'sw4',  name:'Sample Warehouse 4',emoji:'📦', x:78, y:75, cap:5, pts:15, unlock:0},
+];
+const CS_ROLES_RB = [
+  {v:'dc1',c:'#1e90ff',l:'DC 1'},{v:'dc2',c:'#1e90ff',l:'DC 2'},
+  {v:'sf1',c:'#39ff14',l:'SF 1'},{v:'sf2',c:'#39ff14',l:'SF 2'},
+  {v:'pt', c:'#ffd700',l:'Power Tower'},{v:'ds1',c:'#ff6666',l:'DS 1'},
+  {v:'ds2',c:'#ff6666',l:'DS 2'},{v:'vl',c:'#c084ff',l:'Viro Lab'},
+  {v:'sw1',c:'#ffb347',l:'SW 1'},{v:'sw2',c:'#ffb347',l:'SW 2'},
+  {v:'sw3',c:'#ffb347',l:'SW 3'},{v:'sw4',c:'#ffb347',l:'SW 4'},
+  {v:'judi',c:'#ff00ff',l:'Judicator'},{v:'bomb',c:'#ff4444',l:'Bomb'},
+  {v:'flex',c:'#5a7090',l:'Flex'},
+];
+const CS_ROLES_DB = [
+  {v:'dc1',c:'#1e90ff',l:'DC 1'},{v:'dc2',c:'#1e90ff',l:'DC 2'},
+  {v:'sf1',c:'#39ff14',l:'SF 1'},{v:'sf2',c:'#39ff14',l:'SF 2'},
+  {v:'pt', c:'#ffd700',l:'Power Tower'},{v:'ds1',c:'#ff6666',l:'DS 1'},
+  {v:'ds2',c:'#ff6666',l:'DS 2'},{v:'vl',c:'#c084ff',l:'Viro Lab'},
+  {v:'sw1',c:'#ffb347',l:'SW 1'},{v:'sw2',c:'#ffb347',l:'SW 2'},
+  {v:'sw3',c:'#ffb347',l:'SW 3'},{v:'sw4',c:'#ffb347',l:'SW 4'},
+  {v:'bomb',c:'#ff4444',l:'Bomb'},{v:'flex',c:'#5a7090',l:'Flex'},
+];
+const TACTICS = {
+  rb: [
+    {id:'defensive', label:'Defensive', desc:'Power Tower first · hold center · Judicator at Lab'},
+    {id:'aggressive',label:'Aggressive',desc:'Push early · Seismic Tower usage · fast Lab rush'},
+  ],
+  db: [
+    {id:'structured',label:'Structured',desc:'3 per building · Alliance A labs · Alliance B holds'},
+    {id:'rush',      label:'Rush',       desc:'Overwhelm key buildings · priority focus'},
+  ]
+};
+const TACTIC_PRIORITY_CS = {
+  defensive:  ['pt','dc1','dc2','sf1','sf2','ds1','ds2','vl','sw1','sw2','sw3','sw4'],
+  aggressive: ['dc1','dc2','pt','sf1','sf2','vl','ds1','ds2','sw1','sw2','sw3','sw4'],
+  structured: ['sw1','sw2','sw3','sw4','pt','sf1','sf2','ds1','ds2','dc1','dc2','vl'],
+  rush:       ['sw1','sw2','sw3','sw4','pt','vl','sf1','sf2','ds1','ds2','dc1','dc2'],
+};
+
+let csPlayers=[], csAssignments={}, csFac='rb', csTactic='defensive', csUID=1, csDragId=null;
+
+/* ── Init ─────────────────────────────────────────────────────── */
+(function init(){
+  CS_BUILDINGS.forEach(b=>csAssignments[b.id]=[]);
+  buildMap();
+  buildTactics();
+  loadState();
+  renderAll();
+})();
+
+/* ── Map builder ──────────────────────────────────────────────── */
+function buildMap(){
+  const map=document.getElementById('csMap');
+  CS_BUILDINGS.forEach(b=>{
+    const isHigh=b.pts>=50, isLocked=b.unlock>0;
+    const el=document.createElement('div');
+    el.className='bnode'+(isHigh?' high-value':'')+(isLocked?' locked':'');
+    el.id='cbnode-'+b.id;
+    el.style.left=b.x+'%'; el.style.top=b.y+'%';
+    if(b.pts>=50) el.innerHTML=`<span class="pts-badge">${b.pts}pts</span>`;
+    el.innerHTML+=(el.innerHTML||'')+`
+      <div class="bnode-emoji">${b.emoji}</div>
+      <div class="bnode-head">${b.name.replace('Sample Warehouse','SW')}</div>
+      ${b.unlock?`<div class="bnode-unlock">🔒${b.unlock}:00</div>`:''}
+      <div class="bnode-cap" id="ccap-${b.id}">0/${b.cap}</div>
+      <div class="bnode-players" id="cplayers-${b.id}"></div>`;
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');csDropPlayer(b.id);});
+    map.appendChild(el);
+  });
+}
+
+function buildTactics(){
+  const container=document.getElementById('csTacticBtns');
+  const tacs=TACTICS[csFac];
+  container.innerHTML=tacs.map(t=>`
+    <button class="tac-btn${t.id===csTactic?(' active'+(csFac==='db'?' db-tac':'')):''}" id="cstac-${t.id}" onclick="csSetTactic('${t.id}')">
+      <strong>${t.label}</strong><span>${t.desc}</span>
+    </button>`).join('');
+}
+
+/* ── Render ───────────────────────────────────────────────────── */
+function renderAll(){renderSidebar();renderMap();renderGrid();renderPlan();saveState();}
+
+function renderSidebar(){
+  const list=document.getElementById('csPlayerList');
+  const maxStarters=csFac==='rb'?20:40;
+  const starters=csPlayers.filter(p=>!p.isSub);
+  const subs=csPlayers.filter(p=>p.isSub);
+  document.getElementById('csPlayerCount').textContent=`${starters.length}/${maxStarters} · ${subs.length} subs`;
+  const roles=csFac==='rb'?CS_ROLES_RB:CS_ROLES_DB;
+  const roleMap=Object.fromEntries(roles.map(r=>[r.v,r]));
+  const assignedSet=new Set(Object.values(csAssignments).flat());
+  const roleOpts=roles.map(r=>`<option value="${r.v}">${r.l}</option>`).join('');
+
+  const renderChip=p=>{
+    const r=roleMap[p.role]||{c:'#5a7090',l:p.role};
+    const assigned=assignedSet.has(p.id);
+    const allyBadge=csFac==='db'&&!p.isSub?`<span class="alliance-badge ${p.alliance==='b'?'badge-b':'badge-a'}">${p.alliance==='b'?'B':'A'}</span>`:'';
+    return `<div class="player-chip${p.isSub?' is-sub':''}${p.alliance==='b'?' alliance-b':''}" id="cchip-${p.id}"
+              draggable="true" ondragstart="csDragStart(${p.id})" ondragend="csDragEnd(${p.id})">
+      <div class="player-chip-top">
+        <span class="role-dot" style="background:${r.c}"></span>
+        <span class="chip-name">${esc(p.name)}</span>
+        ${allyBadge}
+        ${assigned?'<span style="font-size:.6rem;color:var(--green)">●</span>':''}
+        <button class="chip-remove" onclick="csRemovePlayer(${p.id})">✕</button>
+      </div>
+      <div class="chip-controls">
+        <select onchange="csSetRole(${p.id},this.value)">${roles.map(r=>`<option value="${r.v}"${p.role===r.v?' selected':''}>${r.l}</option>`).join('')}</select>
+        ${csFac==='db'&&!p.isSub?`<select onchange="csSetAlliance(${p.id},this.value)" style="width:45px"><option value="a"${p.alliance==='a'?' selected':''}>A</option><option value="b"${p.alliance==='b'?' selected':''}>B</option></select>`:''}
+        <label style="display:flex;align-items:center;gap:3px;font-size:.68rem;color:var(--text3)">
+          <input type="checkbox" class="chip-sub-chk"${p.isSub?' checked':''} onchange="csToggleSub(${p.id},this.checked)"> <span class="sub-label">Sub</span>
+        </label>
+      </div>
+    </div>`;
+  };
+
+  list.innerHTML=(starters.length?starters.map(renderChip).join(''):'<div style="font-size:.8rem;color:var(--text3)">No players yet.</div>')
+    +(subs.length?`<div style="font-size:.65rem;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:6px 0 3px">Substitutes</div>`+subs.map(renderChip).join(''):'');
+}
+
+function renderMap(){
+  CS_BUILDINGS.forEach(b=>{
+    const ids=csAssignments[b.id]||[];
+    document.getElementById('ccap-'+b.id).textContent=`${ids.length}/${b.cap}`;
+    const pp=document.getElementById('cplayers-'+b.id);
+    pp.innerHTML=ids.map(id=>{
+      const p=csPlayers.find(x=>x.id===id);
+      if(!p) return '';
+      const isAllyB=csFac==='db'&&p.alliance==='b';
+      return `<div class="bnode-player${p.isSub?' is-sub':''}${isAllyB?' ally-b':''}" onclick="csUnassign('${b.id}',${id})">${esc(p.name)}</div>`;
+    }).join('');
+  });
+}
+
+function renderGrid(){
+  const grid=document.getElementById('csAssignGrid');
+  grid.innerHTML=CS_BUILDINGS.map(b=>{
+    const ids=csAssignments[b.id]||[];
+    const ptsClass=b.pts>=100?'pts-high':b.pts>=40?'pts-med':'pts-low';
+    const roleMap=Object.fromEntries((csFac==='rb'?CS_ROLES_RB:CS_ROLES_DB).map(r=>[r.v,r]));
+    return `<div class="assign-card${b.pts>=100?' high-value':b.unlock?' locked':''}">
+      <div class="ac-head">
+        <span class="ac-emoji">${b.emoji}</span>
+        <span class="ac-name">${b.name.replace('Sample Warehouse ','SW')}</span>
+        <span class="ac-pts ${ptsClass}">${b.pts}pts</span>
+      </div>
+      <div class="ac-players">${ids.length
+        ?ids.map(id=>{const p=csPlayers.find(x=>x.id===id);if(!p)return'';const r=roleMap[p.role]||{c:'#5a7090'};
+          const isB=csFac==='db'&&p.alliance==='b';
+          return `<div class="ac-player"><span class="ac-role-dot" style="background:${r.c}"></span>${esc(p.name)}${p.isSub?' <span style="font-size:.6rem;color:var(--amber)">[S]</span>':''}${isB?' <span style="font-size:.6rem;color:#06b6d4">[B]</span>':''}</div>`;}).join('')
+        :'<div class="ac-empty">Empty</div>'}
+      </div>
+      <div class="ac-slots">${ids.length}/${b.cap} slots${b.unlock?` · 🔒${b.unlock}:00`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderPlan(){
+  const el=document.getElementById('csPhasePlan');
+  const count=new Set(Object.values(csAssignments).flat()).size;
+  if(!csPlayers.length||!count){el.innerHTML='<pre style="color:var(--text3)">Assign players to buildings to generate the battle plan.</pre>';return;}
+  el.innerHTML=buildPlan();
+}
+
+function buildPlan(){
+  const gp=id=>csPlayers.find(p=>p.id===id);
+  const pName=id=>{const p=gp(id);if(!p)return'?';let s=esc(p.name);if(p.isSub)s+=' [SUB]';if(csFac==='db'&&!p.isSub)s+=` [${p.alliance?.toUpperCase()||'A'}]`;return s;};
+  const assignedSet=new Set(Object.values(csAssignments).flat());
+  const unassigned=csPlayers.filter(p=>!assignedSet.has(p.id));
+  const imm=CS_BUILDINGS.filter(b=>b.unlock===0&&b.id!=='vl');
+  const at5=CS_BUILDINGS.filter(b=>b.unlock===5);
+  const at8=CS_BUILDINGS.filter(b=>b.unlock===8);
+  const vl=CS_BUILDINGS.find(b=>b.id==='vl');
+
+  const tacNotes={
+    defensive:'Power Tower gives RB a SHIELD. Defend it at all costs.',
+    aggressive:'Rush Power Tower + Data Centers simultaneously. Seismic Tower on cooldown.',
+    structured:`Alliance A storms labs. Alliance B holds Sample Warehouses + Power Tower.`,
+    rush:`Flood key buildings with numbers. Overwhelm before the enemy sets up.`
+  };
+  const ph2Notes={
+    defensive:'Keep Phase 1 buildings. Only designated players move to Serum Factories.',
+    aggressive:'Capture Serum Factories immediately at 5:00, then Defense Systems at 8:00.',
+    structured:'Alliance A: both SFs at 5:00, both DSs at 8:00. Alliance B: maintain holds.',
+    rush:'Push Serum Factories and Defense Systems with overwhelming numbers.'
+  };
+  const ph3Notes={
+    defensive:`Do NOT abandon held buildings for the Lab. Judicator deploys at Lab.`,
+    aggressive:'Silo is highest priority. Judicator + strongest players storm it.',
+    structured:`Alliance A storms Viro Lab (5 players). Alliance B defends everything else.`,
+    rush:'Flood the Viro Lab with maximum numbers. Win the Lab, win the game.'
+  };
+
+  let h='';
+  h+=`<div class="phase-badge ph1-badge">⚡ Phase 1 — 0:00–5:00 · ${csTactic.toUpperCase()}</div>\n<pre>`;
+  for(const b of imm){const ids=csAssignments[b.id]||[];if(ids.length)h+=`${b.emoji} ${b.name}: ${ids.map(pName).join(', ')}\n`;}
+  const bombs=csPlayers.filter(p=>p.role==='bomb'&&assignedSet.has(p.id));
+  if(bombs.length) h+=`💣 Bomb Squad: ${bombs.map(p=>esc(p.name)).join(', ')}\n`;
+  if(csFac==='rb'){const judis=csPlayers.filter(p=>p.role==='judi');if(judis.length)h+=`🟣 Judicator: ${judis.map(p=>esc(p.name)).join(', ')} — standby\n`;}
+  if(unassigned.length)h+=`⚪ Unassigned: ${unassigned.map(p=>esc(p.name)).join(', ')}\n`;
+  h+=`\n→ ${tacNotes[csTactic]}</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph2-badge">🔒 Phase 2 — 5:00–12:00 · SF unlock @ 5:00 · DS unlock @ 8:00</div>\n<pre>`;
+  h+=`⚠️ KEEP PHASE 1 BUILDINGS — only designated players move!\n\n`;
+  for(const b of at5){const ids=csAssignments[b.id]||[];h+=`${b.emoji} ${b.name} (@ 5:00): ${ids.length?ids.map(pName).join(', '):'❌ UNASSIGNED'}\n`;}
+  for(const b of at8){const ids=csAssignments[b.id]||[];h+=`${b.emoji} ${b.name} (@ 8:00): ${ids.length?ids.map(pName).join(', '):'❌ UNASSIGNED'}\n`;}
+  h+=`\n→ ${ph2Notes[csTactic]}</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph3-badge">🦠 Phase 3 — 12:00–30:00 · Viro Lab UNLOCKS (120pts/sec)</div>\n<pre>`;
+  const vlIds=csAssignments['vl']||[];
+  h+=`🦠 Viro Lab: ${vlIds.length?vlIds.map(pName).join(', '):'❌ UNASSIGNED — assign NOW!'}\n`;
+  h+=`\n→ ${ph3Notes[csTactic]}\n`;
+  h+=`\n⚠️ Do NOT abandon held buildings to rush the Lab — you will lose more points than you gain.`;
+  h+=`</pre>`;
+  return h;
+}
+
+/* ── Drag & Drop ──────────────────────────────────────────────── */
+function csDragStart(id){csDragId=id;setTimeout(()=>{const c=document.getElementById('cchip-'+id);if(c)c.classList.add('dragging');},0);}
+function csDragEnd(id){csDragId=null;const c=document.getElementById('cchip-'+id);if(c)c.classList.remove('dragging');}
+function csDropPlayer(bId){
+  if(csDragId===null) return;
+  const b=CS_BUILDINGS.find(x=>x.id===bId);
+  if(!b) return;
+  const ids=csAssignments[bId];
+  if(ids.includes(csDragId)) return;
+  if(ids.length>=b.cap){alert(`${b.name} is full (${b.cap}/${b.cap})`);return;}
+  CS_BUILDINGS.forEach(bi=>{csAssignments[bi.id]=csAssignments[bi.id].filter(i=>i!==csDragId);});
+  csAssignments[bId].push(csDragId);
+  renderAll();
+}
+function csUnassign(bId,id){csAssignments[bId]=csAssignments[bId].filter(i=>i!==id);renderAll();}
+
+/* ── Player management ────────────────────────────────────────── */
+function csAddPlayer(){
+  const input=document.getElementById('csPlayerInput');
+  const name=input.value.trim();
+  if(!name) return;
+  const max=csFac==='rb'?20:40;
+  const starters=csPlayers.filter(p=>!p.isSub).length;
+  const maxTotal=csFac==='rb'?30:50;
+  if(csPlayers.length>=maxTotal){alert(`Max ${maxTotal} players`);return;}
+  csPlayers.push({id:csUID++,name,role:'flex',isSub:starters>=max,alliance:'a'});
+  input.value=''; renderAll();
+}
+function csRemovePlayer(id){
+  csPlayers=csPlayers.filter(p=>p.id!==id);
+  CS_BUILDINGS.forEach(b=>{csAssignments[b.id]=csAssignments[b.id].filter(i=>i!==id);});
+  renderAll();
+}
+function csSetRole(id,v){const p=csPlayers.find(x=>x.id===id);if(p){p.role=v;renderAll();}}
+function csSetAlliance(id,v){const p=csPlayers.find(x=>x.id===id);if(p){p.alliance=v;renderAll();}}
+function csToggleSub(id,v){const p=csPlayers.find(x=>x.id===id);if(p){p.isSub=v;renderAll();}}
+
+/* ── Faction / Tactic ─────────────────────────────────────────── */
+function csFaction(f){
+  csFac=f;
+  document.getElementById('fac-rb').className='fac-btn'+(f==='rb'?' active-rb':'');
+  document.getElementById('fac-db').className='fac-btn'+(f==='db'?' active-db':'');
+  document.getElementById('csAddBtn').className=f==='db'?'db-mode':'';
+  const autoBtn=document.getElementById('csAutoBtn');
+  autoBtn.className='cs-btn '+(f==='rb'?'cs-btn-rb':'cs-btn-db');
+  const exportBtn=document.getElementById('csExportBtn');
+  exportBtn.className='cs-btn '+(f==='rb'?'cs-btn-rb':'cs-btn-db');
+  // Default tactic for faction
+  csTactic=f==='rb'?'defensive':'structured';
+  buildTactics(); renderAll();
+}
+function csSetTactic(t){
+  csTactic=t;
+  TACTICS[csFac].forEach(x=>{
+    const el=document.getElementById('cstac-'+x.id);
+    if(el) el.className='tac-btn'+(x.id===t?' active'+(csFac==='db'?' db-tac':''):'');
+  });
+  renderAll();
+}
+
+/* ── Auto-assign ──────────────────────────────────────────────── */
+function csAutoAssign(){
+  CS_BUILDINGS.forEach(b=>csAssignments[b.id]=[]);
+  const sorted=[...csPlayers].sort((a,b)=>{
+    if(a.isSub!==b.isSub) return a.isSub?1:-1; return 0;
+  });
+  const order=TACTIC_PRIORITY_CS[csTactic]||TACTIC_PRIORITY_CS.defensive;
+  const assigned=new Set();
+  // Role-matched
+  for(const p of sorted){
+    if(p.role==='flex'||p.role==='bomb'||p.role==='judi') continue;
+    const b=CS_BUILDINGS.find(x=>x.id===p.role);
+    if(b&&csAssignments[b.id].length<b.cap&&!assigned.has(p.id)){
+      csAssignments[b.id].push(p.id); assigned.add(p.id);
+    }
+  }
+  // Fill by priority
+  for(const p of sorted){
+    if(assigned.has(p.id)) continue;
+    for(const bId of order){
+      const b=CS_BUILDINGS.find(x=>x.id===bId);
+      if(b&&csAssignments[b.id].length<b.cap){
+        csAssignments[b.id].push(p.id); assigned.add(p.id); break;
+      }
+    }
+  }
+  renderAll();
+}
+function csClearAssignments(){CS_BUILDINGS.forEach(b=>csAssignments[b.id]=[]);renderAll();}
+
+/* ── Export ───────────────────────────────────────────────────── */
+function csBuildTxt(){
+  const assignedSet=new Set(Object.values(csAssignments).flat());
+  const gp=id=>csPlayers.find(p=>p.id===id);
+  const pn=id=>{const p=gp(id);if(!p)return'?';let s=p.name;if(p.isSub)s+=' [SUB]';if(csFac==='db'&&!p.isSub)s+=` [${p.alliance?.toUpperCase()||'A'}]`;return s;};
+  const un=csPlayers.filter(p=>!assignedSet.has(p.id));
+  let t=`CANYON STORM — TACTICAL PLAN\n`;
+  t+=`Faction: ${csFac.toUpperCase()}  |  Tactic: ${csTactic.toUpperCase()}  |  Players: ${csPlayers.filter(p=>!p.isSub).length}\n`;
+  t+='═'.repeat(45)+'\n\n';
+  t+=`PHASE 1 (0:00–5:00)\n${'─'.repeat(30)}\n`;
+  CS_BUILDINGS.filter(b=>b.unlock===0&&b.id!=='vl').forEach(b=>{const ids=csAssignments[b.id]||[];if(ids.length)t+=`${b.emoji} ${b.name}: ${ids.map(pn).join(', ')}\n`;});
+  if(un.length)t+=`⚪ Unassigned: ${un.map(p=>p.name).join(', ')}\n`;
+  t+=`\nPHASE 2 (5:00–12:00)\n${'─'.repeat(30)}\n`;
+  CS_BUILDINGS.filter(b=>b.unlock>0&&b.unlock<12).forEach(b=>{const ids=csAssignments[b.id]||[];t+=`${b.emoji} ${b.name} (@ ${b.unlock}:00): ${ids.length?ids.map(pn).join(', '):'❌ UNASSIGNED'}\n`;});
+  t+=`\nPHASE 3 (12:00–30:00) — VIRO LAB UNLOCKS\n${'─'.repeat(30)}\n`;
+  const vl=CS_BUILDINGS.find(b=>b.id==='vl');const vlIds=csAssignments['vl']||[];
+  t+=`🦠 Viro Lab (${vl.pts}pts/sec): ${vlIds.length?vlIds.map(pn).join(', '):'❌ UNASSIGNED'}\n`;
+  t+=`\nHold ALL buildings. Do not abandon positions for the Lab rush.`;
+  return t;
+}
+function csExportTxt(){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(csBuildTxt());a.download='canyon-storm-plan.txt';a.click();}
+function csExportClipboard(){navigator.clipboard.writeText(csBuildTxt()).then(()=>{const btn=event.target;const o=btn.innerHTML;btn.innerHTML='✅ Copied!';setTimeout(()=>btn.innerHTML=o,2000);}).catch(()=>alert('Copy failed.'));}
+
+/* ── Persistence ──────────────────────────────────────────────── */
+function saveState(){try{localStorage.setItem('cs-planner',JSON.stringify({players:csPlayers,assignments:csAssignments,faction:csFac,tactic:csTactic,uid:csUID}));}catch(e){}}
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem('cs-planner')||'null');
+    if(!s) return;
+    csPlayers=s.players||[]; csAssignments=s.assignments||{}; csFac=s.faction||'rb'; csTactic=s.tactic||'defensive'; csUID=s.uid||1;
+    CS_BUILDINGS.forEach(b=>{if(!csAssignments[b.id])csAssignments[b.id]=[];});
+    // sync faction UI
+    document.getElementById('fac-rb').className='fac-btn'+(csFac==='rb'?' active-rb':'');
+    document.getElementById('fac-db').className='fac-btn'+(csFac==='db'?' active-db':'');
+    buildTactics();
+  }catch(e){CS_BUILDINGS.forEach(b=>csAssignments[b.id]=[]);}
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
