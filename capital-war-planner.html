@@ -442,11 +442,12 @@
         </div>
         <div class="bg-zoom-row">
           <button class="gz-btn" onclick="bgZoom(-1)">−</button>
-          <span class="gz-val" id="bgZoomLabel">12px</span>
+          <span class="gz-val" id="bgZoomLabel">8px</span>
           <button class="gz-btn" onclick="bgZoom(1)">+</button>
         </div>
         <button class="map-tool-btn" onclick="bgScrollToCapitol()">⌖ Center</button>
         <button class="map-tool-btn" onclick="cwClearBases()" style="color:var(--red)">✕ Clear</button>
+        <span class="gz-val" id="bgCoordLabel" style="min-width:88px;color:var(--text3);font-size:.6rem">—</span>
       </div>
       <!-- Canvas -->
       <div class="bg-scroll-wrap" id="bgScrollWrap">
@@ -1091,25 +1092,58 @@ function cwExportClip(btn){navigator.clipboard.writeText(planTextPlain()).then((
 /* ══════════════════════════════════════════════════════════════
    BASE GRID CANVAS
 ══════════════════════════════════════════════════════════════ */
-// Grid: 120×120 tiles. Mud zone 48×48 centered. Each base occupies 3×3 tiles.
-const BG_W=120,BG_H=120;
-const BG_MUD={x1:36,y1:36,x2:84,y2:84};   // 48×48 mud zone
-const BG_CAP={cx:60,cy:60};                 // Capitol center (6×6 block: cols 57-62, rows 57-62)
-// Cannons: 3×3 tiles touching Capitol's diagonal corners (no gap)
-// Capitol: cols 57-62, rows 57-62. Cannons butt up against its corners.
+// ── EXACT GAME GEOMETRY ────────────────────────────────────────
+// Base = 3×3 tiles. Cannon = 3×3 tiles. Capitol = 10×10 tiles.
+// Capitol center: cx=100, cy=100.
+//   Capitol spans [cx-5, cx+5) = [95,105) in both axes.
+//
+// Game coordinate system: 1–998 per axis (confirmed via in-game tooltip).
+//   1 game coord unit = 1 base slot = 3×3 micro-tiles (two nested grids).
+//   Resources occupy 1×1 micro-tile within a 3×3 slot.
+//   Full map ≈ 998×998 base slots. Our planner tile = 1 micro-tile.
+//
+// TWO MUD ZONES (confirmed from game screenshots):
+//   Outer mud zone (lighter): 23 slots = 69 micro-tiles/side
+//     x:[66,135), y:[66,135). 3-aligned (66=22×3, 135=45×3). Center≈100.
+//   Inner dark zone (darker, around Capitol): 7 slots = 21 micro-tiles/side
+//     x:[90,111), y:[90,111). 3-aligned (90=30×3, 111=37×3). Center≈100.
+//
+// Layout confirmed (Images #7, #8, #9, #10):
+//   Outer mud zone:  [66,135) = 69 micro-tiles = 23 game slots/side  (lighter)
+//   Inner dark zone: [90,111) = 21 micro-tiles =  7 game slots/side  (darker, around Capitol)
+//   Cannons sit at the FOUR CORNERS of the INNER dark zone, inside the darker mud.
+//   3-tile aligned positions flush with inner zone boundaries:
+//     NW (90, 90 ): left=90=iz.x1, top=90=iz.y1
+//     NE (108,90 ): right=111=iz.x2, top=90=iz.y1  (108+3=111)
+//     SW (90, 108): left=90=iz.x1, bottom=111=iz.y2 (108+3=111)
+//     SE (108,108): right=111=iz.x2, bottom=111=iz.y2
+//   90=30×3 ✓  108=36×3 ✓
+//
+// Grid: 200×200 tiles. Default zoom 0.8× → mud zone 442px → fits 520px canvas.
+const BG_W=200,BG_H=200;
+const BG_MUD={x1:66,y1:66,x2:135,y2:135};   // 69×69 tiles = 23 slots/side; 3-tile aligned ✓
+const BG_CAP={cx:100,cy:100};                  // 10×10 tiles: [95,105)
+const BG_CAP_HALF=5;                           // Capitol half-size in tiles
 const BG_CANNONS=[
-  {id:'can_nw',x:48,y:48,lbl:'NW'},
-  {id:'can_ne',x:69,y:48,lbl:'NE'},
-  {id:'can_sw',x:48,y:69,lbl:'SW'},
-  {id:'can_se',x:69,y:69,lbl:'SE'}
+  {id:'can_nw',x:90, y:90, lbl:'NW'},          // NW corner of inner zone [90,111)
+  {id:'can_ne',x:108,y:90, lbl:'NE'},           // NE corner (108+3=111=iz.x2)
+  {id:'can_sw',x:90, y:108,lbl:'SW'},           // SW corner (108+3=111=iz.y2)
+  {id:'can_se',x:108,y:108,lbl:'SE'}            // SE corner
 ];
 const ATYPE_RGB={heavy:[248,113,113],mid:[251,146,60],support:[96,165,250],flex:[52,211,153]};
-const BG_TILE=8; // base world pixels per tile
+const BG_TILE=8; // world pixels per tile
+// Game ↔ planner coordinate conversion (capitol confirmed at game X:499 Y:497)
+//   game_x = floor(tileCol/3) + 466   [466 = 499 - floor(100/3)]
+//   game_y = 530 - floor(tileRow/3)   [530 = 497 + floor(100/3); Y axis flipped]
+const BG_GAME_OFFSET_X=466, BG_GAME_OFFSET_Y=530;
+function bgToGameCoord(tileCol,tileRow){
+  return {x:Math.floor(tileCol/3)+BG_GAME_OFFSET_X, y:BG_GAME_OFFSET_Y-Math.floor(tileRow/3)};
+}
 let bgHQImg=null,bgCapImg=null;
-let bgViewX=0,bgViewY=0,bgViewScale=1.5;
+let bgViewX=0,bgViewY=0,bgViewScale=0.8; // zoom=0.8 → tile=6.4px, mud zone 480px → fits 520px canvas
 let bgPanning=false,bgPanMoved=false,bgPanX=0,bgPanY=0;
 let bgPlaceCount=1;
-let bgPlaceWidth=5; // bases per row before wrapping down
+let bgPlaceWidth=5; // base columns per row (each column = 3 tiles wide)
 
 function bgLoadImages(){
   bgHQImg=new Image();
@@ -1205,6 +1239,24 @@ function bgInit(){
   },{passive:false});
 
   canvas.addEventListener('contextmenu',bgHandleRightClick);
+
+  // ── Coordinate display (hover) ───────────────────────────────
+  canvas.addEventListener('mousemove',e=>{
+    if(bgPanning) return;
+    const rect=canvas.getBoundingClientRect();
+    const wx=(e.clientX-rect.left-bgViewX)/bgViewScale;
+    const wy=(e.clientY-rect.top-bgViewY)/bgViewScale;
+    const tileCol=Math.floor(wx/BG_TILE);
+    const tileRow=Math.floor(wy/BG_TILE);
+    const g=bgToGameCoord(tileCol,tileRow);
+    const lbl=document.getElementById('bgCoordLabel');
+    if(lbl) lbl.textContent=`X:${g.x} Y:${g.y}`;
+  });
+  canvas.addEventListener('mouseleave',()=>{
+    const lbl=document.getElementById('bgCoordLabel');
+    if(lbl) lbl.textContent='—';
+  });
+
   requestAnimationFrame(bgScrollToCapitol);
 }
 
@@ -1260,17 +1312,14 @@ function bgRender(){
   }
   ctx.restore();
 
-  // Mud zone (brownish)
+  // Outer mud zone (lighter brownish)
   const mw=(BG_MUD.x2-BG_MUD.x1)*ts, mh=(BG_MUD.y2-BG_MUD.y1)*ts;
   const mx=BG_MUD.x1*ts, my=BG_MUD.y1*ts;
   ctx.fillStyle='#4a4038'; ctx.fillRect(mx,my,mw,mh);
 
-  // Inner Capitol zone — slightly darker mud containing Capitol + cannons
-  {
-    const izN=13*ts; // 13 tiles from Capitol center each way (covers cannons at ±10.5 tiles)
-    ctx.fillStyle='#3e3530';
-    ctx.fillRect(BG_CAP.cx*ts-izN, BG_CAP.cy*ts-izN, izN*2, izN*2);
-  }
+  // Inner dark zone (darker mud around Capitol — 7 base slots/side = 21 tiles = [90,111))
+  ctx.fillStyle='#3e3530';
+  ctx.fillRect(90*ts, 90*ts, 21*ts, 21*ts);
 
   // Mud zone inner texture
   ctx.save();
@@ -1326,8 +1375,8 @@ function bgRender(){
     ctx.restore();
   }
 
-  /* ── Capitol (6×6 tiles) ─────────────────────────────────── */
-  const capPx=(BG_CAP.cx-3)*ts, capPy=(BG_CAP.cy-3)*ts, capSz=6*ts;
+  /* ── Capitol (10×10 tiles) ──────────────────────────────────── */
+  const capPx=(BG_CAP.cx-BG_CAP_HALF)*ts, capPy=(BG_CAP.cy-BG_CAP_HALF)*ts, capSz=10*ts;
   ctx.fillStyle='rgba(232,114,12,0.15)'; ctx.fillRect(capPx,capPy,capSz,capSz);
   // Capitol image
   if(bgCapImg&&bgCapImg.complete&&bgCapImg.naturalWidth>0){
@@ -1377,7 +1426,7 @@ function bgRender(){
     ctx.fillText('N',nx,ny);
   }
 
-  /* ── Placed bases ────────────────────────────────────────── */
+  /* ── Placed bases (3×3 tiles each — 23 fit per mud-zone side) ── */
   cwBases.forEach(b=>{
     if(b.tileCol===undefined) return;
     const a=cwAlliances.find(x=>x.id===b.allianceId);
@@ -1391,7 +1440,6 @@ function bgRender(){
 
     // ── HQ building image ───────────────────────────────────
     if(bgHQImg&&bgHQImg.complete&&bgHQImg.naturalWidth>0&&effTs>=6){
-      // Clip to tile so it doesn't bleed
       ctx.save();
       ctx.beginPath(); ctx.rect(bx,by,bw,bh); ctx.clip();
       const pad=Math.max(0.5,ts*0.08);
@@ -1401,7 +1449,6 @@ function bgRender(){
 
     // ── Border ──────────────────────────────────────────────
     if(b.shielded){
-      // Glowing blue border — contained within the tile, no overflow
       ctx.save();
       ctx.shadowColor='rgba(96,200,255,0.9)';
       ctx.shadowBlur=Math.max(2,ts*0.9);
@@ -1410,7 +1457,6 @@ function bgRender(){
       const inset=ctx.lineWidth/2;
       ctx.strokeRect(bx+inset,by+inset,bw-ctx.lineWidth,bh-ctx.lineWidth);
       ctx.restore();
-      // Inner blue fill wash
       ctx.fillStyle='rgba(96,165,250,0.14)';
       ctx.fillRect(bx,by,bw,bh);
     } else {
@@ -1456,10 +1502,10 @@ function bgRender(){
       const a=cwAlliances.find(x=>x.id===id);if(!a) return;
       const [r,g,bl]=ATYPE_RGB[a.type]||[180,180,180];
       const tag=a.tag.slice(0,4);
-      const fs=Math.max(4,Math.floor(ts*0.62));
+      const fs=Math.max(6,Math.floor(ts*0.72));
       ctx.font=`bold ${fs}px Chakra Petch,sans-serif`;
       const tw=ctx.measureText(tag).width;
-      const ty=(BG_CAP.cy-1.0+i*1.3)*ts;
+      const ty=(BG_CAP.cy-2.5+i*1.5)*ts; // starts 2.5 tiles above center, 1.5-tile spacing — fits 10×10 capitol
       ctx.fillStyle=`rgba(20,70,180,0.82)`;
       ctx.fillRect(BG_CAP.cx*ts-tw/2-3,ty-fs*0.6,tw+6,fs*1.2);
       ctx.fillStyle='#fff'; ctx.fillText(tag,BG_CAP.cx*ts,ty);
@@ -1470,7 +1516,7 @@ function bgRender(){
       ids.forEach((id,i)=>{
         const a=cwAlliances.find(x=>x.id===id);if(!a) return;
         const tag=a.tag.slice(0,4);
-        const fs=Math.max(4,Math.floor(ts*0.58));
+        const fs=Math.max(6,Math.floor(ts*0.68));
         ctx.font=`bold ${fs}px Chakra Petch,sans-serif`;
         const tw=ctx.measureText(tag).width;
         const cx2=(c.x+1.5)*ts, cy2=(c.y+0.7+i*1.1)*ts;
@@ -1489,10 +1535,10 @@ function bgHandleClick(e){
   const wy=(e.clientY-rect.top-bgViewY)/bgViewScale;
   const tileCol=Math.floor(wx/BG_TILE);
   const tileRow=Math.floor(wy/BG_TILE);
-  // Click on existing base → toggle shield
+  // Click on existing base → toggle shield (3×3 tile hit test)
   const hit=cwBases.find(b=>b.tileCol!==undefined&&tileCol>=b.tileCol&&tileCol<b.tileCol+3&&tileRow>=b.tileRow&&tileRow<b.tileRow+3);
   if(hit){cwToggleBaseShield(hit.id);return;}
-  // Place new base(s)
+  // Place new base(s) — snap to 3-tile grid
   if(!activeId){alert('Create or select a profile first.');return;}
   const snapCol=Math.floor(tileCol/3)*3, snapRow=Math.floor(tileRow/3)*3;
   if(snapCol<0||snapCol>BG_W-3||snapRow<0||snapRow>BG_H-3) return;
@@ -1507,18 +1553,23 @@ function bgHandleRightClick(e){
   const wy=(e.clientY-rect.top-bgViewY)/bgViewScale;
   const tileCol=Math.floor(wx/BG_TILE);
   const tileRow=Math.floor(wy/BG_TILE);
+  // 3×3 base hit test
   const b=cwBases.find(base=>base.tileCol!==undefined&&tileCol>=base.tileCol&&tileCol<base.tileCol+3&&tileRow>=base.tileRow&&tileRow<base.tileRow+3);
   if(b) cwRemoveBase(b.id);
 }
 
 function bgIsBlockedCell(sc,sr){
-  if(sc>=(BG_CAP.cx-3)&&sc<(BG_CAP.cx+3)&&sr>=(BG_CAP.cy-3)&&sr<(BG_CAP.cy+3)) return true;
-  if(BG_CANNONS.some(c=>sc===c.x&&sr===c.y)) return true;
+  // Capitol: 10×10 tiles centered at (cx,cy). A 3×3 base at (sc,sr) overlaps if their rects intersect.
+  if(sc<BG_CAP.cx+BG_CAP_HALF && sc+3>BG_CAP.cx-BG_CAP_HALF &&
+     sr<BG_CAP.cy+BG_CAP_HALF && sr+3>BG_CAP.cy-BG_CAP_HALF) return true;
+  // Cannons: 3×3 each — check rect overlap with a 3×3 base
+  if(BG_CANNONS.some(c=>sc<c.x+3&&sc+3>c.x&&sr<c.y+3&&sr+3>c.y)) return true;
   return false;
 }
 function bgPlaceBasesFrom(startCol,startRow,count){
   let placed=0;
-  outer:for(let dr=0;dr<40;dr++){
+  // Step 3 tiles at a time (bases are 3×3, snapped to 3-tile grid)
+  outer:for(let dr=0;dr<60;dr++){
     for(let dc=0;dc<bgPlaceWidth;dc++){
       const sc=startCol+dc*3, sr=startRow+dr*3;
       if(sc<0||sc>BG_W-3||sr<0||sr>BG_H-3) continue;
@@ -1530,7 +1581,7 @@ function bgPlaceBasesFrom(startCol,startRow,count){
   }
 }
 function bgChangePlaceCount(delta){
-  bgPlaceCount=Math.max(1,Math.min(20,bgPlaceCount+delta));
+  bgPlaceCount=Math.max(1,Math.min(50,bgPlaceCount+delta));
   const lbl=document.getElementById('placeCountLabel');
   if(lbl) lbl.textContent=bgPlaceCount;
 }
@@ -1613,7 +1664,8 @@ function renderBasesList(){
 }
 
 function baseListRow(b){
-  const coord=b.tileCol!==undefined?`(${b.tileCol},${b.tileRow})`:'—';
+  const gc=b.tileCol!==undefined?bgToGameCoord(b.tileCol,b.tileRow):null;
+  const coord=gc?`X:${gc.x} Y:${gc.y}`:'—';
   return `<div class="base-list-item">
     <span class="bli-ref">${coord}</span>
     <input class="bli-name" type="text" value="${esc(b.label)}" placeholder="Player name (optional)"
@@ -1641,36 +1693,87 @@ async function cwSharePlan(btn){
   const orig=btn.textContent;btn.disabled=true;
   status.textContent='Uploading…';status.className='cloud-status busy';
   try{
+    // plan_name = alliance tag so each alliance on a server has its own slot
+    const planName=prof.alliance||'Default';
     const payload={
-      server:String(prof.server),label:prof.label||'',alliance:prof.alliance||'',
+      server:String(prof.server),plan_name:planName,label:prof.label||'',alliance:prof.alliance||'',
       updated_by:prof.alliance||'anon',
       plan_data:JSON.stringify({cwAlliances:prof.cwAlliances,cwAssignments:prof.cwAssignments,cwTactic:prof.cwTactic,cwBases:prof.cwBases||[]})
     };
     const r=await fetch('/api/coalition',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const j=await r.json();
-    if(j.ok){status.textContent=`✓ Shared at ${j.updated_at} UTC`;status.className='cloud-status ok';}
+    if(j.ok){status.textContent=`✓ Shared as "${planName}" at ${j.updated_at} UTC`;status.className='cloud-status ok';}
     else{status.textContent='Error: '+(j.error||'unknown');status.className='cloud-status err';}
   }catch(e){status.textContent='Network error — is the site deployed with D1?';status.className='cloud-status err';}
   btn.disabled=false;btn.textContent=orig;
 }
+
+// Pick-plan modal — resolves with the selected plan object or null
+function cwPickPlan(plans,server){
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:9999';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.3rem;min-width:320px;max-width:500px;max-height:80vh;display:flex;flex-direction:column;gap:.6rem';
+    const hdr=document.createElement('div');
+    hdr.style.cssText='font-family:"JetBrains Mono",monospace;font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)';
+    hdr.textContent=`${plans.length} plan${plans.length!==1?'s':''} found — Server ${server}`;
+    box.appendChild(hdr);
+    const list=document.createElement('div');
+    list.style.cssText='display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:55vh';
+    plans.forEach(p=>{
+      const item=document.createElement('div');
+      item.style.cssText='padding:.55rem .75rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .12s';
+      item.innerHTML=`<div style="display:flex;align-items:center;gap:8px">
+        <strong style="font-family:'Chakra Petch',sans-serif;font-size:.88rem;color:var(--cw-gold)">${esc(p.plan_name||p.alliance||'Unnamed')}</strong>
+        ${p.label?`<span style="font-size:.7rem;color:var(--text3)">${esc(p.label)}</span>`:''}
+        <span style="font-size:.65rem;color:var(--text3);margin-left:auto;font-family:'JetBrains Mono',monospace">${(p.updated_at||'').slice(0,16)}</span>
+      </div>
+      <div style="font-size:.68rem;color:var(--text2);margin-top:2px">By ${esc(p.updated_by||'?')}${p.alliance&&p.alliance!==p.plan_name?' · '+esc(p.alliance):''}${p.label?' · '+esc(p.label):''}</div>`;
+      item.addEventListener('mouseover',()=>item.style.borderColor='var(--cw-gold)');
+      item.addEventListener('mouseout',()=>item.style.borderColor='var(--border)');
+      item.addEventListener('click',()=>{overlay.remove();resolve(p);});
+      list.appendChild(item);
+    });
+    box.appendChild(list);
+    const foot=document.createElement('div');
+    foot.style.cssText='display:flex;justify-content:flex-end';
+    const cancelBtn=document.createElement('button');
+    cancelBtn.textContent='Cancel';
+    cancelBtn.style.cssText='padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:"Chakra Petch",sans-serif;font-size:.8rem;cursor:pointer';
+    cancelBtn.addEventListener('click',()=>{overlay.remove();resolve(null);});
+    foot.appendChild(cancelBtn);
+    box.appendChild(foot);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  });
+}
+
 async function cwLoadPlan(btn){
   const prof=activeId?profiles[activeId]:null;
   if(!prof||!prof.server){alert('Profile needs a server number to load.');return;}
   const status=document.getElementById('cloudStatus');
   const orig=btn.textContent;btn.disabled=true;
-  status.textContent='Loading…';status.className='cloud-status busy';
+  status.textContent='Loading plans…';status.className='cloud-status busy';
   try{
     const r=await fetch(`/api/coalition?server=${encodeURIComponent(prof.server)}`);
-    if(r.status===404){status.textContent=`No cloud plan found for server ${prof.server}.`;status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
-    const j=await r.json();
-    let data;try{data=JSON.parse(j.plan_data);}catch{status.textContent='Corrupt plan data.';status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
-    if(!confirm(`Load cloud plan from ${j.updated_by||'?'} (${j.updated_at||'?'} UTC)? This overwrites your local assignments.`)){btn.disabled=false;btn.textContent=orig;return;}
+    if(r.status===404){status.textContent=`No cloud plans found for S${prof.server}.`;status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
+    const plans=await r.json();
+    if(!Array.isArray(plans)||!plans.length){status.textContent=`No cloud plans found for S${prof.server}.`;status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
+
+    // If only 1 plan, use it directly; otherwise show picker
+    let chosen=plans.length===1?plans[0]:await cwPickPlan(plans,prof.server);
+    if(!chosen){status.textContent='Load cancelled.';status.className='cloud-status';btn.disabled=false;btn.textContent=orig;return;}
+
+    let data;try{data=JSON.parse(chosen.plan_data);}catch{status.textContent='Corrupt plan data.';status.className='cloud-status err';btn.disabled=false;btn.textContent=orig;return;}
+    if(!confirm(`Load plan "${chosen.plan_name||'?'}" from ${chosen.updated_by||'?'} (${chosen.updated_at||'?'} UTC)?\nThis overwrites your local assignments for the active profile.`)){btn.disabled=false;btn.textContent=orig;return;}
+
     profiles[activeId].cwAlliances=data.cwAlliances||[];
     profiles[activeId].cwAssignments=data.cwAssignments||{};
     profiles[activeId].cwTactic=data.cwTactic||'balanced';
     profiles[activeId].cwBases=data.cwBases||[];
     saveProfiles();loadActiveProfile();renderAll();
-    status.textContent=`✓ Loaded from ${j.updated_by||'?'} · ${j.updated_at||'?'} UTC`;status.className='cloud-status ok';
+    status.textContent=`✓ Loaded "${chosen.plan_name}" from ${chosen.updated_by||'?'} · ${chosen.updated_at||'?'} UTC`;status.className='cloud-status ok';
   }catch(e){status.textContent='Network error';status.className='cloud-status err';}
   btn.disabled=false;btn.textContent=orig;
 }

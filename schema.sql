@@ -32,11 +32,35 @@ CREATE TABLE IF NOT EXISTS train_roster (
   created_at TEXT    DEFAULT (datetime('now'))
 );
 
+-- coalition_plans: supports multiple plans per server (keyed by server + plan_name)
+-- NEW schema — run the migration block below if upgrading from the old single-plan schema
 CREATE TABLE IF NOT EXISTS coalition_plans (
-  server      TEXT NOT NULL PRIMARY KEY,  
-  label       TEXT DEFAULT '',             -- e.g. "S3 Capitol War"
-  alliance    TEXT DEFAULT '',             -- coordinating alliance tag
-  plan_data   TEXT NOT NULL,              -- JSON blob: alliances, assignments, bases, tactic
-  updated_by  TEXT DEFAULT '',            -- alliance tag of last uploader
-  updated_at  TEXT NOT NULL               -- ISO datetime, UTC
+  server      TEXT NOT NULL,
+  plan_name   TEXT NOT NULL DEFAULT 'Default',  -- alliance tag or custom name — differentiates plans per server
+  label       TEXT DEFAULT '',                   -- e.g. "S3 Capitol War — Attack Plan"
+  alliance    TEXT DEFAULT '',                   -- coordinating alliance tag
+  plan_data   TEXT NOT NULL,                    -- JSON blob: alliances, assignments, bases, tactic
+  updated_by  TEXT DEFAULT '',                  -- alliance tag of last uploader
+  updated_at  TEXT NOT NULL,                    -- ISO datetime, UTC
+  PRIMARY KEY (server, plan_name)
 );
+
+-- MIGRATION (ran this block once for upgrading from the old single-primary-key schema)
+-- CREATE TABLE coalition_plans_new (
+--   server    TEXT NOT NULL,
+--   plan_name TEXT NOT NULL DEFAULT 'Default',
+--   label     TEXT DEFAULT '',
+--   alliance  TEXT DEFAULT '',
+--   plan_data TEXT NOT NULL,
+--   updated_by TEXT DEFAULT '',
+--   updated_at TEXT NOT NULL,
+--   PRIMARY KEY (server, plan_name)
+-- );
+-- INSERT OR IGNORE INTO coalition_plans_new
+--   SELECT server,
+--          COALESCE(NULLIF(alliance,''), COALESCE(NULLIF(label,''), 'Default')),
+--          label, alliance, plan_data, updated_by, updated_at
+--   FROM coalition_plans;
+-- DROP TABLE coalition_plans;
+-- ALTER TABLE coalition_plans_new RENAME TO coalition_plans;
+
