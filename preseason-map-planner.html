@@ -483,6 +483,23 @@
             margin-left: auto
         }
 
+        .mode-export-btn {
+            background: var(--ps-bg);
+            border: 1px solid var(--ps-bdr);
+            border-radius: 5px;
+            color: var(--ps);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: .7rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s;
+            flex-shrink: 0
+        }
+
+        .mode-export-btn:hover { background: rgba(167,139,250,.15); }
+
         .action-btns {
             display: flex;
             gap: 5px;
@@ -848,6 +865,7 @@
         <span class="pb-label">☁ Cloud Sync</span>
         <button class="pb-btn" onclick="psSharePlan(this)">📤 Share Plan</button>
         <button class="pb-btn" onclick="psLoadPlan(this)">📥 Load Plan</button>
+        <button class="pb-btn" onclick="psSyncAlliances(this)" title="Pull alliance list &amp; NAP flags from all shared plans for this server">👥 Sync Alliances</button>
         <span class="cloud-status" id="psCloudStatus">Local only — share to let alliance members load this plan.</span>
     </div>
 
@@ -881,7 +899,6 @@
             <div class="panel">
                 <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Actions</div>
                 <div class="action-btns">
-                    <button class="ps-btn ps-btn-primary" onclick="exportPNG()">Export PNG</button>
                     <button class="ps-btn" onclick="exportProfile()" title="Download profile as JSON file">⬇ Export Profile</button>
                     <button class="ps-btn" onclick="document.getElementById('importFileInput').click()" title="Load a previously exported profile JSON">⬆ Import Profile</button>
                     <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importProfile(event)">
@@ -895,6 +912,7 @@
                 <div class="mode-dot"></div>
                 <span id="modeText">Select a profile above to start planning</span>
                 <span class="mode-hint">87 zones &bull; Ctrl+S to save</span>
+                <button class="mode-export-btn" onclick="exportPNG()">⬇ Export PNG</button>
             </div>
             <div class="map-outer" id="mapOuter">
                 <div id="mapInner">
@@ -2140,6 +2158,61 @@
         btn.disabled = false; btn.textContent = orig;
     }
 
+    async function psSyncAlliances(btn) {
+        const p = getProfile();
+        if (!p || !p.server) { alert('Profile needs a server number to sync.'); return; }
+        const status = document.getElementById('psCloudStatus');
+        const orig = btn.textContent; btn.disabled = true;
+        status.textContent = 'Fetching alliance data…'; status.className = 'cloud-status busy';
+        try {
+            const r = await fetch(`/api/preseason?server=${encodeURIComponent(p.server)}`);
+            if (r.status === 404) { status.textContent = `No shared plans found for S${p.server} — share a plan first.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            const plans = await r.json();
+            if (!Array.isArray(plans) || !plans.length) { status.textContent = 'No plans found.'; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+
+            // Collect all alliances from all plans, keyed by tag (uppercase)
+            // NAP=true wins: if any shared plan marks it NAP, it's NAP
+            const cloudByTag = {};
+            plans.forEach(pl => {
+                let data;
+                try { data = JSON.parse(pl.plan_data); } catch { return; }
+                (data.alliances || []).forEach(a => {
+                    const tag = (a.tag || '').toUpperCase();
+                    if (!tag) return;
+                    if (!cloudByTag[tag]) {
+                        cloudByTag[tag] = { tag, name: a.name || tag, color: a.color || '#a78bfa', nap: !!a.nap };
+                    } else {
+                        // NAP=true wins; keep longest name; keep existing color
+                        if (a.nap) cloudByTag[tag].nap = true;
+                        if ((a.name || '').length > cloudByTag[tag].name.length) cloudByTag[tag].name = a.name;
+                    }
+                });
+            });
+
+            // Merge into local profile
+            // For existing alliances: update NAP flag (cloud NAP=true wins)
+            // For new alliances: add them
+            let added = 0, napUpdated = 0;
+            Object.values(cloudByTag).forEach(cloud => {
+                const existing = p.alliances.find(a => a.tag.toUpperCase() === cloud.tag);
+                if (existing) {
+                    if (cloud.nap && !existing.nap) { existing.nap = true; napUpdated++; }
+                } else {
+                    p.alliances.push({ id: uid(), tag: cloud.tag, name: cloud.name, color: cloud.color, nap: cloud.nap });
+                    added++;
+                }
+            });
+
+            saveAll(); renderAll();
+            const parts = [];
+            if (added) parts.push(`${added} new alliance${added !== 1 ? 's' : ''} added`);
+            if (napUpdated) parts.push(`${napUpdated} NAP flag${napUpdated !== 1 ? 's' : ''} updated`);
+            status.textContent = parts.length ? `✓ ${parts.join(', ')}.` : '✓ Already up to date — no changes.';
+            status.className = 'cloud-status ok';
+        } catch (e) { status.textContent = 'Network error'; status.className = 'cloud-status err'; }
+        btn.disabled = false; btn.textContent = orig;
+    }
+
     function psEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
     /* ── Export ─────────────────────────────────────────────────── */
@@ -2161,11 +2234,13 @@
         const p = getProfile();
         const img = document.getElementById('mapImg');
         const W = img.naturalWidth, H = img.naturalHeight;
+        const SCALE = 3; // 3× supersampling — crisp at any zoom level
         const c = document.createElement('canvas');
-        c.width = W;
-        c.height = H;
+        c.width = W * SCALE;
+        c.height = H * SCALE;
         const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        ctx.scale(SCALE, SCALE); // all subsequent drawing uses original map coords
+        ctx.drawImage(img, 0, 0, W, H);
         TERR_DATA.forEach(t => {
             const color = zoneColor(t.id);
             if (!color) return;
@@ -2181,14 +2256,13 @@
             ctx.fill();
             ctx.globalAlpha = .85;
             ctx.strokeStyle = color;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
             ctx.globalAlpha = 1;
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
             const zt = z && z.type ? ZONE_TYPES.find(x => x.id === z.type) : null;
             if (!a && !zt) return;
             const num = zt ? String(zt.id) : '', tag = a ? a.tag : '', name = zt ? zt.name : '';
-            // Dynamic width — same estimation as makeBadge
             const tagStr = tag ? '[' + tag + ']' : '';
             const estTagW = Math.ceil(tagStr.length * 6.0);
             const estNameW = Math.ceil(name.length * 5.0);
@@ -2231,9 +2305,10 @@
                 ctx.fillText(name, tx, by + BH / 2 + (hasBoth ? 2.5 : 0));
             }
         });
+        const slug = p ? [p.server && 'S' + p.server, p.alliance].filter(Boolean).join('-') : '';
         const link = document.createElement('a');
-        link.download = 'preseason_map_plan.png';
-        link.href = c.toDataURL();
+        link.download = 'preseason' + (slug ? '-' + slug : '') + '.png';
+        link.href = c.toDataURL('image/png');
         link.click();
     }
 
