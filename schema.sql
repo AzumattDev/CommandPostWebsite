@@ -45,6 +45,18 @@ CREATE TABLE IF NOT EXISTS coalition_plans (
   PRIMARY KEY (server, plan_name)
 );
 
+-- preseason_plans: one plan per server+alliance combo (mirrors coalition_plans pattern)
+CREATE TABLE IF NOT EXISTS preseason_plans (
+  server      TEXT NOT NULL,
+  plan_name   TEXT NOT NULL DEFAULT 'Default',
+  label       TEXT DEFAULT '',
+  alliance    TEXT DEFAULT '',
+  plan_data   TEXT NOT NULL,
+  updated_by  TEXT DEFAULT '',
+  updated_at  TEXT NOT NULL,
+  PRIMARY KEY (server, plan_name)
+);
+
 MIGRATION (ran this block once for upgrading from the old single-primary-key schema)
 CREATE TABLE coalition_plans_new (
   server    TEXT NOT NULL,

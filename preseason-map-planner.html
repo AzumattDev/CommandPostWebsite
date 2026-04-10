@@ -131,6 +131,29 @@
             display: flex
         }
 
+        .cloud-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: .55rem 1rem;
+            margin-bottom: .75rem;
+            display: none;
+            align-items: center;
+            gap: .75rem;
+            flex-wrap: wrap
+        }
+        .cloud-bar.show { display: flex }
+        .cloud-status {
+            font-size: .68rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text3);
+            flex: 1;
+            min-width: 0
+        }
+        .cloud-status.ok  { color: var(--green) }
+        .cloud-status.err { color: var(--red) }
+        .cloud-status.busy { color: var(--ps) }
+
         .npf-field {
             display: flex;
             flex-direction: column;
@@ -723,6 +746,14 @@
         </div>
         <button class="ps-btn ps-btn-primary" onclick="createProfile()" style="align-self:flex-end">Create</button>
         <button class="ps-btn" onclick="hideNewForm()" style="align-self:flex-end">Cancel</button>
+    </div>
+
+    <!-- Cloud sync bar — shown when a profile with a server number is active -->
+    <div class="cloud-bar" id="psCloudBar">
+        <span class="pb-label">☁ Cloud Sync</span>
+        <button class="pb-btn" onclick="psSharePlan(this)">📤 Share Plan</button>
+        <button class="pb-btn" onclick="psLoadPlan(this)">📥 Load Plan</button>
+        <span class="cloud-status" id="psCloudStatus">Local only — share to let alliance members load this plan.</span>
     </div>
 
     <div class="planner-layout">
@@ -1371,6 +1402,8 @@
         document.getElementById('modeText').textContent = activeId
             ? 'Click a territory cell to assign alliance \u0026 type'
             : 'Select a profile above to start planning';
+        const prof = getProfile();
+        document.getElementById('psCloudBar').classList.toggle('show', !!(prof && prof.server));
     }
 
     function switchProfile(id) {
@@ -1756,6 +1789,100 @@
         saveAll();
         renderAll();
     }
+
+    /* ── Cloud Sync ─────────────────────────────────────────────── */
+    async function psSharePlan(btn) {
+        const p = getProfile();
+        if (!p || !p.server) { alert('Profile needs a server number to share.'); return; }
+        const status = document.getElementById('psCloudStatus');
+        const orig = btn.textContent; btn.disabled = true;
+        status.textContent = 'Uploading…'; status.className = 'cloud-status busy';
+        try {
+            const planName = p.alliance || 'Default';
+            const payload = {
+                server: String(p.server),
+                plan_name: planName,
+                label: p.label || '',
+                alliance: p.alliance || '',
+                updated_by: p.alliance || 'anon',
+                plan_data: JSON.stringify({ alliances: p.alliances, zones: p.zones })
+            };
+            const r = await fetch('/api/preseason', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const j = await r.json();
+            if (j.ok) { status.textContent = `✓ Shared as "${planName}" at ${j.updated_at} UTC`; status.className = 'cloud-status ok'; }
+            else { status.textContent = 'Error: ' + (j.error || 'unknown'); status.className = 'cloud-status err'; }
+        } catch (e) { status.textContent = 'Network error — is the site deployed with D1?'; status.className = 'cloud-status err'; }
+        btn.disabled = false; btn.textContent = orig;
+    }
+
+    function psPickPlan(plans, server) {
+        return new Promise(resolve => {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:9999';
+            const box = document.createElement('div');
+            box.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.3rem;min-width:320px;max-width:500px;max-height:80vh;display:flex;flex-direction:column;gap:.6rem';
+            const hdr = document.createElement('div');
+            hdr.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)';
+            hdr.textContent = `${plans.length} plan${plans.length !== 1 ? 's' : ''} found — Server ${server}`;
+            box.appendChild(hdr);
+            const list = document.createElement('div');
+            list.style.cssText = 'display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:55vh';
+            plans.forEach(pl => {
+                const item = document.createElement('div');
+                item.style.cssText = 'padding:.55rem .75rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .12s';
+                item.innerHTML = `<div style="display:flex;align-items:center;gap:8px">
+                    <strong style="font-family:'Chakra Petch',sans-serif;font-size:.88rem;color:var(--ps)">${psEsc(pl.plan_name || pl.alliance || 'Unnamed')}</strong>
+                    ${pl.label ? `<span style="font-size:.7rem;color:var(--text3)">${psEsc(pl.label)}</span>` : ''}
+                    <span style="font-size:.65rem;color:var(--text3);margin-left:auto;font-family:'JetBrains Mono',monospace">${(pl.updated_at || '').slice(0, 16)}</span>
+                </div>
+                <div style="font-size:.68rem;color:var(--text2);margin-top:2px">By ${psEsc(pl.updated_by || '?')}${pl.alliance && pl.alliance !== pl.plan_name ? ' · ' + psEsc(pl.alliance) : ''}${pl.label ? ' · ' + psEsc(pl.label) : ''}</div>`;
+                item.addEventListener('mouseover', () => item.style.borderColor = 'var(--ps)');
+                item.addEventListener('mouseout',  () => item.style.borderColor = 'var(--border)');
+                item.addEventListener('click', () => { overlay.remove(); resolve(pl); });
+                list.appendChild(item);
+            });
+            box.appendChild(list);
+            const foot = document.createElement('div');
+            foot.style.cssText = 'display:flex;justify-content:flex-end';
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.cssText = 'padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:"Chakra Petch",sans-serif;font-size:.8rem;cursor:pointer';
+            cancelBtn.addEventListener('click', () => { overlay.remove(); resolve(null); });
+            foot.appendChild(cancelBtn);
+            box.appendChild(foot);
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+        });
+    }
+
+    async function psLoadPlan(btn) {
+        const p = getProfile();
+        if (!p || !p.server) { alert('Profile needs a server number to load.'); return; }
+        const status = document.getElementById('psCloudStatus');
+        const orig = btn.textContent; btn.disabled = true;
+        status.textContent = 'Loading plans…'; status.className = 'cloud-status busy';
+        try {
+            const r = await fetch(`/api/preseason?server=${encodeURIComponent(p.server)}`);
+            if (r.status === 404) { status.textContent = `No cloud plans found for S${p.server}.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            const plans = await r.json();
+            if (!Array.isArray(plans) || !plans.length) { status.textContent = `No cloud plans found for S${p.server}.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+
+            const chosen = plans.length === 1 ? plans[0] : await psPickPlan(plans, p.server);
+            if (!chosen) { status.textContent = 'Load cancelled.'; status.className = 'cloud-status'; btn.disabled = false; btn.textContent = orig; return; }
+
+            let data;
+            try { data = JSON.parse(chosen.plan_data); } catch { status.textContent = 'Corrupt plan data.'; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            if (!confirm(`Load plan "${chosen.plan_name || '?'}" from ${chosen.updated_by || '?'} (${chosen.updated_at || '?'} UTC)?\nThis overwrites your local assignments for the active profile.`)) { btn.disabled = false; btn.textContent = orig; return; }
+
+            p.alliances = data.alliances || [];
+            p.zones = data.zones || {};
+            saveAll(); renderAll();
+            status.textContent = `✓ Loaded "${chosen.plan_name}" from ${chosen.updated_by || '?'} · ${chosen.updated_at || '?'} UTC`; status.className = 'cloud-status ok';
+        } catch (e) { status.textContent = 'Network error'; status.className = 'cloud-status err'; }
+        btn.disabled = false; btn.textContent = orig;
+    }
+
+    function psEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
     /* ── Export ─────────────────────────────────────────────────── */
     function roundRect(ctx, x, y, w, h, r) {
