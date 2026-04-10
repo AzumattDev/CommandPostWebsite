@@ -18,6 +18,7 @@ const NAV_LINKS = [
   ]},
   {label:'Territory', children:[
     {label:'Capital War Planner', href:'capital-war-planner.html'},
+    {label:'Pre-Season Map Planner', href:'preseason-map-planner.html'},
     {label:'Hex Warzone Planner', href:'hex-warzone-planner.html'},
     {label:'City Capture Planner', href:'city-capture-planner.html'},
     {label:'Hive Strategy', href:'hive-strategy-guide.html'},
@@ -35,6 +36,7 @@ const NAV_LINKS = [
 const SEARCH_INDEX = [
   { title:'Home', url:'index.html', tags:'home overview' },
   { title:'Capital War Planner', url:'capital-war-planner.html', tags:'capital war planner cannon assault rally burn squad garrison president occupation' },
+  { title:'Pre-Season Map Planner', url:'preseason-map-planner.html', tags:'preseason map planner territory zone alliance village chemical plant power town metropolis military base capitol' },
   { title:'Desert Storm Planner', url:'desert-storm-planner.html', tags:'desert storm planner tactical map drag drop phase plan auto assign' },
   { title:'Canyon Storm Planner', url:'canyon-storm-planner.html', tags:'canyon storm planner rulebringers dawnbreakers faction viro lab phase plan' },
   { title:'Alliance Duel Planner', url:'alliance-duel-planner.html', tags:'alliance duel vs daily planner monday tuesday wednesday thursday friday saturday points' },
