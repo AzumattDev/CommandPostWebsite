@@ -199,7 +199,7 @@
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: .75rem;
+            gap: .45rem;
             position: sticky;
             top: 58px;
             max-height: calc(100vh - 70px);
@@ -210,7 +210,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: .9rem 1rem;
+            padding: .6rem .85rem;
             flex-shrink: 0
         }
 
@@ -221,11 +221,26 @@
             text-transform: uppercase;
             letter-spacing: .1em;
             color: var(--text3);
-            margin-bottom: .7rem;
+            margin-bottom: .55rem;
             display: flex;
             align-items: center;
-            justify-content: space-between
+            gap: 6px;
+            cursor: pointer;
+            user-select: none
         }
+
+        .panel-title::after {
+            content: '▾';
+            margin-left: auto;
+            font-size: .9rem;
+            color: var(--text2);
+            transition: transform .2s;
+            flex-shrink: 0
+        }
+
+        .panel.collapsed .panel-title::after { transform: rotate(-90deg); }
+        .panel.collapsed .panel-title { margin-bottom: 0; }
+        .panel.collapsed > *:not(.panel-title) { display: none !important; }
 
         .panel-title .cnt {
             font-size: .65rem;
@@ -246,7 +261,7 @@
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 7px;
-            padding: 5px 7px;
+            padding: 4px 6px;
             color: var(--text);
             font-family: 'Chakra Petch', sans-serif;
             font-size: .82rem;
@@ -270,8 +285,8 @@
         }
 
         .add-row input[type=color] {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border: 1px solid var(--border);
             border-radius: 6px;
             background: var(--surface2);
@@ -301,18 +316,18 @@
             display: flex;
             flex-direction: column;
             gap: 3px;
-            max-height: 220px;
+            max-height: 160px;
             overflow-y: auto
         }
 
         .a-chip {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 7px;
-            padding: 4px 7px;
+            padding: 3px 6px;
             transition: border-color .12s
         }
 
@@ -384,7 +399,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 5px;
+            padding: 3px 5px;
             border-radius: 6px;
             cursor: pointer;
             transition: background .12s;
@@ -588,6 +603,86 @@
             fill-opacity: .08
         }
 
+        /* NAP alliance zone: lighter fill + dashed stroke = "protected, don't attack" */
+        .t-poly.nap-zone {
+            stroke-dasharray: 5 3 !important;
+            stroke-opacity: .75 !important;
+            fill-opacity: .38 !important;
+        }
+
+        /* Power-plan pin: pulsing gold outline when user clicks "Go" */
+        .t-poly.pp-pin {
+            stroke: #fbbf24 !important;
+            stroke-width: 2.5 !important;
+            stroke-opacity: 1 !important;
+            fill-opacity: .95 !important;
+            animation: pp-pulse 1s ease-in-out 3;
+        }
+        @keyframes pp-pulse {
+            0%   { fill-opacity: .95 }
+            50%  { fill-opacity: .35 }
+            100% { fill-opacity: .95 }
+        }
+
+        /* NAP toggle button on alliance chip */
+        .nap-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: .6rem;
+            cursor: pointer;
+            padding: 1px 5px;
+            color: var(--text3);
+            transition: all .15s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1.4;
+        }
+        .nap-btn:hover { border-color: var(--green); color: var(--green); }
+        .nap-btn.on { background: rgba(52,211,153,.12); border-color: rgba(52,211,153,.4); color: var(--green); }
+        .a-chip.is-nap { border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.05); }
+
+        /* Power Plan panel */
+        .pp-self-row {
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: .6rem; font-size: .72rem; color: var(--text2);
+        }
+        .pp-self-row select {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 5px; color: var(--text);
+            font-family: 'Chakra Petch', sans-serif; font-size: .72rem;
+            padding: 3px 6px; cursor: pointer; flex: 1;
+        }
+        .pp-target-list { display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; padding-right: 4px; scrollbar-gutter: stable; }
+        .pp-group { margin-bottom: .55rem; }
+        .pp-group-hdr {
+            display: flex; align-items: center; gap: 6px;
+            font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+            color: var(--text3); margin-bottom: 3px; padding-bottom: 3px;
+            border-bottom: 1px solid var(--border);
+        }
+        .pp-type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .pp-row {
+            display: flex; align-items: center; gap: 5px;
+            padding: 3px 5px; border-radius: 5px; cursor: pointer; transition: background .12s;
+        }
+        .pp-row:hover { background: var(--surface2); }
+        .pp-row-id { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--text3); width: 20px; flex-shrink: 0; }
+        .pp-row-tag { font-family: 'Chakra Petch', sans-serif; font-size: .73rem; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pp-badge {
+            font-size: .6rem; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; line-height: 1.5;
+        }
+        .pp-badge.open { background: rgba(52,211,153,.12); color: var(--green); }
+        .pp-badge.enemy { background: rgba(248,113,113,.1); color: var(--red); }
+        .pp-go {
+            background: none; border: none; color: var(--text3);
+            font-size: .78rem; cursor: pointer; padding: 1px 5px;
+            border-radius: 3px; flex-shrink: 0;
+        }
+        .pp-go:hover { color: var(--ps); background: var(--ps-bg); }
+        .pp-empty { font-size: .75rem; color: var(--text3); padding: 4px 2px; }
+
         .t-badge {
             pointer-events: all;
             cursor: pointer;
@@ -759,7 +854,7 @@
     <div class="planner-layout">
         <div class="sidebar">
             <div class="panel">
-                <div class="panel-title">Alliances <span class="cnt" id="aCount">0</span></div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Alliances <span class="cnt" id="aCount">0</span></div>
                 <div class="add-row">
                     <input type="text" id="inTag" placeholder="TAG" maxlength="5"
                            onkeydown="if(event.key==='Enter')addAlliance()">
@@ -770,15 +865,26 @@
                 <div class="a-list" id="aList"></div>
             </div>
             <div class="panel">
-                <div class="panel-title">Territory Types <span
-                        style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3)">click to filter</span>
-                </div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Territory Types <span style="font-size:.58rem;opacity:.6">click to filter</span></div>
                 <div class="type-list" id="typeList"></div>
             </div>
+            <div class="panel" id="ppPanel" style="display:none">
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Power Plan <span class="cnt" id="ppCount">0</span></div>
+                <div class="pp-self-row">
+                    <span>My Alliance:</span>
+                    <select id="ppSelfSel" onchange="renderPowerPlan()">
+                        <option value="">— none —</option>
+                    </select>
+                </div>
+                <div class="pp-target-list" id="ppList"></div>
+            </div>
             <div class="panel">
-                <div class="panel-title">Actions</div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Actions</div>
                 <div class="action-btns">
                     <button class="ps-btn ps-btn-primary" onclick="exportPNG()">Export PNG</button>
+                    <button class="ps-btn" onclick="exportProfile()" title="Download profile as JSON file">⬇ Export Profile</button>
+                    <button class="ps-btn" onclick="document.getElementById('importFileInput').click()" title="Load a previously exported profile JSON">⬆ Import Profile</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importProfile(event)">
                     <button class="ps-btn ps-btn-danger" onclick="clearAll()">Clear All</button>
                 </div>
             </div>
@@ -1451,7 +1557,7 @@
         if (!tag) return;
         const name = document.getElementById('inName').value.trim() || tag;
         const color = document.getElementById('inColor').value;
-        p.alliances.push({id: uid(), tag, name, color});
+        p.alliances.push({id: uid(), tag, name, color, nap: false});
         document.getElementById('inTag').value = '';
         document.getElementById('inName').value = '';
         saveAll();
@@ -1465,6 +1571,15 @@
         Object.keys(p.zones).forEach(k => {
             if (p.zones[k].allianceId === id) p.zones[k].allianceId = ''
         });
+        saveAll();
+        renderAll();
+    }
+
+    function toggleNap(id) {
+        const p = getProfile();
+        if (!p) return;
+        const a = p.alliances.find(x => x.id === id);
+        if (a) a.nap = !a.nap;
         saveAll();
         renderAll();
     }
@@ -1502,11 +1617,12 @@
         const {ac, tc} = getCounts();
         document.getElementById('aCount').textContent = alliances.length;
         document.getElementById('aList').innerHTML = alliances.length
-            ? alliances.map(a => `<div class="a-chip">
+            ? alliances.map(a => `<div class="a-chip${a.nap ? ' is-nap' : ''}">
         <div class="a-dot" style="background:${a.color}"></div>
         <div class="a-tag" style="color:${a.color}">${a.tag}</div>
         <div class="a-name">${a.name}</div>
         <div class="a-cnt">${ac[a.id] || 0}</div>
+        <button class="nap-btn${a.nap ? ' on' : ''}" onclick="toggleNap('${a.id}')" title="${a.nap ? 'Remove NAP' : 'Mark as NAP (Non-Aggression Pact)'}">NAP</button>
         <button class="a-del" onclick="deleteAlliance('${a.id}')" title="Remove">\u2715</button>
       </div>`).join('')
             : `<div class="a-empty">${p ? 'No alliances yet \u2014 add one above' : 'Select a profile to begin'}</div>`;
@@ -1517,6 +1633,108 @@
       <div class="t-lbl">${t.name}</div>
       <div class="t-cnt">${tc[t.id] || 0}</div>
     </div>`).join('');
+
+        // Power plan panel — only shown when there are alliances
+        const ppPanel = document.getElementById('ppPanel');
+        ppPanel.style.display = (p && alliances.length) ? '' : 'none';
+        if (p && alliances.length) {
+            const sel = document.getElementById('ppSelfSel');
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">— none —</option>' +
+                alliances.map(a => `<option value="${a.id}"${a.id === prev ? ' selected' : ''}>${a.tag} — ${a.name}</option>`).join('');
+            // Default to the alliance matching the profile's own tag
+            if (!prev) {
+                const mine = alliances.find(a => a.tag === p.alliance);
+                if (mine) sel.value = mine.id;
+            }
+            renderPowerPlan();
+        }
+    }
+
+    function renderPowerPlan() {
+        const p = getProfile();
+        const list = document.getElementById('ppList');
+        const countEl = document.getElementById('ppCount');
+        if (!p) { list.innerHTML = ''; countEl.textContent = 0; return; }
+
+        const selfId = document.getElementById('ppSelfSel').value;
+        const napIds = new Set(p.alliances.filter(a => a.nap).map(a => a.id));
+
+        // Gather targets: all zones except Capitol (type 7), excluding self + NAP
+        const targets = [];
+        TERR_DATA.forEach(t => {
+            const effectiveType = (p.zones[t.id] && p.zones[t.id].type) || t.type || 1;
+            if (effectiveType === 7) return; // Capitol is the goal, not a target
+            const z = p.zones[t.id];
+            const assignedId = z && z.allianceId ? z.allianceId : null;
+            if (assignedId === selfId && selfId) return; // we own it
+            if (napIds.has(assignedId)) return; // NAP — off limits
+            const enemy = assignedId ? p.alliances.find(a => a.id === assignedId) : null;
+            targets.push({ t, effectiveType, enemy });
+        });
+
+        // Sort by type descending (6 first, then 5, 4, 3, 2, 1)
+        targets.sort((a, b) => b.effectiveType - a.effectiveType);
+        countEl.textContent = targets.length;
+
+        if (!targets.length) {
+            list.innerHTML = '<div class="pp-empty">All zones are owned by you or NAP alliances.</div>';
+            return;
+        }
+
+        // Group by type
+        const groups = {};
+        targets.forEach(item => {
+            const tid = item.effectiveType;
+            if (!groups[tid]) groups[tid] = [];
+            groups[tid].push(item);
+        });
+
+        const typeOrder = [6, 5, 4, 3, 2, 1];
+        list.innerHTML = typeOrder
+            .filter(tid => groups[tid])
+            .map(tid => {
+                const zt = ZONE_TYPES.find(x => x.id === tid);
+                const rows = groups[tid].map(({ t, enemy }) => {
+                    const isOpen = !enemy;
+                    const label = isOpen ? 'Open' : enemy.tag;
+                    const cls = isOpen ? 'open' : 'enemy';
+                    return `<div class="pp-row" onclick="panToZone(${t.id})">
+                        <span class="pp-row-id">#${t.id}</span>
+                        <span class="pp-badge ${cls}">${label}</span>
+                        <span class="pp-row-tag">${zt.name}</span>
+                        <button class="pp-go" onclick="event.stopPropagation();panToZone(${t.id})">⌖</button>
+                    </div>`;
+                }).join('');
+                return `<div class="pp-group">
+                    <div class="pp-group-hdr">
+                        <div class="pp-type-dot" style="background:${zt.color}"></div>
+                        ${zt.name} <span style="margin-left:auto">${groups[tid].length}</span>
+                    </div>
+                    ${rows}
+                </div>`;
+            }).join('');
+    }
+
+    function panToZone(tid) {
+        const t = TERR_DATA.find(x => x.id === tid);
+        if (!t) return;
+        const o = document.getElementById('mapOuter');
+        const ratio = o.offsetWidth / 685;
+        // Zoom to 3× if currently below that, else keep current zoom
+        const targetScale = Math.max(mpScale, 3);
+        mpScale = targetScale;
+        mpX = o.offsetWidth  / 2 - t.cx * ratio * mpScale;
+        mpY = o.offsetHeight / 2 - t.cy * ratio * mpScale;
+        clampMP();
+        applyMT();
+        // Pulse the zone
+        document.querySelectorAll('[data-tid="' + tid + '"]').forEach(el => {
+            el.classList.remove('pp-pin');
+            void el.offsetWidth; // reflow to restart animation
+            el.classList.add('pp-pin');
+            setTimeout(() => el.classList.remove('pp-pin'), 3100);
+        });
     }
 
     function toggleFilter(id) {
@@ -1647,6 +1865,7 @@
         const fills = document.getElementById('mapSvgFills');
         while (fills.lastChild) fills.removeChild(fills.lastChild);
         const p = getProfile();
+        const napIds = p ? new Set(p.alliances.filter(a => a.nap).map(a => a.id)) : new Set();
         TERR_DATA.forEach(t => {
             const z = p && p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
@@ -1655,6 +1874,7 @@
             const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             const color = a ? a.color : (zt ? zt.color : null);
             const faded = filterType !== null && (effectiveType !== filterType);
+            const isNap = a && napIds.has(a.id);
             const poly = document.createElementNS(svgNS, 'polygon');
             poly.setAttribute('points', t.pts);
             poly.setAttribute('data-tid', t.id);
@@ -1665,6 +1885,7 @@
                 poly.style.stroke = color;
             }
             if (faded) poly.classList.add('faded');
+            if (isNap) poly.classList.add('nap-zone');
             poly.addEventListener('click', e => {
                 e.stopPropagation();
                 if (mpMoved > 5) {
@@ -1788,6 +2009,43 @@
         p.zones = {};
         saveAll();
         renderAll();
+    }
+
+    /* ── Export / Import Profile ────────────────────────────────── */
+    function exportProfile() {
+        const p = getProfile();
+        if (!p) { alert('Select a profile first.'); return; }
+        const json = JSON.stringify(p, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const slug = [p.server && 'S' + p.server, p.alliance, p.label].filter(Boolean).join('-') || 'profile';
+        a.download = 'preseason-' + slug.replace(/[^a-z0-9-]/gi, '_') + '.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function importProfile(e) {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            let p;
+            try { p = JSON.parse(ev.target.result); } catch { alert('Invalid JSON file.'); return; }
+            if (!p || typeof p !== 'object' || !Array.isArray(p.alliances) || typeof p.zones !== 'object') {
+                alert('This file doesn\'t look like a Pre-Season Map profile.'); return;
+            }
+            // Give it a fresh ID so it doesn't collide with existing profiles
+            p.id = uid();
+            if (p.label) p.label = p.label + ' (imported)';
+            allProfiles.push(p);
+            activeId = p.id;
+            saveAll();
+            renderAll();
+            alert('Profile imported: ' + (p.label || ('S' + (p.server || '?'))));
+        };
+        reader.readAsText(file);
     }
 
     /* ── Cloud Sync ─────────────────────────────────────────────── */
