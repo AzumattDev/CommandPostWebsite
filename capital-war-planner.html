@@ -428,23 +428,13 @@
           <option value="">— unlinked —</option>
         </select>
         <label class="pt-check"><input type="checkbox" id="placeShieldedChk" onchange="cwPlaceShielded=this.checked"> Bubble</label>
-        <span class="pt-lbl" title="Bases placed per click">×</span>
-        <div class="bg-zoom-row">
-          <button class="gz-btn" onclick="bgChangePlaceCount(-1)">−</button>
-          <span class="gz-val" id="placeCountLabel">1</span>
-          <button class="gz-btn" onclick="bgChangePlaceCount(1)">+</button>
-        </div>
-        <span class="pt-lbl" title="Columns per row">W</span>
-        <div class="bg-zoom-row">
-          <button class="gz-btn" onclick="bgChangePlaceWidth(-1)">−</button>
-          <span class="gz-val" id="placeWidthLabel">5</span>
-          <button class="gz-btn" onclick="bgChangePlaceWidth(1)">+</button>
-        </div>
-        <div class="bg-zoom-row">
-          <button class="gz-btn" onclick="bgZoom(-1)">−</button>
-          <span class="gz-val" id="bgZoomLabel">8px</span>
-          <button class="gz-btn" onclick="bgZoom(1)">+</button>
-        </div>
+        <span class="pt-lbl">Bases per click:</span>
+        <input type="number" class="pt-sel" id="placeCountInput" value="1" min="1" max="200" style="max-width:58px;min-width:52px" oninput="bgSetPlaceCount(this.value)">
+        <span class="pt-lbl">Columns wide:</span>
+        <input type="number" class="pt-sel" id="placeWidthInput" value="5" min="1" max="20" style="max-width:54px;min-width:48px" oninput="bgSetPlaceWidth(this.value)">
+        <span class="pt-lbl">Zoom:</span>
+        <input type="number" class="pt-sel" id="bgZoomInput" value="80" min="35" max="400" style="max-width:58px;min-width:52px" oninput="bgSetZoom(this.value)">
+        <span class="pt-lbl" style="color:var(--text3)">%</span>
         <button class="map-tool-btn" onclick="bgScrollToCapitol()">⌖ Center</button>
         <button class="map-tool-btn" onclick="cwClearBases()" style="color:var(--red)">✕ Clear</button>
         <span class="gz-val" id="bgCoordLabel" style="min-width:88px;color:var(--text3);font-size:.6rem">—</span>
@@ -1203,8 +1193,8 @@ function bgInit(){
     bgViewX=sx-(sx-bgViewX)*(newScale/bgViewScale);
     bgViewY=sy-(sy-bgViewY)*(newScale/bgViewScale);
     bgViewScale=newScale;
-    const lbl=document.getElementById('bgZoomLabel');
-    if(lbl) lbl.textContent=Math.round(BG_TILE*bgViewScale)+'px';
+    const inp=document.getElementById('bgZoomInput');
+    if(inp) inp.value=Math.round(bgViewScale*100);
     bgRender();
   },{passive:false});
 
@@ -1268,17 +1258,16 @@ function bgScrollToCapitol(){
   bgRender();
 }
 
-function bgZoom(delta){
+function bgSetZoom(val){
   const canvas=document.getElementById('baseGridCanvas');
   if(!canvas) return;
-  const factor=delta>0?1.25:1/1.25;
+  const newScale=Math.max(0.35,Math.min(4.0,(parseInt(val)||80)/100));
   const cx=canvas.width/2, cy=canvas.height/2;
-  const newScale=Math.max(0.35,Math.min(4.0,bgViewScale*factor));
   bgViewX=cx-(cx-bgViewX)*(newScale/bgViewScale);
   bgViewY=cy-(cy-bgViewY)*(newScale/bgViewScale);
   bgViewScale=newScale;
-  const lbl=document.getElementById('bgZoomLabel');
-  if(lbl) lbl.textContent=Math.round(BG_TILE*bgViewScale)+'px';
+  const inp=document.getElementById('bgZoomInput');
+  if(inp) inp.value=Math.round(bgViewScale*100);
   bgRender();
 }
 
@@ -1580,15 +1569,15 @@ function bgPlaceBasesFrom(startCol,startRow,count){
     }
   }
 }
-function bgChangePlaceCount(delta){
-  bgPlaceCount=Math.max(1,Math.min(50,bgPlaceCount+delta));
-  const lbl=document.getElementById('placeCountLabel');
-  if(lbl) lbl.textContent=bgPlaceCount;
+function bgSetPlaceCount(val){
+  bgPlaceCount=Math.max(1,Math.min(200,parseInt(val)||1));
+  const inp=document.getElementById('placeCountInput');
+  if(inp) inp.value=bgPlaceCount;
 }
-function bgChangePlaceWidth(delta){
-  bgPlaceWidth=Math.max(1,Math.min(20,bgPlaceWidth+delta));
-  const lbl=document.getElementById('placeWidthLabel');
-  if(lbl) lbl.textContent=bgPlaceWidth;
+function bgSetPlaceWidth(val){
+  bgPlaceWidth=Math.max(1,Math.min(20,parseInt(val)||1));
+  const inp=document.getElementById('placeWidthInput');
+  if(inp) inp.value=bgPlaceWidth;
 }
 
 /* ══════════════════════════════════════════════════════════════
