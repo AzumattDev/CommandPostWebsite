@@ -19,12 +19,8 @@ const NAV_LINKS = [
   {label:'Territory', children:[
     {label:'Capital War Planner', href:'capital-war-planner.html', icon:'images/ui/capitol.png'},
     {label:'Pre-Season Map Planner', href:'preseason-map-planner.html', icon:'images/ui/capitol.png'},
-    {label:'Hex Warzone Planner', href:'hex-warzone-planner.html', icon:'images/allianceduel/vs_combat.png'},
-    {label:'City Capture Planner', href:'city-capture-planner.html', icon:'images/allianceduel/vs_combat.png'},
-    {label:'Hive Strategy', href:'hive-strategy-guide.html', icon:'images/troops/troop_t8.png'},
   ]},
   {label:'Tools', children:[
-    {label:'Daily Checklist', href:'daily-checklist.html', icon:'images/resources/res_stamina.png'},
     {label:'Hero EXP Calculator', href:'hero-exp-calculator.html', icon:'images/allianceduel/heroxp.png'},
     {label:'Speedup Calculator', href:'speedup-calculator.html', icon:'images/resources/res_time.png'},
     {label:'Server Tracker', href:'server-tracker.html', icon:'images/resources/res_time.png'},
