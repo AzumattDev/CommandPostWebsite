@@ -2150,6 +2150,7 @@
         const z = p.zones[tid] || {};
         const td = TERR_DATA.find(x => x.id === tid);
         const effectiveType = (td && td.type) || null;
+        const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
         const color = zoneColor(tid);
         const sw = document.getElementById('zpSw');
         sw.style.background = color || '';
@@ -2158,8 +2159,7 @@
         document.getElementById('zpAlliance').innerHTML =
             '<option value="">\u2014 Unassigned \u2014</option>' +
             p.alliances.map(a => `<option value="${a.id}"${a.id === z.allianceId ? ' selected' : ''}>${a.tag} \u2013 ${a.name}</option>`).join('');
-        const ztName = zt ? zt.name : '— Unknown —';
-        document.getElementById('zpType').textContent = ztName;
+        document.getElementById('zpType').textContent = zt ? zt.name : '— Unknown —';
         const pop = document.getElementById('zonePopup');
         const pw = 223, ph = 200;
         let l = mx + 12, top = my + 12;
