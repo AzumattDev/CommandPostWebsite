@@ -61,8 +61,8 @@ const style = document.createElement('style');
 style.textContent = `
 .cp-nav{position:sticky;top:0;z-index:9999;background:rgba(10,11,14,.92);backdrop-filter:blur(12px);border-bottom:1px solid #262838;padding:0 1rem;font-family:'DM Sans',sans-serif}
 .cp-nav-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;height:48px;gap:4px}
-.cp-brand{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:.9rem;color:#34d399;text-decoration:none;margin-right:auto;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.cp-brand:hover{color:#6ee7b7}
+.cp-brand{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:.9rem;color:#38bdf8;text-decoration:none;margin-right:auto;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.cp-brand:hover{color:#7dd3fc}
 .cp-brand span{font-size:.65rem;color:#6b6980;font-family:'JetBrains Mono',monospace;font-weight:400}
 .cp-links{display:flex;align-items:center;gap:2px}
 .cp-link{color:#9d9baf;text-decoration:none;font-size:.8rem;padding:6px 10px;border-radius:6px;transition:all .15s;position:relative;cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit}
@@ -111,7 +111,7 @@ function isActive(href){ return currentPage === href; }
 function isGroupActive(children){ return children.some(c => currentPage === c.href); }
 
 let navHTML = `<nav class="cp-nav"><div class="cp-nav-inner">`;
-navHTML += `<a class="cp-brand" href="index.html">⬡ Command Post <span>Last War</span></a>`;
+navHTML += `<a class="cp-brand" href="index.html">⬡ Last Horizon <span>Command Post</span></a>`;
 navHTML += `<div class="cp-links">`;
 
 NAV_LINKS.forEach(item => {
