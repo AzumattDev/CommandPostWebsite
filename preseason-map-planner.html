@@ -874,6 +874,68 @@
         .zp-clr:hover {
             background: var(--red-bg)
         }
+
+        /* ── Mobile ──────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            /* Map first, sidebar below */
+            .planner-layout { gap: .6rem }
+            .planner-layout > div:last-child { order: -1 }
+
+            /* Sidebar: drop sticky so it doesn't eat viewport */
+            .sidebar { position: static; max-height: none; overflow-y: visible }
+
+            /* Profile bar: stack vertically */
+            .profile-bar { flex-direction: column; align-items: stretch; gap: .5rem }
+            .pb-select { min-width: 0; width: 100% }
+            .pb-btns { margin-left: 0 }
+            .pb-btn { padding: 9px 14px; font-size: .8rem }
+
+            /* New profile form: stack fields */
+            .new-profile-form { flex-direction: column }
+            .npf-field input { width: 100% !important; box-sizing: border-box }
+
+            /* Cloud bar: wrap tightly */
+            .cloud-bar { gap: .4rem }
+            .cloud-bar .pb-btn { flex: 1 }
+
+            /* Mode bar: hide desktop hint */
+            .mode-hint { display: none }
+            .mode-bar { flex-wrap: wrap }
+
+            /* Map footer: stack, hide desktop zoom hint */
+            .map-footer { flex-direction: column; align-items: flex-start; gap: 5px; padding: 6px 10px }
+            .map-zoom-hint { display: none }
+            .map-touch-hint { display: block !important }
+
+            /* Zone popup → bottom sheet */
+            .zone-popup {
+                border-radius: 16px 16px 0 0;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 1.1rem 1rem calc(env(safe-area-inset-bottom, 0px) + 1rem)
+            }
+            .zone-popup.show {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto
+            }
+
+            /* Bigger tap targets */
+            .zp-btn { padding: 10px 4px; font-size: .82rem }
+            .zp-sel { padding: 9px 8px; font-size: .88rem }
+            .ps-btn { padding: 9px 13px }
+            .a-chip { padding: 7px 8px; min-height: 36px }
+            .a-del { padding: 5px 9px }
+            .nap-btn { padding: 4px 8px }
+            .type-row { padding: 6px 5px; min-height: 32px }
+            .pp-go { padding: 4px 9px }
+
+            /* Lists: no max-height clamp on mobile (page scrolls) */
+            .a-list { max-height: none }
+            .pp-target-list { max-height: none }
+        }
     </style>
 </head>
 <body>
@@ -983,6 +1045,7 @@
                     <div class="map-legend-row"><div class="map-legend-dot" style="background:#4a9e54"></div>NAP <span style="font-size:.55rem;color:var(--muted);margin-left:2px">(custom — not in-game)</span></div>
                 </div>
                 <div class="map-zoom-hint">Scroll to zoom &bull; Drag to pan &bull; Dbl-click to reset</div>
+                <div class="map-touch-hint" style="display:none;font-size:.58rem;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.4">Pinch to zoom &bull; Drag to pan &bull; Tap to assign</div>
             </div>
         </div>
     </div>
@@ -2531,6 +2594,11 @@
     });
     loadAll();
     renderAll();
+
+    // On mobile, collapse all sidebar panels by default so the map is front-and-center
+    if (window.innerWidth <= 768) {
+        document.querySelectorAll('.sidebar .panel').forEach(p => p.classList.add('collapsed'));
+    }
 
     // Re-render badges once the image finishes loading so mapOuter has its real
     // height and the cull check `sy > offsetHeight + 20` doesn't discard everything.
