@@ -235,7 +235,7 @@
 <div class="container" style="max-width:1140px">
 
 <div class="cw-hero">
-  <h1>🏛️ <span class="acc">Capitol War</span> Coalition Planner</h1>
+  <h1><img src="images/ui/capitol.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-right:6px" alt=""><span class="acc">Capitol War</span> Coalition Planner</h1>
   <p class="sub">Assign top 10–15 alliances to cannons, Capitol defense, perimeter, and flex roles. Generate a Discord-ready battle plan for your coalition.</p>
 </div>
 
@@ -1129,7 +1129,7 @@ const BG_GAME_OFFSET_X=466, BG_GAME_OFFSET_Y=530;
 function bgToGameCoord(tileCol,tileRow){
   return {x:Math.floor(tileCol/3)+BG_GAME_OFFSET_X, y:BG_GAME_OFFSET_Y-Math.floor(tileRow/3)};
 }
-let bgHQImg=null,bgCapImg=null;
+let bgHQImg=null,bgCapImg=null,bgCannonImg=null,bgLvlImg=null;
 let bgViewX=0,bgViewY=0,bgViewScale=0.8; // zoom=0.8 → tile=6.4px, mud zone 480px → fits 520px canvas
 let bgPanning=false,bgPanMoved=false,bgPanX=0,bgPanY=0;
 let bgPlaceCount=1;
@@ -1141,7 +1141,13 @@ function bgLoadImages(){
   bgHQImg.src='images/headquarters.png';
   bgCapImg=new Image();
   bgCapImg.onload=()=>bgRender();
-  bgCapImg.src='images/capital.png';
+  bgCapImg.src='images/ui/capitol.png';
+  bgCannonImg=new Image();
+  bgCannonImg.onload=()=>bgRender();
+  bgCannonImg.src='images/ui/capitol_cannon.png';
+  bgLvlImg=new Image();
+  bgLvlImg.onload=()=>bgRender();
+  bgLvlImg.src='images/ui/alliancecity_level.png';
 }
 
 function bgInit(){
@@ -1380,10 +1386,14 @@ function bgRender(){
   if(effTs>=4){
     const badgeSz=Math.max(4,ts*1.1);
     const badgeX=capPx+ts*0.15, badgeY=capPy+capSz-badgeSz-ts*0.1;
-    ctx.fillStyle='rgba(200,90,10,0.92)';
-    ctx.beginPath();
-    ctx.roundRect(badgeX,badgeY,badgeSz,badgeSz,ts*0.15);
-    ctx.fill();
+    if(bgLvlImg&&bgLvlImg.complete&&bgLvlImg.naturalWidth>0){
+      ctx.drawImage(bgLvlImg,badgeX,badgeY,badgeSz,badgeSz);
+    } else {
+      ctx.fillStyle='rgba(200,90,10,0.92)';
+      ctx.beginPath();
+      ctx.roundRect(badgeX,badgeY,badgeSz,badgeSz,ts*0.15);
+      ctx.fill();
+    }
     ctx.fillStyle='#fff';
     ctx.font=`bold ${Math.max(4,Math.floor(badgeSz*0.72))}px sans-serif`;
     ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -1392,10 +1402,18 @@ function bgRender(){
 
   /* ── Cannon markers (3×3 tiles each) ────────────────────── */
   BG_CANNONS.forEach(c=>{
+    const cx=c.x*ts, cy=c.y*ts, cw=3*ts, ch=3*ts;
     ctx.fillStyle='rgba(192,132,255,0.2)';
-    ctx.fillRect(c.x*ts,c.y*ts,3*ts,3*ts);
+    ctx.fillRect(cx,cy,cw,ch);
+    if(bgCannonImg&&bgCannonImg.complete&&bgCannonImg.naturalWidth>0&&effTs>=4){
+      ctx.save();
+      ctx.beginPath(); ctx.rect(cx,cy,cw,ch); ctx.clip();
+      const pad=Math.max(0.5,ts*0.1);
+      ctx.drawImage(bgCannonImg,cx+pad,cy+pad,cw-pad*2,ch-pad*2);
+      ctx.restore();
+    }
     ctx.strokeStyle='rgba(192,132,255,0.9)'; ctx.lineWidth=1.5;
-    ctx.strokeRect(c.x*ts,c.y*ts,3*ts,3*ts);
+    ctx.strokeRect(cx,cy,cw,ch);
     if(effTs>=4){
       ctx.fillStyle='rgba(200,160,255,1)';
       ctx.font=`bold ${Math.max(5,Math.floor(ts*0.85))}px monospace`;

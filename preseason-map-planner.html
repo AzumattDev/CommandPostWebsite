@@ -553,7 +553,8 @@
         .map-outer {
             position: relative;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: none;
             overflow: hidden;
             cursor: grab;
             user-select: none;
@@ -594,15 +595,51 @@
             pointer-events: none
         }
 
-        .map-zoom-hint {
-            position: absolute;
-            bottom: 6px;
-            right: 8px;
+        .map-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 5px 8px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+        }
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .map-legend-label {
             font-size: .58rem;
-            color: rgba(255, 255, 255, .32);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--muted);
+            margin-right: 2px;
+        }
+        .map-legend-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .6rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--fg);
+        }
+        .map-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 1px rgba(0,0,0,.35);
+        }
+
+        .map-zoom-hint {
+            font-size: .58rem;
+            color: var(--muted);
             font-family: 'JetBrains Mono', monospace;
-            pointer-events: none;
-            z-index: 10;
+            white-space: nowrap;
+            flex-shrink: 0;
             line-height: 1.4
         }
 
@@ -842,7 +879,7 @@
 <body>
 <div class="container" style="max-width:1160px">
     <div class="ps-hero">
-        <h1>Pre-Season <span class="acc">Map Planner</span></h1>
+        <h1><img src="images/ui/capitol.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-right:6px" alt="">Pre-Season <span class="acc">Map Planner</span></h1>
         <p class="sub">Assign alliances to each territory zone. Multiple server profiles supported — each stores its own
             alliance list and assignments.</p>
     </div>
@@ -936,6 +973,15 @@
                          preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
                 <svg class="map-svg map-labels" id="mapSvgLabels"></svg>
+            </div>
+            <div class="map-footer">
+                <div class="map-legend">
+                    <span class="map-legend-label">Legend:</span>
+                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#8a8a8a"></div>Unclaimed</div>
+                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#c84018"></div>Enemy</div>
+                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#3a7ec0"></div>Own alliance</div>
+                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#4a9e54"></div>NAP <span style="font-size:.55rem;color:var(--muted);margin-left:2px">(custom — not in-game)</span></div>
+                </div>
                 <div class="map-zoom-hint">Scroll to zoom &bull; Drag to pan &bull; Dbl-click to reset</div>
             </div>
         </div>
@@ -1787,7 +1833,22 @@
     const BC = '#c84018', BD = '#8a2800';
     const BW = 54, BH = 18, BNW = 17, BP = 7, BR = 3;
 
-    function makeBadge(sx, sy, tid, z, a, zt, bsz) {
+    // Badge source image dimensions (alliancecity_name_*.png = 58×40)
+    const BADGE_SW = 58, BADGE_SH = 40, BADGE_CAP = 20; // cap = SH/2 (semicircular ends)
+
+    // Returns {img, fill, stroke, ptr} for the name-banner based on claim state.
+    // img = game asset path used for 9-slice rendering.
+    // fill/stroke/ptr = canvas-export fallback colors.
+    // selfId = the user's own alliance id (null if not set).
+    function getBannerStyle(a, selfId) {
+        if (!a)              return { img: 'images/ui/badge_name_gray.png',  fill: '#8a8a8a', stroke: '#5a5a5a', ptr: '#777' };
+        if (a.id === selfId) return { img: 'images/ui/badge_name_blue.png',  fill: '#3a7ec0', stroke: '#1a519a', ptr: '#2e6db0' };
+        if (a.nap)           return { img: 'images/ui/badge_name_green.png', fill: '#4a9e54', stroke: '#2a6830', ptr: '#3c7e42' };
+        return                      { img: 'images/ui/badge_name_red.png',   fill: '#c84018', stroke: '#8a2800', ptr: '#b03010' };
+    }
+
+    function makeBadge(sx, sy, tid, z, a, zt, bsz, bStyle) {
+        bStyle = bStyle || { fill: BC, stroke: BD, ptr: BC };
         bsz = bsz || 1;
         const bh = Math.round(BH * bsz);
         const bnw = Math.round(BNW * bsz), bp = Math.round(BP * bsz), br = Math.max(2, Math.round(BR * bsz));
@@ -1800,8 +1861,9 @@
         // Chakra Petch bold ~6px/ch; DM Sans regular ~5px/ch — both at bsz=1.
         const tagStr = tag ? '[' + tag + ']' : '';
         const estTagW = Math.ceil(tagStr.length * 6.0 * bsz);
-        const estNameW = Math.ceil(name.length * 5.0 * bsz);
-        const textW = Math.max(estTagW, estNameW);
+        const estNameW = Math.ceil(name.length * 5.5 * bsz);
+        const gap = (tag && name) ? Math.round(3 * bsz) : 0;
+        const textW = estTagW + gap + estNameW;
         const padR = Math.round(8 * bsz);
         const bw = textW > 0
             ? Math.round((num ? bnw : Math.round(4 * bsz)) + textW + padR)
@@ -1814,31 +1876,45 @@
         g.classList.add('t-badge');
         g.setAttribute('data-tid', tid);
 
-        const body = document.createElementNS(svgNS, 'rect');
-        body.setAttribute('x', bx);
-        body.setAttribute('y', by);
-        body.setAttribute('width', bw);
-        body.setAttribute('height', bh);
-        body.setAttribute('rx', br);
-        body.setAttribute('fill', BC);
-        g.appendChild(body);
+        // 9-slice the badge image: fixed end caps + stretched solid middle.
+        // Nested <svg> with viewBox crops each section without distorting the rounded ends.
+        const capD = Math.round(BADGE_CAP * bh / BADGE_SH); // dest cap width scaled to bh
+        const midSrcW = BADGE_SW - 2 * BADGE_CAP;           // 18px solid middle in source
+        const midDstW = bw - 2 * capD;
+        [
+            { dx: bx,               dw: capD,    vx: 0,                         vw: BADGE_CAP  }, // left cap
+            { dx: bx + capD,        dw: midDstW, vx: BADGE_CAP,                 vw: midSrcW    }, // middle
+            { dx: bx + bw - capD,   dw: capD,    vx: BADGE_SW - BADGE_CAP,      vw: BADGE_CAP  }, // right cap
+        ].forEach(s => {
+            if (s.dw <= 0) return;
+            const outer = document.createElementNS(svgNS, 'svg');
+            outer.setAttribute('x', s.dx);
+            outer.setAttribute('y', by);
+            outer.setAttribute('width', s.dw);
+            outer.setAttribute('height', bh);
+            outer.setAttribute('viewBox', `${s.vx} 0 ${s.vw} ${BADGE_SH}`);
+            outer.setAttribute('preserveAspectRatio', 'none');
+            outer.setAttribute('overflow', 'hidden');
+            const imgEl = document.createElementNS(svgNS, 'image');
+            imgEl.setAttribute('href', bStyle.img);
+            imgEl.setAttribute('x', '0');
+            imgEl.setAttribute('y', '0');
+            imgEl.setAttribute('width', BADGE_SW);
+            imgEl.setAttribute('height', BADGE_SH);
+            outer.appendChild(imgEl);
+            g.appendChild(outer);
+        });
 
         if (num) {
-            const nb = document.createElementNS(svgNS, 'rect');
+            const nb = document.createElementNS(svgNS, 'image');
             nb.setAttribute('x', bx);
             nb.setAttribute('y', by);
             nb.setAttribute('width', bnw);
             nb.setAttribute('height', bh);
-            nb.setAttribute('rx', br);
-            nb.setAttribute('fill', BD);
+            nb.setAttribute('href', 'images/ui/alliancecity_level.png');
+            nb.setAttribute('preserveAspectRatio', 'none');
+            nb.setAttribute('image-rendering', 'crisp-edges');
             g.appendChild(nb);
-            const nbf = document.createElementNS(svgNS, 'rect');
-            nbf.setAttribute('x', bx + bnw - br);
-            nbf.setAttribute('y', by);
-            nbf.setAttribute('width', br);
-            nbf.setAttribute('height', bh);
-            nbf.setAttribute('fill', BD);
-            g.appendChild(nbf);
             const nt = document.createElementNS(svgNS, 'text');
             nt.setAttribute('x', bx + bnw / 2);
             nt.setAttribute('y', by + bh / 2);
@@ -1855,35 +1931,58 @@
         const pOff = Math.round(5 * bsz);
         const ptr = document.createElementNS(svgNS, 'polygon');
         ptr.setAttribute('points', `${cx - pOff},${by + bh} ${cx + pOff},${by + bh} ${cx},${cy}`);
-        ptr.setAttribute('fill', BC);
+        ptr.setAttribute('fill', bStyle.ptr);
         g.appendChild(ptr);
 
         const tx = bx + (num ? bnw + Math.round(3 * bsz) : Math.round(4 * bsz));
         const hasBoth = tag && name;
-        const vOff = Math.round(4.0 * bsz);
+        const midY = by + bh / 2;
 
-        if (tag) {
-            const tt = document.createElementNS(svgNS, 'text');
-            tt.setAttribute('x', tx);
-            tt.setAttribute('y', by + bh / 2 + (hasBoth ? -vOff : 0));
-            tt.setAttribute('dominant-baseline', 'central');
-            tt.setAttribute('fill', 'white');
-            tt.setAttribute('font-family', "'Chakra Petch',sans-serif");
-            tt.setAttribute('font-weight', '700');
-            tt.setAttribute('font-size', Math.round(8 * bsz));
-            tt.textContent = '[' + tag + ']';
-            g.appendChild(tt);
-        }
-        if (name) {
-            const tn = document.createElementNS(svgNS, 'text');
-            tn.setAttribute('x', tx);
-            tn.setAttribute('y', by + bh / 2 + (hasBoth ? vOff : 0));
-            tn.setAttribute('dominant-baseline', 'central');
-            tn.setAttribute('fill', 'rgba(255,255,255,.88)');
-            tn.setAttribute('font-family', "'DM Sans',sans-serif");
-            tn.setAttribute('font-size', Math.round(7 * bsz));
-            tn.textContent = name;
-            g.appendChild(tn);
+        if (hasBoth) {
+            // Single-line: [TAG] Name — matches game UI
+            const tLine = document.createElementNS(svgNS, 'text');
+            tLine.setAttribute('x', tx);
+            tLine.setAttribute('y', midY);
+            tLine.setAttribute('dominant-baseline', 'central');
+            tLine.setAttribute('fill', 'white');
+            tLine.setAttribute('font-family', "'Chakra Petch',sans-serif");
+            tLine.setAttribute('font-weight', '700');
+            tLine.setAttribute('font-size', Math.round(8 * bsz));
+            const spanTag = document.createElementNS(svgNS, 'tspan');
+            spanTag.textContent = '[' + tag + ']';
+            const spanName = document.createElementNS(svgNS, 'tspan');
+            spanName.setAttribute('dx', Math.round(3 * bsz));
+            spanName.setAttribute('font-family', "'DM Sans',sans-serif");
+            spanName.setAttribute('font-weight', 'normal');
+            spanName.setAttribute('font-size', Math.round(7.5 * bsz));
+            spanName.textContent = name;
+            tLine.appendChild(spanTag);
+            tLine.appendChild(spanName);
+            g.appendChild(tLine);
+        } else {
+            if (tag) {
+                const tt = document.createElementNS(svgNS, 'text');
+                tt.setAttribute('x', tx);
+                tt.setAttribute('y', midY);
+                tt.setAttribute('dominant-baseline', 'central');
+                tt.setAttribute('fill', 'white');
+                tt.setAttribute('font-family', "'Chakra Petch',sans-serif");
+                tt.setAttribute('font-weight', '700');
+                tt.setAttribute('font-size', Math.round(8 * bsz));
+                tt.textContent = '[' + tag + ']';
+                g.appendChild(tt);
+            }
+            if (name) {
+                const tn = document.createElementNS(svgNS, 'text');
+                tn.setAttribute('x', tx);
+                tn.setAttribute('y', midY);
+                tn.setAttribute('dominant-baseline', 'central');
+                tn.setAttribute('fill', 'rgba(255,255,255,.88)');
+                tn.setAttribute('font-family', "'DM Sans',sans-serif");
+                tn.setAttribute('font-size', Math.round(7.5 * bsz));
+                tn.textContent = name;
+                g.appendChild(tn);
+            }
         }
 
         g.addEventListener('click', e => {
@@ -1980,6 +2079,8 @@
         while (labels.lastChild) labels.removeChild(labels.lastChild);
         const p = getProfile();
         if (!p) return;
+        const selfAlliance = p.alliances && p.alliances.find(x => x.tag === p.alliance);
+        const selfId = selfAlliance ? selfAlliance.id : null;
         const o = document.getElementById('mapOuter');
         const ratio = o.offsetWidth / 685;  // SVG coord → screen pixel
         const bsz = Math.min(mpScale, 3);  // badges scale with zoom, capped at 3×
@@ -1988,16 +2089,36 @@
         TERR_DATA.forEach(t => {
             const z = p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
-            const zt = z && z.type ? ZONE_TYPES.find(x => x.id === z.type) : null;
-            if (!a && !zt) return;
-            const faded = (filterType !== null && (!z || z.type !== filterType)) ||
-                          (filterAlliance !== null && (!a || a.id !== filterAlliance));
+            const effectiveType = (z && z.type) || t.type || null;
+            const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             // Convert SVG centroid → screen coords (accounts for pan + zoom)
             const sx = mpX + t.cx * ratio * mpScale;
             const sy = mpY + t.cy * ratio * mpScale;
             // Cull off-screen badges
             if (sx < -bwCull || sx > o.offsetWidth + bwCull || sy < -(bhCull + 20) || sy > o.offsetHeight + 20) return;
-            const badge = makeBadge(sx, sy, t.id, z, a, zt, bsz);
+            const faded = (filterType !== null && effectiveType !== filterType) ||
+                          (filterAlliance !== null && (!a || a.id !== filterAlliance));
+            // Capitol icon — always rendered regardless of saved alliance data
+            if (effectiveType === 7) {
+                const iconSz = Math.round(44 * bsz);
+                const capImg = document.createElementNS(svgNS, 'image');
+                capImg.setAttribute('x', sx - iconSz / 2);
+                capImg.setAttribute('y', sy - iconSz / 2);
+                capImg.setAttribute('width', iconSz);
+                capImg.setAttribute('height', iconSz);
+                capImg.setAttribute('href', 'images/ui/capitol.png');
+                capImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                capImg.classList.add('t-badge');
+                capImg.setAttribute('data-tid', t.id);
+                capImg.addEventListener('click', e => { e.stopPropagation(); if (mpMoved > 5) { mpMoved = 0; return; } openPopup(t.id, e.clientX, e.clientY); });
+                capImg.addEventListener('mouseenter', () => highlight(t.id, true));
+                capImg.addEventListener('mouseleave', () => highlight(t.id, false));
+                if (faded) capImg.classList.add('faded');
+                labels.appendChild(capImg);
+            }
+            if (!a && !zt) return;
+            const bStyle = getBannerStyle(a, selfId);
+            const badge = makeBadge(sx, sy, t.id, z, a, zt, bsz, bStyle);
             if (badge) {
                 if (faded) badge.classList.add('faded');
                 labels.appendChild(badge);
@@ -2290,6 +2411,8 @@
 
     function exportPNG() {
         const p = getProfile();
+        const selfAlliance = p && p.alliances && p.alliances.find(x => x.tag === p.alliance);
+        const selfId = selfAlliance ? selfAlliance.id : null;
         const img = document.getElementById('mapImg');
         const W = img.naturalWidth, H = img.naturalHeight;
         const SCALE = 3; // 3× supersampling — crisp at any zoom level
@@ -2321,18 +2444,20 @@
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
             const zt = z && z.type ? ZONE_TYPES.find(x => x.id === z.type) : null;
             if (!a && !zt) return;
+            const cStyle = getBannerStyle(a, selfId);
             const num = zt ? String(zt.id) : '', tag = a ? a.tag : '', name = zt ? zt.name : '';
             const tagStr = tag ? '[' + tag + ']' : '';
             const estTagW = Math.ceil(tagStr.length * 6.0);
-            const estNameW = Math.ceil(name.length * 5.0);
-            const textW = Math.max(estTagW, estNameW);
+            const estNameW = Math.ceil(name.length * 5.5);
+            const gap = (tag && name) ? 3 : 0;
+            const textW = estTagW + gap + estNameW;
             const eW = textW > 0 ? Math.round((num ? BNW : 4) + textW + 8) : Math.round(BNW + 8);
             const bx = t.cx - eW / 2, by = t.cy - BP - BH;
-            ctx.fillStyle = BC;
+            ctx.fillStyle = cStyle.fill;
             roundRect(ctx, bx, by, eW, BH, BR);
             ctx.fill();
             if (num) {
-                ctx.fillStyle = BD;
+                ctx.fillStyle = cStyle.stroke;
                 roundRect(ctx, bx, by, BNW, BH, BR);
                 ctx.fill();
                 ctx.fillRect(bx + BNW - BR, by, BR, BH);
@@ -2342,7 +2467,7 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText(num, bx + BNW / 2, by + BH / 2);
             }
-            ctx.fillStyle = BC;
+            ctx.fillStyle = cStyle.ptr;
             ctx.beginPath();
             ctx.moveTo(t.cx - 5, by + BH);
             ctx.lineTo(t.cx + 5, by + BH);
@@ -2351,17 +2476,28 @@
             ctx.fill();
             const tx = bx + (num ? BNW + 3 : 4), hasBoth = tag && name;
             ctx.textAlign = 'left';
-            if (tag) {
+            ctx.textBaseline = 'middle';
+            const midY = by + BH / 2;
+            if (hasBoth) {
+                // Single-line: [TAG] Name
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 8px Chakra Petch,sans-serif';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('[' + tag + ']', tx, by + BH / 2 + (hasBoth ? -2.5 : 0));
-            }
-            if (name) {
+                ctx.fillText('[' + tag + ']', tx, midY);
+                const tagPx = ctx.measureText('[' + tag + ']').width;
                 ctx.fillStyle = 'rgba(255,255,255,.88)';
-                ctx.font = '7px DM Sans,sans-serif';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(name, tx, by + BH / 2 + (hasBoth ? 2.5 : 0));
+                ctx.font = '7.5px DM Sans,sans-serif';
+                ctx.fillText(name, tx + tagPx + 3, midY);
+            } else {
+                if (tag) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 8px Chakra Petch,sans-serif';
+                    ctx.fillText('[' + tag + ']', tx, midY);
+                }
+                if (name) {
+                    ctx.fillStyle = 'rgba(255,255,255,.88)';
+                    ctx.font = '7.5px DM Sans,sans-serif';
+                    ctx.fillText(name, tx, midY);
+                }
             }
         });
         const slug = p ? [p.server && 'S' + p.server, p.alliance].filter(Boolean).join('-') : '';

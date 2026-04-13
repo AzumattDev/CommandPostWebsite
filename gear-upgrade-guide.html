@@ -21,6 +21,7 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 .rarity-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--text3);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
 .rarity-table td{padding:9px 12px;border-top:1px solid var(--border)}
 .r-common{color:#9ca3af}.r-rare{color:var(--blue)}.r-epic{color:var(--accent)}.r-legend{color:var(--amber)}.r-mythic{color:var(--red)}
+.quality-icon{width:22px;height:22px;object-fit:contain;vertical-align:middle;margin-right:7px}
 .tabs{display:flex;gap:6px;margin-bottom:1.5rem}.tab{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text3);font-family:inherit;text-align:center;transition:all .15s}
 .tab:hover{background:var(--surface2);color:var(--text2)}.tab.active{background:var(--accent-bg);border-color:rgba(167,139,250,.25);color:var(--accent)}
 .role-panel{display:none}.role-panel.active{display:block}
@@ -47,11 +48,11 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 <table class="rarity-table">
 <thead><tr><th>Rarity</th><th>Max Level</th><th>Strategy</th></tr></thead>
 <tbody>
-<tr><td class="r-common" style="font-weight:600">Common (Green)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Don't invest anything. Dismantle immediately.</td></tr>
-<tr><td class="r-rare" style="font-weight:600">Rare (Blue)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Short-term filler only. Dismantle when you have Epic.</td></tr>
-<tr><td class="r-epic" style="font-weight:600">Epic (Purple)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Temporary. Use until you can craft Legendary. Don't over-invest.</td></tr>
-<tr><td class="r-legend" style="font-weight:600">Legendary (Gold)</td><td class="mono">Lv 40 → Stars</td><td style="color:var(--text2)"><strong>Your target.</strong> Rush to gold gear ASAP. Star upgrades (1–5★) using blueprints are the real power spikes.</td></tr>
-<tr><td class="r-mythic" style="font-weight:600">Mythic (Red)</td><td class="mono">Stars</td><td style="color:var(--text2)">Endgame. Extremely expensive. Only focus after main squad is full Legendary with stars.</td></tr>
+<tr><td class="r-common" style="font-weight:600"><img src="images/gear/quality_common.png" class="quality-icon" alt="">Common (Green)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Don't invest anything. Dismantle immediately.</td></tr>
+<tr><td class="r-rare" style="font-weight:600"><img src="images/gear/quality_rare.png" class="quality-icon" alt="">Rare (Blue)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Skip. Short-term filler only. Dismantle when you have Epic.</td></tr>
+<tr><td class="r-epic" style="font-weight:600"><img src="images/gear/quality_epic.png" class="quality-icon" alt="">Epic (Purple)</td><td class="mono">Lv 40</td><td style="color:var(--text2)">Temporary. Use until you can craft Legendary. Don't over-invest.</td></tr>
+<tr><td class="r-legend" style="font-weight:600"><img src="images/gear/quality_legendary.png" class="quality-icon" alt="">Legendary (Gold)</td><td class="mono">Lv 40 → Stars</td><td style="color:var(--text2)"><strong>Your target.</strong> Rush to gold gear ASAP. Star upgrades (1–5★) using blueprints are the real power spikes.</td></tr>
+<tr><td class="r-mythic" style="font-weight:600"><img src="images/gear/quality_mythic.png" class="quality-icon" alt="">Mythic (Red)</td><td class="mono">Stars</td><td style="color:var(--text2)">Endgame. Extremely expensive. Only focus after main squad is full Legendary with stars.</td></tr>
 </tbody>
 </table>
 <div class="card"><span class="label label-warn">Key insight</span><h3>The real power comes from star upgrades, not crafting</h3><p>Getting gear to Legendary is just the start. Star upgrades (using Legendary/Mythic blueprints + prints) provide permanent stat increases that compound quickly. The big spikes are at 2-star and 4-star. Misallocating prints or ore on the wrong item can stall growth for weeks.</p></div>

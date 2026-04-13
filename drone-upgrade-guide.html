@@ -17,6 +17,9 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 .sys-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
 .sys-card h3{font-size:.92rem;font-weight:600;margin-bottom:4px}.sys-card p{font-size:.82rem;color:var(--text2)}
 .sys-card .sys-icon{font-size:1.3rem;margin-bottom:6px}
+.sys-icon-img{width:44px;height:44px;object-fit:contain;display:block}
+.chip-card-icon{width:52px;height:52px;object-fit:contain;display:block;margin-bottom:8px}
+.ms-skin{width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-left:6px}
 .milestones{position:relative;padding-left:28px;margin-bottom:1.5rem}.milestones::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
 .ms-item{position:relative;margin-bottom:1.25rem}.ms-dot{position:absolute;left:-24px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--green);background:var(--green-bg)}
 .ms-dot.major{border-color:var(--amber);background:var(--amber-bg)}.ms-lvl{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;color:var(--green)}
@@ -32,7 +35,10 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 </head>
 <body>
 <div class="container">
-<h1>Drone Upgrade Priority Guide</h1>
+<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
+  <img src="images/allianceduel/dronedata.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
+  <h1 style="margin:0">Drone Upgrade Priority Guide</h1>
+</div>
 <p class="subtitle">Last War: Survival — The strongest force multiplier most players underestimate</p>
 
 <div class="tip-box"><h3>Why drones matter so much</h3><p>Drones provide combat bonuses across ALL your squads. They're untargetable by enemies, deal automatic damage, and scale with investment. Players who prioritize drone upgrades consistently outperform others at the same power level. It's easy to fall behind on drones and almost impossible to catch up — start investing from Day 1.</p></div>
@@ -40,10 +46,10 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 <div class="section">
 <h2 id="systems">The 4 drone upgrade systems</h2>
 <div class="sys-grid">
-  <div class="sys-card"><div class="sys-icon">📊</div><h3>Data Training (Leveling)</h3><p>Raise your drone's base level using Battle Data and Drone Parts. The core progression system. Parts are required every 5 levels up to 150, then every level after.</p></div>
-  <div class="sys-card"><div class="sys-icon">🔧</div><h3>Components (Gear)</h3><p>Equip the drone with gear of varying rarities. Merge 3 identical components to upgrade level. Adds 10,000 power per upgrade. Unlocks at HQ 15.</p></div>
-  <div class="sys-card"><div class="sys-icon">💎</div><h3>Skill Chips</h3><p>4 chip slots (Initial, Defense, Attack, Interference) that boost your drone and hero squads. Unlocks at Combat Boost Level 10 (~Day 85). The biggest power leap.</p></div>
-  <div class="sys-card"><div class="sys-icon">🎨</div><h3>Skins</h3><p>Cosmetic + small stat boosts (attack, crit rate). From events and premium packs. Nice but not a priority — focus on the other three first.</p></div>
+  <div class="sys-card"><img class="sys-icon-img" src="images/allianceduel/dronedata.png" alt=""><h3>Data Training (Leveling)</h3><p>Raise your drone's base level using Battle Data and Drone Parts. The core progression system. Parts are required every 5 levels up to 150, then every level after.</p></div>
+  <div class="sys-card"><img class="sys-icon-img" src="images/allianceduel/dronepart.png" alt=""><h3>Components (Gear)</h3><p>Equip the drone with gear of varying rarities. Merge 3 identical components to upgrade level. Adds 10,000 power per upgrade. Unlocks at HQ 15.</p></div>
+  <div class="sys-card"><img class="sys-icon-img" src="images/drone/chip_initial_legendary.png" alt=""><h3>Skill Chips</h3><p>4 chip slots (Initial, Defense, Attack, Interference) that boost your drone and hero squads. Unlocks at Combat Boost Level 10 (~Day 85). The biggest power leap.</p></div>
+  <div class="sys-card"><img class="sys-icon-img" src="images/drone/drone_skin_lv100.png" alt=""><h3>Skins</h3><p>Cosmetic + small stat boosts (attack, crit rate). From events and premium packs. Nice but not a priority — focus on the other three first.</p></div>
 </div>
 </div>
 
@@ -67,14 +73,14 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 <h2 id="milestones">Key drone milestones</h2>
 <div class="milestones">
   <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 31</div><div class="ms-text">First drone skill unlocks</div></div>
-  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 50</div><div class="ms-text"><strong>Drone skin #2 unlocks.</strong> Nice stat boost.</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 50</div><div class="ms-text"><strong>Drone skin #2 unlocks.</strong> Nice stat boost.<img class="ms-skin" src="images/drone/drone_skin_lv50.png" alt="Drone skin Lv50"></div></div>
   <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 51</div><div class="ms-text">Second drone skill unlocks</div></div>
   <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 71</div><div class="ms-text">Third drone skill unlocks</div></div>
   <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 91</div><div class="ms-text">Fourth drone skill unlocks</div></div>
-  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 100</div><div class="ms-text"><strong>Drone skin #3.</strong> Major power milestone for mid-game.</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 100</div><div class="ms-text"><strong>Drone skin #3.</strong> Major power milestone for mid-game.<img class="ms-skin" src="images/drone/drone_skin_lv100.png" alt="Drone skin Lv100"></div></div>
   <div class="ms-item"><div class="ms-dot"></div><div class="ms-lvl">Level 111</div><div class="ms-text">Fifth drone skill unlocks</div></div>
-  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 150</div><div class="ms-text"><strong>Combat Boost Level 2 — unlocks chips for 2nd troop.</strong> After this, parts are needed every level.</div></div>
-  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 200</div><div class="ms-text"><strong>Drone skin #5.</strong> Significant combat boost.</div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 150</div><div class="ms-text"><strong>Combat Boost Level 2 — unlocks chips for 2nd troop.</strong> After this, parts are needed every level.<img class="ms-skin" src="images/drone/drone_skin_lv150.png" alt="Drone skin Lv150"></div></div>
+  <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 200</div><div class="ms-text"><strong>Drone skin #5.</strong> Significant combat boost.<img class="ms-skin" src="images/drone/drone_skin_lv200.png" alt="Drone skin Lv200"></div></div>
   <div class="ms-item"><div class="ms-dot major"></div><div class="ms-lvl major">Level 250</div><div class="ms-text"><strong>Drone skin #6.</strong> Requires further Tech Research to go beyond.</div></div>
 </div>
 </div>
@@ -91,10 +97,10 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 <h2 id="skill-chips">Skill Chips — the biggest power leap</h2>
 <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Unlocks at Combat Boost Level 10 (~server Day 85). Four chip slots, each with a different combat role:</p>
 <div class="chip-grid">
-  <div class="chip-card"><div class="chip-name">Initial (Movement)</div><div class="chip-desc">Activates at battle start — creates a shield that absorbs enemy attacks for a set duration. Protects your frontline through the critical opening burst.</div><div class="chip-prio prio-1">Priority 1 — survivability</div></div>
-  <div class="chip-card"><div class="chip-name">Defense</div><div class="chip-desc">Defensive mechanism that reduces incoming damage to your team. Stacks with Initial chip for a very tanky opening phase.</div><div class="chip-prio prio-2">Priority 2 — durability</div></div>
-  <div class="chip-card"><div class="chip-name">Attack</div><div class="chip-desc">Enhances damage output of rear-row heroes. Triggers on every drone bombing cycle. Higher burst for faster kills.</div><div class="chip-prio prio-3">Priority 3 — offense</div></div>
-  <div class="chip-card"><div class="chip-name">Interference</div><div class="chip-desc">Disrupts enemy strategy by extending damage duration and intensity of drone attacks. Niche but powerful in prolonged fights.</div><div class="chip-prio prio-4">Priority 4 — situational</div></div>
+  <div class="chip-card"><img class="chip-card-icon" src="images/drone/chip_initial_legendary.png" alt="Initial Chip"><div class="chip-name">Initial (Movement)</div><div class="chip-desc">Activates at battle start — creates a shield that absorbs enemy attacks for a set duration. Protects your frontline through the critical opening burst.</div><div class="chip-prio prio-1">Priority 1 — survivability</div></div>
+  <div class="chip-card"><img class="chip-card-icon" src="images/drone/chip_defense_legendary.png" alt="Defense Chip"><div class="chip-name">Defense</div><div class="chip-desc">Defensive mechanism that reduces incoming damage to your team. Stacks with Initial chip for a very tanky opening phase.</div><div class="chip-prio prio-2">Priority 2 — durability</div></div>
+  <div class="chip-card"><img class="chip-card-icon" src="images/drone/chip_attack_legendary.png" alt="Attack Chip"><div class="chip-name">Attack</div><div class="chip-desc">Enhances damage output of rear-row heroes. Triggers on every drone bombing cycle. Higher burst for faster kills.</div><div class="chip-prio prio-3">Priority 3 — offense</div></div>
+  <div class="chip-card"><img class="chip-card-icon" src="images/drone/chip_interference_legendary.png" alt="Interference Chip"><div class="chip-name">Interference</div><div class="chip-desc">Disrupts enemy strategy by extending damage duration and intensity of drone attacks. Niche but powerful in prolonged fights.</div><div class="chip-prio prio-4">Priority 4 — situational</div></div>
 </div>
 
 <div class="warn-box"><h3>Legendary chips ALWAYS beat Epic chips</h3><p>Many players hold onto heavily invested Epic (purple) chips because they've sunk resources into them. Don't do this. A fresh Legendary (gold) chip outpaces an invested Epic every time. Why? Legendary effects usually last until the battle ends, while Epics are short bursts (~15 seconds) that vanish before fights are halfway done. Replace Epics with Legendaries as soon as you get them.</p></div>

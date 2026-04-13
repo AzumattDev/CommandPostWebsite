@@ -1,0 +1,28 @@
+name: Daily Train Conductor Announcement
+
+on:
+  schedule:
+    # 02:00 UTC — game reset time
+    - cron: '0 2 * * *'
+  # Allow manual trigger from the Actions tab for testing
+  workflow_dispatch:
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post today's conductor to Discord
+        run: |
+          STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            "${{ secrets.SITE_URL }}/api/discord?action=daily&token=${{ secrets.ADMIN_TOKEN }}")
+
+          BODY=$(cat /tmp/response.txt)
+          echo "Status: $STATUS"
+          echo "Response: $BODY"
+
+          if [ "$STATUS" -ne 200 ]; then
+            echo "::error::Discord post failed (HTTP $STATUS): $BODY"
+            exit 1
+          fi

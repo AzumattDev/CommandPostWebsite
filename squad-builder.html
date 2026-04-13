@@ -47,7 +47,8 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 .badge-meta { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); }
 .badge-niche { background: rgba(107,105,128,0.15); color: var(--text3); border: 1px solid var(--border); }
 .hero-slots { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-.hero-slot { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; flex: 1; min-width: 120px; }
+.hero-slot { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; flex: 1; min-width: 100px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hero-portrait { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; }
 .hero-name { font-size: 0.88rem; font-weight: 600; }
 .hero-role { font-size: 0.75rem; color: var(--text3); }
 .hero-type { font-size: 0.68rem; font-weight: 600; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; }
@@ -141,7 +142,10 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
 </head>
 <body>
 <div class="container">
-  <h1><span>Squad Builder & Formations</span></h1>
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
+    <img src="images/formation.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
+    <h1 style="margin:0"><span>Squad Builder & Formations</span></h1>
+  </div>
   <p class="subtitle">Last War: Survival — Counter system, meta formations, and when to build what</p>
 
   <div class="page-tabs">
@@ -202,11 +206,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card recommended">
         <div class="form-header"><span class="form-title">Classic Tank (Early–Mid Meta)</span><span class="form-badge badge-best">Best early game</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank / Shield</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Stetmann</div><div class="hero-role">Sustained DPS</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Buffer / Support</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_murphy.png" alt="Murphy"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_williams.png" alt="Williams"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank / Shield</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_kimberly.png" alt="Kimberly"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_stetmann.png" alt="Stetmann"><div class="hero-name">Stetmann</div><div class="hero-role">Sustained DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div><div class="hero-role">Buffer / Support</div><span class="hero-type type-tank">Tank</span></div>
         </div>
         <div class="form-desc">The dominant early-game formation. Murphy and Williams create an extremely durable frontline while Kimberly deals massive AoE damage. Stetmann provides sustained DPS and Marshall buffs the entire squad's attack speed. Crushes Missile squads by design.</div>
         <div class="form-notes"><strong>Get by:</strong> Day 57 of server for all 5 UR heroes. <strong>Kimberly:</strong> Available for ~$2 on Day 1, or free in Tavern on Day 60. <strong>Priority upgrades:</strong> Kimberly's gear and skills first — she's the damage engine.</div>
@@ -215,11 +219,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card">
         <div class="form-header"><span class="form-title">Anti-Air Tank (Season 4+)</span><span class="form-badge badge-meta">Counter meta</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Anti-Air Specialist</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Buffer</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_murphy.png" alt="Murphy"><div class="hero-name">Murphy</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_williams.png" alt="Williams"><div class="hero-name">Williams</div><div class="hero-role">Off-Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_kimberly.png" alt="Kimberly"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_adam.png" alt="Adam"><div class="hero-name">Adam</div><div class="hero-role">Anti-Air Specialist</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div><div class="hero-role">Buffer</div><span class="hero-type type-tank">Tank</span></div>
         </div>
         <div class="form-desc">A 4+1 hybrid that swaps Stetmann for Adam (Missile) to counter Aircraft-heavy servers. Adam's Exclusive Weapon lets him survive much longer against Aircraft than a standard Tank hero. You drop from +20% to +15% type bonus, but gain a critical matchup advantage. Best used when your server is dominated by Air squads.</div>
         <div class="form-notes"><strong>Trade-off:</strong> -5% type bonus for a specific counter capability. Only worth it in Aircraft-dominated metas.</div>
@@ -231,11 +235,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card recommended">
         <div class="form-header"><span class="form-title">Core Aircraft (Mid–Late Meta)</span><span class="form-badge badge-best">Current PvP king</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Carlie</div><div class="hero-role">Off-Tank</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_lucius.png" alt="Lucius"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_carlie.png" alt="Carlie"><div class="hero-name">Carlie</div><div class="hero-role">Off-Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_dva.png" alt="DVA"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_morrison.png" alt="Morrison"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_schuyler.png" alt="Schuyler"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
         </div>
         <div class="form-desc">The king of PvP from Day 70 onward. Aircraft naturally counter Tanks (the most common squad type), giving an inherent 20% damage advantage in most server fights. Lucius is widely considered the best tank hero in the game once his Exclusive Weapon is unlocked. DVA and Morrison provide devastating burst damage that can delete the enemy backline before they fire skills.</div>
         <div class="form-notes"><strong>Get by:</strong> Day 71 of server for all 5 UR heroes. <strong>Lucius:</strong> Best tank in the game with Exclusive Weapon. <strong>Why it dominates:</strong> Counters the most popular squad type (Tank) with a 20% type bonus on top of a 20% matchup advantage.</div>
@@ -244,11 +248,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card">
         <div class="form-header"><span class="form-title">Air + Murphy Hybrid (Season 4+ with Tactics Cards)</span><span class="form-badge badge-meta">Competitive meta</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Murphy</div><div class="hero-role">Pure Tank</div><span class="hero-type type-tank">Tank</span></div>
-          <div class="hero-slot"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
-          <div class="hero-slot"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_lucius.png" alt="Lucius"><div class="hero-name">Lucius</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_murphy.png" alt="Murphy"><div class="hero-name">Murphy</div><div class="hero-role">Pure Tank</div><span class="hero-type type-tank">Tank</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_dva.png" alt="DVA"><div class="hero-name">DVA</div><div class="hero-role">Burst DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_morrison.png" alt="Morrison"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_schuyler.png" alt="Schuyler"><div class="hero-name">Schuyler</div><div class="hero-role">CC / Stun</div><span class="hero-type type-air">Aircraft</span></div>
         </div>
         <div class="form-desc">The most feared squad in high-level PvP. Murphy's Exclusive Weapon and high-level Tactics Cards make him a better pure damage sponge than Carlie. You lose the 5-hero bonus (dropping to 15%), but Murphy's individual tankiness gives your Air backline significantly more time to delete the enemy.</div>
         <div class="form-notes"><strong>Requires:</strong> Season 4+ Tactics Cards. Murphy at high stars with Exclusive Weapon. <strong>Don't use this</strong> if your Murphy isn't heavily invested — vanilla Carlie is better at low investment.</div>
@@ -260,11 +264,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card">
         <div class="form-header"><span class="form-title">Core Missile (Counter-pick)</span><span class="form-badge badge-niche">Niche / Anti-Air</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Fiona</div><div class="hero-role">Primary AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Swift</div><div class="hero-role">Finisher</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_adam.png" alt="Adam"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_mcgregor.png" alt="McGregor"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_fiona.png" alt="Fiona"><div class="hero-name">Fiona</div><div class="hero-role">Primary AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_tesla.png" alt="Tesla"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_swift.png" alt="Swift"><div class="hero-name">Swift</div><div class="hero-role">Finisher</div><span class="hero-type type-missile">Missile</span></div>
         </div>
         <div class="form-desc">Built to counter Aircraft squads. Adam and McGregor protect the damage dealers while Fiona unleashes devastating cluster attacks and Tesla provides consistent single-target damage. Swift finishes off weakened targets. This squad excels when your server is Aircraft-heavy, but struggles against Tank squads, making it a counter-pick rather than a main.</div>
         <div class="form-notes"><strong>Get by:</strong> Day 99 for all 5 UR heroes — the slowest to assemble. <strong>Best as:</strong> 2nd or 3rd squad in Alliance Wars / 3v3 to counter specific Aircraft opponents.</div>
@@ -273,11 +277,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="formation-card">
         <div class="form-header"><span class="form-title">Season 5 Missile (Venom UR)</span><span class="form-badge badge-meta">S5 meta shift</span></div>
         <div class="hero-slots">
-          <div class="hero-slot"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Fiona</div><div class="hero-role">AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
-          <div class="hero-slot"><div class="hero-name">Venom (UR)</div><div class="hero-role">Burst + DoT</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_adam.png" alt="Adam"><div class="hero-name">Adam</div><div class="hero-role">Frontline Tank</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_mcgregor.png" alt="McGregor"><div class="hero-name">McGregor</div><div class="hero-role">Taunt Tank / CC</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_tesla.png" alt="Tesla"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_fiona.png" alt="Fiona"><div class="hero-name">Fiona</div><div class="hero-role">AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
+          <div class="hero-slot"><img class="hero-portrait" src="images/hero_venom.png" alt="Venom"><div class="hero-name">Venom (UR)</div><div class="hero-role">Burst + DoT</div><span class="hero-type type-missile">Missile</span></div>
         </div>
         <div class="form-desc">Season 5 promotes Venom to UR rarity, making the full 5-man Missile team significantly more viable. With Fiona's Exclusive Weapon, missiles can now reliably burst down Aircraft squads. This is the strongest Missile formation has ever been.</div>
         <div class="form-notes"><strong>Requires:</strong> Season 5 (Golden Wasteland). Venom's UR promotion. Fiona's Exclusive Weapon for full effectiveness.</div>
@@ -337,11 +341,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <span class="form-badge" style="background:var(--tank-bg);color:var(--tank);border:1px solid var(--tank-border);">Tank</span>
       </div>
       <div class="hero-slots">
-        <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Frontline</div><span class="hero-type type-tank">Tank</span></div>
-        <div class="hero-slot"><div class="hero-name">Tesla / DVA</div><div class="hero-role">DPS</div><span class="hero-type type-missile">Missile / Air</span></div>
-        <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
-        <div class="hero-slot"><div class="hero-name">Stetmann</div><div class="hero-role">Sustained DPS</div><span class="hero-type type-tank">Tank</span></div>
-        <div class="hero-slot"><div class="hero-name">Mason (UR)</div><div class="hero-role">Rear row buffer</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div><div class="hero-role">Frontline</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_tesla.png" alt="Tesla"><div class="hero-name">Tesla / DVA</div><div class="hero-role">DPS</div><span class="hero-type type-missile">Missile / Air</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_kimberly.png" alt="Kimberly"><div class="hero-name">Kimberly</div><div class="hero-role">Primary DPS</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_stetmann.png" alt="Stetmann"><div class="hero-name">Stetmann</div><div class="hero-role">Sustained DPS</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_mason.png" alt="Mason"><div class="hero-name">Mason (UR)</div><div class="hero-role">Rear row buffer</div><span class="hero-type type-tank">Tank</span></div>
       </div>
       <div class="form-desc">Set the rear row to Tank heroes — Mason buffs the tank heroes behind him. If Tesla's power is lower than DVA's, replace him with DVA. Mason can be omitted if under-invested; substitute your next strongest DPS. Marshall must carry full defense gear.</div>
       <div class="form-notes"><strong>Gear priority:</strong> 1) Kimberly &nbsp; 2) Stetmann &nbsp; 3) Mason (if used) &nbsp; — DVA only gets cannon gear if surplus remains after primary DPS are geared. Mason's "Zombie Cleaner" skill should be Lv 20 before using him here.</div>
@@ -356,11 +360,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <span class="form-badge" style="background:var(--air-bg);color:var(--air);border:1px solid var(--air-border);">Aircraft</span>
       </div>
       <div class="hero-slots">
-        <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Frontline anchor</div><span class="hero-type type-tank">Tank</span></div>
-        <div class="hero-slot"><div class="hero-name">Kimberly</div><div class="hero-role">DPS</div><span class="hero-type type-tank">Tank</span></div>
-        <div class="hero-slot"><div class="hero-name">DVA</div><div class="hero-role">Primary DPS</div><span class="hero-type type-air">Aircraft</span></div>
-        <div class="hero-slot"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
-        <div class="hero-slot"><div class="hero-name">Schuyler / Stetmann</div><div class="hero-role">CC / flex</div><span class="hero-type type-air">Aircraft</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div><div class="hero-role">Frontline anchor</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_kimberly.png" alt="Kimberly"><div class="hero-name">Kimberly</div><div class="hero-role">DPS</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_dva.png" alt="DVA"><div class="hero-name">DVA</div><div class="hero-role">Primary DPS</div><span class="hero-type type-air">Aircraft</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_morrison.png" alt="Morrison"><div class="hero-name">Morrison</div><div class="hero-role">Anti-Defense DPS</div><span class="hero-type type-air">Aircraft</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_schuyler.png" alt="Schuyler"><div class="hero-name">Schuyler / Stetmann</div><div class="hero-role">CC / flex</div><span class="hero-type type-air">Aircraft</span></div>
       </div>
       <div class="form-desc">DVA gets the best attack gear first, then Morrison, then Schuyler. If Schuyler's strength is low, Stetmann is a solid substitute. Marshall stays frontline and needs defense gear. Test swapping Schuyler for Kimberly if results are inconsistent. If Schuyler/Morrison are unavailable, Statesman/Mason are reliable substitutes.</div>
       <div class="form-notes"><strong>Gear priority:</strong> 1) DVA &nbsp; 2) Morrison &nbsp; 3) Schuyler</div>
@@ -375,11 +379,11 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <span class="form-badge" style="background:var(--missile-bg);color:var(--missile);border:1px solid var(--missile-border);">Missile</span>
       </div>
       <div class="hero-slots">
-        <div class="hero-slot"><div class="hero-name">Swift</div><div class="hero-role">DPS</div><span class="hero-type type-missile">Missile</span></div>
-        <div class="hero-slot"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
-        <div class="hero-slot"><div class="hero-name">Adam / DVA</div><div class="hero-role">Frontline flex</div><span class="hero-type type-missile">Missile</span></div>
-        <div class="hero-slot"><div class="hero-name">Fiona</div><div class="hero-role">AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
-        <div class="hero-slot"><div class="hero-name">Marshall</div><div class="hero-role">Buffer — mandatory</div><span class="hero-type type-tank">Tank</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_swift.png" alt="Swift"><div class="hero-name">Swift</div><div class="hero-role">DPS</div><span class="hero-type type-missile">Missile</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_tesla.png" alt="Tesla"><div class="hero-name">Tesla</div><div class="hero-role">Precision DPS</div><span class="hero-type type-missile">Missile</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_adam.png" alt="Adam"><div class="hero-name">Adam / DVA</div><div class="hero-role">Frontline flex</div><span class="hero-type type-missile">Missile</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_fiona.png" alt="Fiona"><div class="hero-name">Fiona</div><div class="hero-role">AoE DPS</div><span class="hero-type type-missile">Missile</span></div>
+        <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div><div class="hero-role">Buffer — mandatory</div><span class="hero-type type-tank">Tank</span></div>
       </div>
       <div class="form-desc">Tesla gets the best attack gear, then Swift, then Fiona. If Adam's frontline skill level is low, replace him with DVA. Marshall is mandatory — without his buffs, missile damage falls off dramatically. No Missile squad? Use your top 4 damage dealers (DVA, Kimberly, Statesman, Mason, Schuyler) with Marshall as the 5th slot.</div>
       <div class="form-notes"><strong>Gear priority:</strong> 1) Tesla &nbsp; 2) Swift &nbsp; 3) Fiona &nbsp; — Marshall is always the 5th hero regardless of squad type.</div>

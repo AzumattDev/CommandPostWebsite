@@ -1,0 +1,470 @@
+{
+  "id": "mntb9cl3lee",
+  "alliance": "LHZN",
+  "server": "2190",
+  "label": "Pre-Season",
+  "alliances": [
+    {
+      "id": "mntbcfv5a4c",
+      "tag": "LHZN",
+      "name": "Last Horizon",
+      "color": "#6541d2",
+      "nap": true
+    },
+    {
+      "id": "mntfbkevtlp",
+      "tag": "XPEX",
+      "name": "XPEX",
+      "color": "#b782ac",
+      "nap": false
+    },
+    {
+      "id": "mntfc5nvnua",
+      "tag": "NBR2",
+      "name": "NBR2",
+      "color": "#85a763",
+      "nap": false
+    },
+    {
+      "id": "mntfe98vt9z",
+      "tag": "PXZR",
+      "name": "PXZR",
+      "color": "#83a462",
+      "nap": true
+    },
+    {
+      "id": "mntffe3rcyc",
+      "tag": "BIT",
+      "name": "BIT",
+      "color": "#7490c7",
+      "nap": true
+    },
+    {
+      "id": "mntfgbhp2fz",
+      "tag": "N1FG",
+      "name": "N1FG",
+      "color": "#9cacd2",
+      "nap": true
+    },
+    {
+      "id": "mntfh5t288t",
+      "tag": "YZ9J",
+      "name": "YZ9J",
+      "color": "#7490c7",
+      "nap": false
+    },
+    {
+      "id": "mntfhjk934b",
+      "tag": "ALFO",
+      "name": "ALFO",
+      "color": "#da7b4b",
+      "nap": false
+    },
+    {
+      "id": "mntfidyyicz",
+      "tag": "AMCS",
+      "name": "AMCS",
+      "color": "#85a663",
+      "nap": true
+    },
+    {
+      "id": "mntfjj13tlz",
+      "tag": "ASHM",
+      "name": "ASHM",
+      "color": "#de9f86",
+      "nap": true
+    },
+    {
+      "id": "mntfk423ucl",
+      "tag": "HEAL",
+      "name": "HEAL",
+      "color": "#7490c7",
+      "nap": true
+    },
+    {
+      "id": "mntfl47ry70",
+      "tag": "AA1",
+      "name": "AA1",
+      "color": "#b782ac",
+      "nap": false
+    },
+    {
+      "id": "mntflw326cy",
+      "tag": "M3W",
+      "name": "M3W",
+      "color": "#d97a49",
+      "nap": true
+    },
+    {
+      "id": "mntfm8oz532",
+      "tag": "99XX",
+      "name": "99XX",
+      "color": "#dda243",
+      "nap": false
+    },
+    {
+      "id": "mntfn097l3x",
+      "tag": "PLAB",
+      "name": "PLAB",
+      "color": "#b782ac",
+      "nap": true
+    },
+    {
+      "id": "mntfnvvdkkj",
+      "tag": "NEBR",
+      "name": "NEBR",
+      "color": "#aab346",
+      "nap": true
+    },
+    {
+      "id": "mntfpte6u8a",
+      "tag": "Q669",
+      "name": "Q669",
+      "color": "#d97a49",
+      "nap": false
+    },
+    {
+      "id": "mntfq73peix",
+      "tag": "GGW",
+      "name": "GGW",
+      "color": "#dda243",
+      "nap": true
+    },
+    {
+      "id": "mntfqysbepd",
+      "tag": "PLUD",
+      "name": "PLUD",
+      "color": "#c3a1bc",
+      "nap": true
+    },
+    {
+      "id": "mntfrrk1f3o",
+      "tag": "DM33",
+      "name": "DM33",
+      "color": "#b782ac",
+      "nap": true
+    }
+  ],
+  "zones": {
+    "0": {
+      "allianceId": "mntfpte6u8a",
+      "type": 1
+    },
+    "3": {
+      "allianceId": "mntfqysbepd",
+      "type": 1
+    },
+    "4": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 1
+    },
+    "5": {
+      "allianceId": "mntfqysbepd",
+      "type": 1
+    },
+    "6": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 1
+    },
+    "7": {
+      "allianceId": "mntfqysbepd",
+      "type": 2
+    },
+    "8": {
+      "allianceId": "mntfc5nvnua",
+      "type": 1
+    },
+    "9": {
+      "allianceId": "mntfn097l3x",
+      "type": 2
+    },
+    "10": {
+      "allianceId": "mntfn097l3x",
+      "type": 2
+    },
+    "11": {
+      "allianceId": "mntfn097l3x",
+      "type": 2
+    },
+    "12": {
+      "allianceId": "mntfqysbepd",
+      "type": 1
+    },
+    "13": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 2
+    },
+    "14": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 1
+    },
+    "15": {
+      "allianceId": "mntflw326cy",
+      "type": 1
+    },
+    "16": {
+      "allianceId": "mntfc5nvnua",
+      "type": 1
+    },
+    "17": {
+      "allianceId": "mntflw326cy",
+      "type": 2
+    },
+    "18": {
+      "allianceId": "mntfq73peix",
+      "type": 2
+    },
+    "19": {
+      "allianceId": "mntfn097l3x",
+      "type": 3
+    },
+    "20": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 1
+    },
+    "21": {
+      "allianceId": "mntfrrk1f3o",
+      "type": 1
+    },
+    "22": {
+      "allianceId": "mntfq73peix",
+      "type": 1
+    },
+    "23": {
+      "allianceId": "mntflw326cy",
+      "type": 3
+    },
+    "24": {
+      "allianceId": "mntflw326cy",
+      "type": 4
+    },
+    "25": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 5
+    },
+    "26": {
+      "allianceId": "mntfbkevtlp",
+      "type": 1
+    },
+    "27": {
+      "allianceId": "mntfl47ry70",
+      "type": 1
+    },
+    "28": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 3
+    },
+    "29": {
+      "allianceId": "mntflw326cy",
+      "type": 3
+    },
+    "30": {
+      "allianceId": "mntflw326cy",
+      "type": 2
+    },
+    "31": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 2
+    },
+    "32": {
+      "allianceId": "mntfn097l3x",
+      "type": 5
+    },
+    "33": {
+      "allianceId": "mntfjj13tlz",
+      "type": 3
+    },
+    "34": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 6
+    },
+    "35": {
+      "allianceId": "mntfm8oz532",
+      "type": 1
+    },
+    "36": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 4
+    },
+    "37": {
+      "allianceId": "mntfnvvdkkj",
+      "type": 3
+    },
+    "38": {
+      "allianceId": "mntbcfv5a4c",
+      "type": 1
+    },
+    "39": {
+      "allianceId": "mntfk423ucl",
+      "type": 4
+    },
+    "40": {
+      "allianceId": "mntfidyyicz",
+      "type": 7
+    },
+    "41": {
+      "allianceId": "mntfidyyicz",
+      "type": 6
+    },
+    "42": {
+      "allianceId": "mntfl47ry70",
+      "type": 1
+    },
+    "43": {
+      "allianceId": "mntfjj13tlz",
+      "type": 2
+    },
+    "44": {
+      "allianceId": "mntfe98vt9z",
+      "type": 3
+    },
+    "45": {
+      "allianceId": "mntfe98vt9z",
+      "type": 5
+    },
+    "46": {
+      "allianceId": "mntfjj13tlz",
+      "type": 3
+    },
+    "47": {
+      "allianceId": "mntfk423ucl",
+      "type": 4
+    },
+    "48": {
+      "allianceId": "mntfe98vt9z",
+      "type": 6
+    },
+    "49": {
+      "allianceId": "mntbcfv5a4c",
+      "type": 1
+    },
+    "50": {
+      "allianceId": "mntffe3rcyc",
+      "type": 2
+    },
+    "51": {
+      "allianceId": "mntfe98vt9z",
+      "type": 4
+    },
+    "52": {
+      "allianceId": "mntfjj13tlz",
+      "type": 1
+    },
+    "54": {
+      "allianceId": "mntfidyyicz",
+      "type": 5
+    },
+    "55": {
+      "allianceId": "mntfe98vt9z",
+      "type": 3
+    },
+    "56": {
+      "allianceId": "mntfk423ucl",
+      "type": 2
+    },
+    "57": {
+      "allianceId": "mntffe3rcyc",
+      "type": 2
+    },
+    "58": {
+      "allianceId": "mntfidyyicz",
+      "type": 4
+    },
+    "59": {
+      "allianceId": "mntfjj13tlz",
+      "type": 2
+    },
+    "60": {
+      "allianceId": "mntfidyyicz",
+      "type": 4
+    },
+    "61": {
+      "allianceId": "mntbcfv5a4c",
+      "type": 1
+    },
+    "62": {
+      "allianceId": "mntfk423ucl",
+      "type": 3
+    },
+    "63": {
+      "allianceId": "mntfk423ucl",
+      "type": 3
+    },
+    "64": {
+      "allianceId": "mntfidyyicz",
+      "type": 1
+    },
+    "65": {
+      "allianceId": "mntfhjk934b",
+      "type": 2
+    },
+    "66": {
+      "allianceId": "mntfidyyicz",
+      "type": 3
+    },
+    "67": {
+      "allianceId": "mntffe3rcyc",
+      "type": 1
+    },
+    "69": {
+      "allianceId": "mntfk423ucl",
+      "type": 2
+    },
+    "71": {
+      "allianceId": "mntffe3rcyc",
+      "type": 1
+    },
+    "72": {
+      "allianceId": "mntfhjk934b",
+      "type": 2
+    },
+    "73": {
+      "allianceId": "mntfhjk934b",
+      "type": 1
+    },
+    "74": {
+      "allianceId": "mntfidyyicz",
+      "type": 2
+    },
+    "75": {
+      "allianceId": "mntfhjk934b",
+      "type": 1
+    },
+    "76": {
+      "allianceId": "mntffe3rcyc",
+      "type": 2
+    },
+    "77": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 2
+    },
+    "78": {
+      "allianceId": "mntfhjk934b",
+      "type": 1
+    },
+    "80": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 1
+    },
+    "81": {
+      "allianceId": "mntfh5t288t",
+      "type": 1
+    },
+    "82": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 1
+    },
+    "84": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 1
+    },
+    "85": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 1
+    },
+    "86": {
+      "allianceId": "mntfgbhp2fz",
+      "type": 1
+    }
+  }
+}

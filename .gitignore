@@ -16,3 +16,9 @@ ADMIN-NOTES.md
 !.dev.vars.example
 .env*
 !.env.example
+
+# RIP images
+/images/RIP/
+
+/images/AssetStudioModCLI_net472_win32_64
+AssetStudioModCLI_net472_win32_64.zip

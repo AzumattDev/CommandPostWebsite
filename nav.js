@@ -2,33 +2,33 @@
 const NAV_LINKS = [
   {label:'Home', href:'index.html', icon:'🏠'},
   {label:'Events', children:[
-    {label:'Desert Storm Planner', href:'desert-storm-planner.html'},
-    {label:'Canyon Storm Planner', href:'canyon-storm-planner.html'},
+    {label:'Desert Storm Planner', href:'desert-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
+    {label:'Canyon Storm Planner', href:'canyon-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
   ]},
   {label:'Guides', children:[
-    {label:'Alliance Duel Planner', href:'alliance-duel-planner.html'},
-    {label:'Stamina & Resource ROI', href:'stamina-roi-guide.html'},
-    {label:'Power Progression', href:'power-progression.html'},
-    {label:'Waterfall Training', href:'waterfall-training.html'},
-    {label:'Squad Builder', href:'squad-builder.html'},
-    {label:'Research Priority', href:'research-priority-path.html'},
-    {label:'VIP & Diamonds', href:'vip-diamond-guide.html'},
-    {label:'Gear Upgrade', href:'gear-upgrade-guide.html'},
-    {label:'Drone Priority', href:'drone-upgrade-guide.html'},
+    {label:'Alliance Duel Planner', href:'alliance-duel-planner.html', icon:'images/allianceduel/vs_logo.png'},
+    {label:'Stamina & Resource ROI', href:'stamina-roi-guide.html', icon:'images/resources/res_stamina.png'},
+    {label:'Power Progression', href:'power-progression.html', icon:'images/troops/troop_t10.png'},
+    {label:'Waterfall Training', href:'waterfall-training.html', icon:'images/troops/troop_t8.png'},
+    {label:'Squad Builder', href:'squad-builder.html', icon:'images/formation.png'},
+    {label:'Research Priority', href:'research-priority-path.html', icon:'images/research/sci_tree_specialforces.png'},
+    {label:'VIP & Diamonds', href:'vip-diamond-guide.html', icon:'images/resources/res_diamonds.png'},
+    {label:'Gear Upgrade', href:'gear-upgrade-guide.html', icon:'images/gear/quality_legendary.png'},
+    {label:'Drone Priority', href:'drone-upgrade-guide.html', icon:'images/allianceduel/dronedata.png'},
   ]},
   {label:'Territory', children:[
-    {label:'Capital War Planner', href:'capital-war-planner.html'},
-    {label:'Pre-Season Map Planner', href:'preseason-map-planner.html'},
-    {label:'Hex Warzone Planner', href:'hex-warzone-planner.html'},
-    {label:'City Capture Planner', href:'city-capture-planner.html'},
-    {label:'Hive Strategy', href:'hive-strategy-guide.html'},
+    {label:'Capital War Planner', href:'capital-war-planner.html', icon:'images/ui/capitol.png'},
+    {label:'Pre-Season Map Planner', href:'preseason-map-planner.html', icon:'images/ui/capitol.png'},
+    {label:'Hex Warzone Planner', href:'hex-warzone-planner.html', icon:'images/allianceduel/vs_combat.png'},
+    {label:'City Capture Planner', href:'city-capture-planner.html', icon:'images/allianceduel/vs_combat.png'},
+    {label:'Hive Strategy', href:'hive-strategy-guide.html', icon:'images/troops/troop_t8.png'},
   ]},
   {label:'Tools', children:[
-    {label:'Daily Checklist', href:'daily-checklist.html'},
-    {label:'Hero EXP Calculator', href:'hero-exp-calculator.html'},
-    {label:'Speedup Calculator', href:'speedup-calculator.html'},
-    {label:'Server Tracker', href:'server-tracker.html'},
-    {label:'HQ Upgrade Planner', href:'hq-upgrade-planner.html'},
+    {label:'Daily Checklist', href:'daily-checklist.html', icon:'images/resources/res_stamina.png'},
+    {label:'Hero EXP Calculator', href:'hero-exp-calculator.html', icon:'images/allianceduel/heroxp.png'},
+    {label:'Speedup Calculator', href:'speedup-calculator.html', icon:'images/resources/res_time.png'},
+    {label:'Server Tracker', href:'server-tracker.html', icon:'images/resources/res_time.png'},
+    {label:'HQ Upgrade Planner', href:'hq-upgrade-planner.html', icon:'images/headquarters.png'},
   ]},
 ];
 
@@ -70,7 +70,7 @@ style.textContent = `
 .cp-link.active{color:#a78bfa;background:rgba(167,139,250,.08)}
 .cp-dropdown{position:absolute;top:100%;left:0;background:#14151b;border:1px solid #262838;border-radius:10px;padding:6px;min-width:200px;display:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .cp-link:hover .cp-dropdown,.cp-link:focus-within .cp-dropdown{display:block}
-.cp-dd-item{display:block;color:#9d9baf;text-decoration:none;font-size:.78rem;padding:7px 10px;border-radius:6px;transition:all .12s;white-space:nowrap}
+.cp-dd-item{display:flex;align-items:center;gap:7px;color:#9d9baf;text-decoration:none;font-size:.78rem;padding:7px 10px;border-radius:6px;transition:all .12s;white-space:nowrap}
 .cp-dd-item:hover{color:#e8e6f0;background:rgba(255,255,255,.05)}
 .cp-dd-item.active{color:#a78bfa;background:rgba(167,139,250,.06)}
 .cp-arrow{font-size:.55rem;margin-left:3px;opacity:.5}
@@ -82,7 +82,7 @@ style.textContent = `
 .cp-mobile-menu.open{display:block}
 .cp-mob-section{margin-bottom:12px}
 .cp-mob-label{font-size:.68rem;color:#6b6980;text-transform:uppercase;letter-spacing:.08em;padding:4px 8px;font-family:'JetBrains Mono',monospace}
-.cp-mob-link{display:block;color:#9d9baf;text-decoration:none;font-size:.88rem;padding:10px 12px;border-radius:8px;transition:all .12s}
+.cp-mob-link{display:flex;align-items:center;gap:9px;color:#9d9baf;text-decoration:none;font-size:.88rem;padding:10px 12px;border-radius:8px;transition:all .12s}
 .cp-mob-link:hover,.cp-mob-link.active{color:#e8e6f0;background:rgba(255,255,255,.04)}
 .cp-mob-link.active{color:#a78bfa}
 @media(max-width:700px){.cp-links{display:none}.cp-hamburger{display:block}}
@@ -120,7 +120,8 @@ NAV_LINKS.forEach(item => {
     navHTML += `<div class="cp-link${groupActive?' active':''}" tabindex="0">${item.label}<span class="cp-arrow">▼</span>`;
     navHTML += `<div class="cp-dropdown">`;
     item.children.forEach(c => {
-      navHTML += `<a class="cp-dd-item${isActive(c.href)?' active':''}" href="${c.href}">${c.label}</a>`;
+      const icn = c.icon ? `<img src="${c.icon}" style="width:16px;height:16px;object-fit:contain;opacity:.85;flex-shrink:0" alt="">` : '';
+      navHTML += `<a class="cp-dd-item${isActive(c.href)?' active':''}" href="${c.href}">${icn}${c.label}</a>`;
     });
     navHTML += `</div></div>`;
   } else {
@@ -140,7 +141,8 @@ NAV_LINKS.forEach(item => {
   if(item.children){
     navHTML += `<div class="cp-mob-section"><div class="cp-mob-label">${item.label}</div>`;
     item.children.forEach(c => {
-      navHTML += `<a class="cp-mob-link${isActive(c.href)?' active':''}" href="${c.href}" onclick="document.getElementById('cpMobile').classList.remove('open')">${c.label}</a>`;
+      const micn = c.icon ? `<img src="${c.icon}" style="width:18px;height:18px;object-fit:contain;opacity:.85;flex-shrink:0" alt="">` : '';
+      navHTML += `<a class="cp-mob-link${isActive(c.href)?' active':''}" href="${c.href}" onclick="document.getElementById('cpMobile').classList.remove('open')">${micn}${c.label}</a>`;
     });
     navHTML += `</div>`;
   } else {

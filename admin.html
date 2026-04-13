@@ -104,6 +104,9 @@ input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
 .pl-btn-gold:hover{background:rgba(255,215,0,.14)}
 .pl-btn-danger{background:transparent;color:var(--red);border-color:rgba(248,113,113,.2)}
 .pl-btn-danger:hover{background:rgba(248,113,113,.06)}
+.pl-btn-discord{background:rgba(88,101,242,.1);color:#7289da;border-color:rgba(88,101,242,.3)}
+.pl-btn-discord:hover{background:rgba(88,101,242,.18)}
+.pl-btn-discord:disabled{opacity:.45;cursor:not-allowed}
 .pl-btn-sm{padding:5px 11px;font-size:.76rem}
 .pl-actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
 .pl-pager{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
@@ -241,6 +244,10 @@ input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
     <button class="pl-btn pl-btn-primary" onclick="plRandomize()">🎲 Randomize</button>
     <button class="pl-btn pl-btn-ghost" id="plCopyBtn" onclick="plCopyChat()">📋 Copy for Chat</button>
     <button class="pl-btn pl-btn-gold" id="plDlBtn" onclick="plDownload()">📥 Download PNG</button>
+    <button class="pl-btn pl-btn-discord" id="plDiscordBtn" onclick="plPostDiscord()">
+      <svg width="16" height="16" viewBox="0 0 71 55" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:4px"><path d="M60.1 4.9A58.55 58.55 0 0 0 45.7.7a.22.22 0 0 0-.23.11 40.78 40.78 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.25 0A37.3 37.3 0 0 0 25.6.81a.22.22 0 0 0-.23-.11A58.36 58.36 0 0 0 10.97 4.9a.2.2 0 0 0-.09.08C1.62 18.73-1 32.2.31 45.5a.24.24 0 0 0 .09.16 58.84 58.84 0 0 0 17.72 8.96.22.22 0 0 0 .24-.08 42.04 42.04 0 0 0 3.63-5.9.22.22 0 0 0-.12-.3 38.73 38.73 0 0 1-5.53-2.63.22.22 0 0 1-.02-.37c.37-.28.74-.57 1.1-.86a.22.22 0 0 1 .22-.03c11.6 5.3 24.15 5.3 35.6 0a.22.22 0 0 1 .23.03c.36.29.73.58 1.1.86a.22.22 0 0 1-.02.37 36.36 36.36 0 0 1-5.54 2.63.22.22 0 0 0-.11.3 47.15 47.15 0 0 0 3.62 5.9.22.22 0 0 0 .24.08 58.7 58.7 0 0 0 17.74-8.96.22.22 0 0 0 .09-.16C73 30.08 69.89 16.7 60.18 4.98a.17.17 0 0 0-.08-.08ZM23.73 37.33c-3.5 0-6.39-3.21-6.39-7.16s2.83-7.16 6.39-7.16c3.59 0 6.44 3.24 6.39 7.16 0 3.95-2.84 7.16-6.39 7.16Zm23.62 0c-3.5 0-6.38-3.21-6.38-7.16s2.83-7.16 6.38-7.16c3.6 0 6.45 3.24 6.4 7.16 0 3.95-2.8 7.16-6.4 7.16Z"/></svg>
+      Post to Discord
+    </button>
     <button class="pl-btn pl-btn-danger pl-btn-sm" onclick="plClearHistory()">Clear History</button>
   </div>
 
@@ -774,6 +781,50 @@ function plCopyChat() {
     const orig = btn.innerHTML; btn.innerHTML = '✅ Copied!';
     setTimeout(() => btn.innerHTML = orig, 2000);
   }).catch(() => { alert('Copy failed:\n\n' + text); });
+}
+
+/* ── Post to Discord ─────────────────────────────────────── */
+async function plPostDiscord() {
+  const conductors = PL_DAYS.map(d => document.getElementById(`plC${d}`)?.value || '');
+  const vips       = PL_DAYS.map(d => document.getElementById(`plV${d}`)?.value || '');
+  const showVip    = document.getElementById('plVip').checked;
+  const time       = document.getElementById('plTime').value;
+  const wkLabel    = plGenWeeks.length > 1 ? `Week ${plCurWeek + 1} of ${plGenWeeks.length}` : null;
+
+  const schedule = PL_DLONG.map((day, i) => ({
+    day,
+    conductor: conductors[i] || '',
+    ...(showVip && vips[i] ? { vip: vips[i] } : {})
+  }));
+
+  const btn = document.getElementById('plDiscordBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Posting…';
+
+  try {
+    const res = await fetch(`/api/discord?token=${encodeURIComponent(adminToken)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schedule, boardingTime: time, weekLabel: wkLabel })
+    });
+    if (res.status === 503) {
+      alert('Discord webhook not configured.\n\nAdd DISCORD_WEBHOOK_URL as a Cloudflare Pages secret in the dashboard (Settings → Environment variables).');
+      return;
+    }
+    if (!res.ok) {
+      const err = await res.text();
+      alert(`Failed to post: ${err}`);
+      return;
+    }
+    btn.innerHTML = '✅ Posted!';
+    setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2500);
+    return;
+  } catch (e) {
+    alert('Network error: ' + e.message);
+  }
+  btn.innerHTML = orig;
+  btn.disabled = false;
 }
 
 /* ── Collapse ────────────────────────────────────────────── */

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RIP Icon Browser — Last War</title>
+<script src="images/RIP/icon-index.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #1a1d27;
+    --border: #2a2d3a;
+    --fg: #e2e8f0;
+    --muted: #64748b;
+    --accent: #7c3aed;
+    --accent-hover: #6d28d9;
+    --green: #34d399;
+    --red: #f87171;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); min-height: 100vh; }
+
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 1rem; font-weight: 700; white-space: nowrap; }
+  header .sub { font-size: .72rem; color: var(--muted); }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  input[type=text], select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: .8rem;
+    font-family: var(--font);
+    outline: none;
+  }
+  input[type=text] { flex: 1; min-width: 180px; }
+  input[type=text]:focus, select:focus { border-color: var(--accent); }
+  select { min-width: 160px; max-width: 280px; }
+
+  .stats { font-size: .7rem; color: var(--muted); white-space: nowrap; margin-left: auto; }
+
+  .size-row {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .size-row label { font-size: .72rem; color: var(--muted); }
+  input[type=range] { width: 80px; accent-color: var(--accent); }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--thumb-size, 72px), 1fr));
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .icon-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px 4px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    overflow: hidden;
+    user-select: none;
+  }
+  .icon-card:hover { border-color: var(--accent); background: #1e2133; }
+  .icon-card.copied { border-color: var(--green); }
+  .icon-card img {
+    width: var(--thumb-size, 72px);
+    height: var(--thumb-size, 72px);
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+  .icon-card .name {
+    font-size: .55rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-align: center;
+    word-break: break-all;
+    line-height: 1.3;
+    max-width: 100%;
+  }
+  .icon-card .copied-lbl {
+    display: none;
+    font-size: .6rem;
+    color: var(--green);
+    margin-top: 2px;
+  }
+  .icon-card.copied .copied-lbl { display: block; }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .pagination button {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 5px;
+    padding: 4px 12px;
+    font-size: .78rem;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+  .pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .pagination button:disabled { opacity: .35; cursor: default; }
+  .pagination .page-info { font-size: .78rem; color: var(--muted); }
+  .pagination input[type=number] {
+    width: 54px; text-align: center; background: var(--bg);
+    border: 1px solid var(--border); color: var(--fg);
+    border-radius: 5px; padding: 4px 6px; font-size: .78rem;
+  }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #1e2133; border: 1px solid var(--green);
+    color: var(--green); font-size: .8rem; padding: 7px 18px;
+    border-radius: 8px; pointer-events: none;
+    opacity: 0; transition: opacity .2s;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: .85rem; }
+
+  /* Context menu */
+  #ctx-menu {
+    position: fixed;
+    z-index: 1000;
+    background: #1e2133;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.6);
+    min-width: 260px;
+    padding: 6px 0;
+    display: none;
+    font-size: .78rem;
+  }
+  #ctx-menu.visible { display: block; }
+  .ctx-path {
+    padding: 6px 12px 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: .65rem;
+    font-family: 'Consolas', monospace;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  .ctx-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 12px;
+    background: none;
+    border: none;
+    color: var(--fg);
+    font-size: .78rem;
+    font-family: var(--font);
+    cursor: pointer;
+    text-align: left;
+  }
+  .ctx-btn:hover { background: rgba(124,58,237,.18); color: #a78bfa; }
+  .ctx-btn .ctx-icon { width: 14px; text-align: center; flex-shrink: 0; }
+  .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
+  .ctx-note {
+    padding: 5px 12px;
+    font-size: .62rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Copy-to modal */
+  #copy-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 1100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #copy-modal-overlay.visible { display: flex; }
+  #copy-modal {
+    background: #1e2133;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    width: 420px;
+    max-width: 95vw;
+    box-shadow: 0 16px 48px rgba(0,0,0,.7);
+  }
+  #copy-modal h2 { font-size: .9rem; margin-bottom: 14px; }
+  .cm-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .cm-preview img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+  .cm-preview-src { font-size: .6rem; color: var(--muted); font-family: 'Consolas', monospace; word-break: break-all; line-height: 1.4; }
+  .cm-field { margin-bottom: 12px; }
+  .cm-field label { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 4px; }
+  .cm-field select, .cm-field input[type=text] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: .82rem;
+    font-family: var(--font);
+    outline: none;
+  }
+  .cm-field select:focus, .cm-field input[type=text]:focus { border-color: var(--accent); }
+  .cm-dest-preview {
+    margin-top: 4px;
+    font-size: .6rem;
+    color: var(--muted);
+    font-family: 'Consolas', monospace;
+  }
+  .cm-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .cm-btn {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: .8rem;
+    font-family: var(--font);
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .cm-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .cm-btn-primary:hover { background: var(--accent-hover); }
+  .cm-btn-secondary { background: var(--panel); color: var(--fg); }
+  .cm-btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .cm-status { font-size: .72rem; margin-top: 8px; min-height: 1.2em; }
+  .cm-status.ok { color: var(--green); }
+  .cm-status.err { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>RIP Icon Browser</h1>
+    <div class="sub" id="totalLabel">Loading…</div>
+  </div>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search filename…" autofocus>
+    <select id="folderFilter">
+      <option value="">All folders</option>
+    </select>
+    <div class="size-row">
+      <label>Size</label>
+      <input type="range" id="thumbSize" min="40" max="160" value="72" step="8">
+      <label id="sizeLabel">72px</label>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div id="grid"></div>
+<div class="pagination" id="pagination"></div>
+<div class="toast" id="toast"></div>
+
+<div id="ctx-menu">
+  <div class="ctx-path" id="ctx-path-label"></div>
+  <button class="ctx-btn" id="ctx-copy-web"><span class="ctx-icon">📋</span>Copy web path</button>
+  <button class="ctx-btn" id="ctx-copy-win"><span class="ctx-icon">📂</span>Copy Windows path</button>
+  <button class="ctx-btn" id="ctx-copy-name"><span class="ctx-icon">🏷️</span>Copy filename</button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-btn" id="ctx-save-as"><span class="ctx-icon">💾</span>Copy to images/ …</button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-btn" id="ctx-open-folder"><span class="ctx-icon">🗂️</span>Open containing folder</button>
+  <div class="ctx-note" id="ctx-explorer-hint"></div>
+</div>
+
+<!-- Copy-to modal -->
+<div id="copy-modal-overlay">
+  <div id="copy-modal">
+    <h2>Copy icon to images/</h2>
+    <div class="cm-preview">
+      <img id="cm-thumb" src="" alt="">
+      <div class="cm-preview-src" id="cm-src-label"></div>
+    </div>
+    <div class="cm-field">
+      <label>Destination subfolder</label>
+      <select id="cm-subfolder">
+        <option value="">images/ (root)</option>
+        <option value="allianceduel">allianceduel/</option>
+        <option value="drone">drone/</option>
+        <option value="gear">gear/</option>
+        <option value="research">research/</option>
+        <option value="resources">resources/</option>
+        <option value="troops">troops/</option>
+        <option value="ui">ui/</option>
+      </select>
+    </div>
+    <div class="cm-field">
+      <label>Save as filename</label>
+      <input type="text" id="cm-filename" placeholder="filename.png">
+      <div class="cm-dest-preview" id="cm-dest-preview"></div>
+    </div>
+    <div class="cm-status" id="cm-status"></div>
+    <div class="cm-actions">
+      <button class="cm-btn cm-btn-secondary" id="cm-cancel">Cancel</button>
+      <button class="cm-btn cm-btn-primary" id="cm-save">Save file…</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const PER_PAGE = 150;
+  let filtered = [];
+  let page = 0;
+
+  // Derive the absolute Windows root from the current page URL.
+  // When opened as file:///C:/Users/.../CommandPostWebsite/icon-browser.html
+  // we strip the filename to get the base directory.
+  function getWinBase() {
+    const href = location.href;
+    if (!href.startsWith('file:///')) return null;
+    // Remove 'file:///' prefix and the filename, convert / → \
+    const raw = decodeURIComponent(href.replace('file:///', '').replace(/\/[^/]+$/, ''));
+    return raw.replace(/\//g, '\\');
+  }
+
+  function toWinPath(relPath) {
+    const base = getWinBase();
+    if (!base) return relPath;
+    return base + '\\' + relPath.replace(/\//g, '\\');
+  }
+
+  // ---- Context menu ----
+  const ctxMenu   = document.getElementById('ctx-menu');
+  const ctxLabel  = document.getElementById('ctx-path-label');
+  const ctxHint   = document.getElementById('ctx-explorer-hint');
+  let ctxPath = '';
+
+  function showCtx(e, relPath) {
+    e.preventDefault();
+    ctxPath = relPath;
+    const winPath = toWinPath(relPath);
+    const winFolder = winPath.substring(0, winPath.lastIndexOf('\\'));
+    const folderUrl  = 'file:///' + winFolder.replace(/\\/g, '/');
+
+    ctxLabel.textContent = winPath || relPath;
+
+    // "Open containing folder" — file:// link to the parent folder
+    const openBtn = document.getElementById('ctx-open-folder');
+    openBtn.onclick = () => {
+      // Try opening the folder directly via file:// href in a new tab
+      window.open(folderUrl, '_blank');
+      hideCtx();
+    };
+
+    document.getElementById('ctx-save-as').onclick = () => {
+      openCopyModal(relPath);
+      hideCtx();
+    };
+
+    // Hint: also show the explorer /select command
+    if (winPath) {
+      ctxHint.textContent = 'Or run: explorer /select,"' + winPath + '"';
+    } else {
+      ctxHint.textContent = 'Open icon-browser.html as file:// for full Windows paths.';
+    }
+
+    // Position
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mw = 270, mh = 200;
+    let x = e.clientX, y = e.clientY;
+    if (x + mw > vw) x = vw - mw - 4;
+    if (y + mh > vh) y = vh - mh - 4;
+    ctxMenu.style.left = x + 'px';
+    ctxMenu.style.top  = y + 'px';
+    ctxMenu.classList.add('visible');
+  }
+
+  function hideCtx() { ctxMenu.classList.remove('visible'); }
+
+  document.addEventListener('click', hideCtx);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideCtx(); });
+
+  document.getElementById('ctx-copy-web').onclick = () => {
+    copyText(ctxPath);
+    showToast('Copied web path: ' + ctxPath);
+    hideCtx();
+  };
+  document.getElementById('ctx-copy-win').onclick = () => {
+    const wp = toWinPath(ctxPath);
+    copyText(wp || ctxPath);
+    showToast('Copied Windows path');
+    hideCtx();
+  };
+  document.getElementById('ctx-copy-name').onclick = () => {
+    const fn = ctxPath.split('/').pop();
+    copyText(fn);
+    showToast('Copied: ' + fn);
+    hideCtx();
+  };
+
+  function copyText(t) {
+    navigator.clipboard.writeText(t).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    });
+  }
+
+  // Thumb size
+  const thumbInput = document.getElementById('thumbSize');
+  const sizeLabel  = document.getElementById('sizeLabel');
+  function applyThumbSize(v) {
+    document.documentElement.style.setProperty('--thumb-size', v + 'px');
+    sizeLabel.textContent = v + 'px';
+  }
+  thumbInput.addEventListener('input', () => { applyThumbSize(+thumbInput.value); });
+  applyThumbSize(72);
+
+  // Populate folder dropdown
+  const folderSel = document.getElementById('folderFilter');
+  if (window.ICON_FOLDERS) {
+    ICON_FOLDERS.forEach(f => {
+      const o = document.createElement('option');
+      o.value = f; o.textContent = f;
+      folderSel.appendChild(o);
+    });
+  }
+
+  const totalLabel = document.getElementById('totalLabel');
+  if (window.ICON_PATHS) {
+    totalLabel.textContent = ICON_PATHS.length.toLocaleString() + ' icons indexed';
+  }
+
+  function getFilename(p) {
+    return p.split('/').pop();
+  }
+
+  function filter() {
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const folder = folderSel.value;
+    filtered = (window.ICON_PATHS || []).filter(p => {
+      if (folder && !p.includes(folder)) return false;
+      if (q) {
+        // Match against filename or full path
+        const fn = getFilename(p).toLowerCase();
+        const fp = p.toLowerCase();
+        return fn.includes(q) || fp.includes(q);
+      }
+      return true;
+    });
+    page = 0;
+    render();
+  }
+
+  function render() {
+    const grid = document.getElementById('grid');
+    const stats = document.getElementById('stats');
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    if (page >= totalPages) page = totalPages - 1;
+
+    stats.textContent = total.toLocaleString() + ' results';
+
+    const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+
+    if (!slice.length) {
+      grid.innerHTML = '<div class="empty">No icons match your search.</div>';
+      renderPagination(0, 0);
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    slice.forEach(path => {
+      const card = document.createElement('div');
+      card.className = 'icon-card';
+      card.title = path;
+
+      const img = document.createElement('img');
+      img.src = path;
+      img.loading = 'lazy';
+      img.alt = '';
+      img.onerror = () => { img.style.opacity = '.2'; };
+
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = getFilename(path).replace('.png','');
+
+      const copied = document.createElement('div');
+      copied.className = 'copied-lbl';
+      copied.textContent = '✓ Copied!';
+
+      card.appendChild(img);
+      card.appendChild(name);
+      card.appendChild(copied);
+
+      card.addEventListener('click', () => {
+        copyText(path);
+        card.classList.add('copied');
+        showToast('Copied: ' + path);
+        setTimeout(() => card.classList.remove('copied'), 1500);
+      });
+
+      card.addEventListener('contextmenu', e => showCtx(e, path));
+
+      frag.appendChild(card);
+    });
+
+    grid.innerHTML = '';
+    grid.appendChild(frag);
+
+    renderPagination(page, totalPages);
+    window.scrollTo(0,0);
+  }
+
+  function renderPagination(cur, total) {
+    const el = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+    el.innerHTML = `
+      <button id="pgFirst" ${cur===0?'disabled':''} onclick="goPage(0)">«</button>
+      <button id="pgPrev"  ${cur===0?'disabled':''} onclick="goPage(${cur-1})">‹ Prev</button>
+      <span class="page-info">Page <input type="number" id="pgInput" value="${cur+1}" min="1" max="${total}" onchange="goPage(+this.value-1)"> of ${total}</span>
+      <button id="pgNext"  ${cur>=total-1?'disabled':''} onclick="goPage(${cur+1})">Next ›</button>
+      <button id="pgLast"  ${cur>=total-1?'disabled':''} onclick="goPage(${total-1})">»</button>
+    `;
+  }
+
+  window.goPage = function(n) {
+    const total = Math.ceil(filtered.length / PER_PAGE);
+    page = Math.max(0, Math.min(total-1, n));
+    render();
+  };
+
+  let searchTimer;
+  document.getElementById('search').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(filter, 150);
+  });
+  folderSel.addEventListener('change', filter);
+
+  // Toast
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ---- Copy-to modal ----
+  const modalOverlay = document.getElementById('copy-modal-overlay');
+  const cmSubfolder  = document.getElementById('cm-subfolder');
+  const cmFilename   = document.getElementById('cm-filename');
+  const cmDestPrev   = document.getElementById('cm-dest-preview');
+  const cmStatus     = document.getElementById('cm-status');
+  let cmSourcePath   = '';
+
+  function updateDestPreview() {
+    const sub  = cmSubfolder.value;
+    const name = cmFilename.value.trim() || 'filename.png';
+    const dest = 'images/' + (sub ? sub + '/' : '') + name;
+    cmDestPrev.textContent = '→ ' + dest;
+  }
+
+  cmSubfolder.addEventListener('change', updateDestPreview);
+  cmFilename.addEventListener('input', updateDestPreview);
+
+  function openCopyModal(relPath) {
+    cmSourcePath = relPath;
+    const origName = relPath.split('/').pop();
+    cmFilename.value = origName;
+    document.getElementById('cm-thumb').src = relPath;
+    document.getElementById('cm-src-label').textContent = relPath;
+    cmStatus.textContent = '';
+    cmStatus.className = 'cm-status';
+    updateDestPreview();
+    modalOverlay.classList.add('visible');
+    cmFilename.focus();
+    cmFilename.select();
+  }
+
+  function closeCopyModal() {
+    modalOverlay.classList.remove('visible');
+  }
+
+  document.getElementById('cm-cancel').onclick = closeCopyModal;
+  modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeCopyModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCopyModal(); });
+
+  document.getElementById('cm-save').onclick = async () => {
+    const name = cmFilename.value.trim();
+    if (!name) { cmStatus.textContent = 'Enter a filename.'; cmStatus.className = 'cm-status err'; return; }
+    const safeName = name.endsWith('.png') ? name : name + '.png';
+    const sub = cmSubfolder.value;
+    const destHint = 'images/' + (sub ? sub + '/' : '') + safeName;
+
+    cmStatus.textContent = '';
+    cmStatus.className = 'cm-status';
+
+    // Fetch the source image as a blob
+    let blob;
+    try {
+      const resp = await fetch(cmSourcePath);
+      if (!resp.ok) throw new Error('fetch failed');
+      blob = await resp.blob();
+    } catch {
+      // Fallback: load via canvas
+      try {
+        blob = await imgToBlob(cmSourcePath);
+      } catch (err) {
+        cmStatus.textContent = 'Could not read source image: ' + err.message;
+        cmStatus.className = 'cm-status err';
+        return;
+      }
+    }
+
+    // Try File System Access API (Save As dialog)
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: safeName,
+          types: [{ description: 'PNG Image', accept: { 'image/png': ['.png'] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        cmStatus.textContent = '✓ Saved! Remember to put it in: ' + destHint;
+        cmStatus.className = 'cm-status ok';
+        showToast('Saved as ' + safeName);
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // user cancelled
+        // Fall through to download fallback
+      }
+    }
+
+    // Fallback: trigger browser download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = safeName;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    cmStatus.textContent = '✓ Downloading as ' + safeName + ' — move it to ' + destHint;
+    cmStatus.className = 'cm-status ok';
+    showToast('Downloaded ' + safeName);
+  };
+
+  function imgToBlob(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/png');
+      };
+      img.onerror = () => reject(new Error('image load failed'));
+      img.src = src;
+    });
+  }
+
+  // Enter key in filename field triggers save
+  cmFilename.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cm-save').click(); });
+
+  // Init
+  filter();
+})();
+</script>
+</body>
+</html>
