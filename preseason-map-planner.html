@@ -998,7 +998,7 @@
         <select class="zp-sel" id="zpAlliance"></select></div>
     <div class="zp-field">
         <div class="zp-lbl">Territory Type</div>
-        <select class="zp-sel" id="zpType"></select></div>
+        <div class="zp-sel" id="zpType" style="padding:6px 8px;background:rgba(255,255,255,.07);border-radius:6px;font-size:.85rem;"></div></div>
     <div class="zp-btns">
         <button class="zp-btn zp-clr" onclick="clearZone()">Clear</button>
         <button class="zp-btn" onclick="closePopup()">Cancel</button>
@@ -1246,7 +1246,7 @@
         "cx": 288.8,
         "cy": 279.8,
         "pts": "285,224 274,231 250,232 237,242 237,251 261,259 264,263 265,289 262,307 276,319 277,336 313,337 332,322 348,321 348,307 302,304 302,247 319,244 319,228",
-        "type": 6
+        "type": 8
     }, {
         "id": 42,
         "cx": 36.5,
@@ -1288,7 +1288,7 @@
         "cx": 380.6,
         "cy": 325.7,
         "pts": "379,272 378,302 374,306 355,307 355,324 334,327 316,341 316,352 358,353 367,360 411,360 424,349 424,330 410,317 412,280 401,273",
-        "type": 6
+        "type": 9
     }, {
         "id": 49,
         "cx": 639.0,
@@ -1526,6 +1526,8 @@
         {id: 5, name: 'Metropolis', color: '#fb923c'},
         {id: 6, name: 'Military Base', color: '#f87171'},
         {id: 7, name: 'Capitol', color: '#f0c040'},
+        {id: 8, name: 'Casino', color: '#c084fc'},
+        {id: 9, name: 'Campus', color: '#38bdf8'},
     ];
 
     const SK = 'psmap_v3';
@@ -1743,7 +1745,7 @@
         // Gather targets: all zones except Capitol (type 7), excluding self + NAP
         const targets = [];
         TERR_DATA.forEach(t => {
-            const effectiveType = (p.zones[t.id] && p.zones[t.id].type) || t.type || 1;
+            const effectiveType = t.type || 1;
             if (effectiveType === 7) return; // Capitol is the goal, not a target
             const z = p.zones[t.id];
             const assignedId = z && z.allianceId ? z.allianceId : null;
@@ -2011,8 +2013,7 @@
         TERR_DATA.forEach(t => {
             const z = p && p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
-            // Use explicitly saved type first, then fall back to auto-detected type from TERR_DATA
-            const effectiveType = (z && z.type) || t.type || null;
+            const effectiveType = t.type || null;
             const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             const color = a ? a.color : (zt ? zt.color : null);
             const faded = (filterType !== null && effectiveType !== filterType) ||
@@ -2052,7 +2053,7 @@
         TERR_DATA.forEach(t => {
             const z = p && p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
-            const effectiveType = (z && z.type) || t.type || null;
+            const effectiveType = t.type || null;
             const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             const isMatch = !(
                 (filterType !== null && effectiveType !== filterType) ||
@@ -2089,7 +2090,7 @@
         TERR_DATA.forEach(t => {
             const z = p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
-            const effectiveType = (z && z.type) || t.type || null;
+            const effectiveType = t.type || null;
             const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             // Convert SVG centroid → screen coords (accounts for pan + zoom)
             const sx = mpX + t.cx * ratio * mpScale;
@@ -2148,7 +2149,7 @@
         editId = tid;
         const z = p.zones[tid] || {};
         const td = TERR_DATA.find(x => x.id === tid);
-        const effectiveType = z.type || (td && td.type) || null;
+        const effectiveType = (td && td.type) || null;
         const color = zoneColor(tid);
         const sw = document.getElementById('zpSw');
         sw.style.background = color || '';
@@ -2157,9 +2158,8 @@
         document.getElementById('zpAlliance').innerHTML =
             '<option value="">\u2014 Unassigned \u2014</option>' +
             p.alliances.map(a => `<option value="${a.id}"${a.id === z.allianceId ? ' selected' : ''}>${a.tag} \u2013 ${a.name}</option>`).join('');
-        document.getElementById('zpType').innerHTML =
-            '<option value="">\u2014 Unknown \u2014</option>' +
-            ZONE_TYPES.map(tp => `<option value="${tp.id}"${tp.id === effectiveType ? ' selected' : ''}>${tp.id} \u2013 ${tp.name}</option>`).join('');
+        const ztName = zt ? zt.name : '— Unknown —';
+        document.getElementById('zpType').textContent = ztName;
         const pop = document.getElementById('zonePopup');
         const pw = 223, ph = 200;
         let l = mx + 12, top = my + 12;
@@ -2180,10 +2180,8 @@
         const p = getProfile();
         if (!p) return;
         const aid = document.getElementById('zpAlliance').value;
-        const tv = document.getElementById('zpType').value;
-        const type = tv ? parseInt(tv) : null;
-        if (!aid && !type) delete p.zones[editId];
-        else p.zones[editId] = {allianceId: aid, type};
+        if (!aid) delete p.zones[editId];
+        else p.zones[editId] = {allianceId: aid};
         closePopup();
         saveAll();
         renderAll();
