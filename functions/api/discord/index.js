@@ -46,6 +46,19 @@ function formatDisplayDate(dateStr) {
   });
 }
 
+function addDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+}
+
+function formatShortDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC'
+  });
+}
+
 async function postToDiscord(webhookUrl, payload) {
   const res = await fetch(webhookUrl, {
     method: 'POST',
@@ -88,15 +101,28 @@ export async function onRequestPost({ request, env }) {
     const conductor = conductorForDate(dateStr, roster);
     const display   = formatDisplayDate(dateStr);
 
+    // Build 7-day look-ahead (today + next 6)
+    const weekFields = [];
+    for (let i = 0; i < 7; i++) {
+      const ds = i === 0 ? dateStr : addDays(dateStr, i);
+      const name = conductorForDate(ds, roster);
+      weekFields.push({
+        name: formatShortDate(ds),
+        value: i === 0 ? `**${name}** ← today` : `**${name}**`,
+        inline: true,
+      });
+    }
+
     const embed = {
       title: '🚂 Today\'s Train Conductor',
       description: `**${conductor}** is conducting the train today.\n\nAll aboard — see you at boarding time!`,
       color: 0xe8720c,
       fields: [
-        { name: 'Date', value: display, inline: true },
-        { name: 'Conductor', value: `**${conductor}**`, inline: true },
+        { name: 'Date', value: display, inline: false },
+        { name: '\u200b', value: '**— Upcoming conductors —**', inline: false },
+        ...weekFields,
       ],
-      footer: { text: 'commandpost.guide · automated reminder' },
+      footer: { text: 'lasthorizoncommandpost.org · automated reminder' },
       timestamp: new Date().toISOString(),
     };
 
@@ -134,7 +160,7 @@ export async function onRequestPost({ request, env }) {
     title,
     color: 0xe8720c,
     fields,
-    footer: { text: `⏰ Boarding: ${boardingTime || '??:??'} · commandpost.guide` },
+    footer: { text: `⏰ Boarding: ${boardingTime || '??:??'} · lasthorizoncommandpost.org` },
     timestamp: new Date().toISOString(),
   };
 

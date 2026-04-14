@@ -2,8 +2,8 @@ name: Daily Train Conductor Announcement
 
 on:
   schedule:
-    # 02:00 UTC — game reset time
-    - cron: '0 2 * * *'
+    # 01:00 UTC — right at game reset, so the announcement lands immediately
+    - cron: '0 1 * * *'
   # Allow manual trigger from the Actions tab for testing
   workflow_dispatch:
 

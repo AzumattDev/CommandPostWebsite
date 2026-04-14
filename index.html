@@ -172,7 +172,7 @@ body::before {
     <h1><span class="accent">The Command Post</span><br><span class="dim">Last War: Survival</span></h1>
     <p class="hero-sub">Last Horizon's strategy hub. Interactive guides and planning tools — no fluff, no ads, no paywalled info.</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="num">20</div><div class="lbl">Guides & Tools</div></div>
+      <div class="hero-stat"><div class="num" id="statGuideCount">—</div><div class="lbl">Guides & Tools</div></div>
       <div class="hero-stat"><div class="num">S1–S5</div><div class="lbl">Seasons covered</div></div>
       <div class="hero-stat"><div class="num">100%</div><div class="lbl">Interactive</div></div>
     </div>
@@ -432,5 +432,9 @@ body::before {
   </footer>
 </div>
 
+<script>
+  document.getElementById('statGuideCount').textContent =
+    document.querySelectorAll('.cp-dd-item').length;
+</script>
 </body>
 </html>

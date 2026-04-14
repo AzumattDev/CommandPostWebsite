@@ -52,15 +52,32 @@
   }
   input[type=text] { flex: 1; min-width: 180px; }
   input[type=text]:focus, select:focus { border-color: var(--accent); }
-  select { min-width: 160px; max-width: 280px; }
+  select { min-width: 120px; }
 
   .stats { font-size: .7rem; color: var(--muted); white-space: nowrap; margin-left: auto; }
 
-  .size-row {
-    display: flex; gap: 6px; align-items: center;
-  }
+  .size-row { display: flex; gap: 6px; align-items: center; }
   .size-row label { font-size: .72rem; color: var(--muted); }
   input[type=range] { width: 80px; accent-color: var(--accent); }
+
+  .folder-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: .78rem;
+    font-family: var(--font);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .folder-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .folder-btn.set { border-color: var(--green); color: var(--green); }
+  .folder-btn .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+  }
 
   #grid {
     display: grid;
@@ -81,14 +98,17 @@
     transition: border-color .15s, background .15s;
     overflow: hidden;
     user-select: none;
+    outline: none;
   }
   .icon-card:hover { border-color: var(--accent); background: #1e2133; }
-  .icon-card.copied { border-color: var(--green); }
+  .icon-card.kb-focus,
+  .icon-card:focus-visible { border-color: var(--accent); background: #1e2133; box-shadow: 0 0 0 2px rgba(124,58,237,.4); }
   .icon-card img {
     width: var(--thumb-size, 72px);
     height: var(--thumb-size, 72px);
     object-fit: contain;
     image-rendering: pixelated;
+    pointer-events: none;
   }
   .icon-card .name {
     font-size: .55rem;
@@ -99,32 +119,15 @@
     line-height: 1.3;
     max-width: 100%;
   }
-  .icon-card .copied-lbl {
-    display: none;
-    font-size: .6rem;
-    color: var(--green);
-    margin-top: 2px;
-  }
-  .icon-card.copied .copied-lbl { display: block; }
 
   .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px; border-top: 1px solid var(--border); flex-wrap: wrap;
   }
   .pagination button {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--fg);
-    border-radius: 5px;
-    padding: 4px 12px;
-    font-size: .78rem;
-    cursor: pointer;
-    font-family: var(--font);
+    background: var(--panel); border: 1px solid var(--border);
+    color: var(--fg); border-radius: 5px; padding: 4px 12px;
+    font-size: .78rem; cursor: pointer; font-family: var(--font);
   }
   .pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
   .pagination button:disabled { opacity: .35; cursor: default; }
@@ -140,8 +143,7 @@
     background: #1e2133; border: 1px solid var(--green);
     color: var(--green); font-size: .8rem; padding: 7px 18px;
     border-radius: 8px; pointer-events: none;
-    opacity: 0; transition: opacity .2s;
-    z-index: 999;
+    opacity: 0; transition: opacity .2s; z-index: 9999;
   }
   .toast.show { opacity: 1; }
 
@@ -149,112 +151,62 @@
 
   /* Context menu */
   #ctx-menu {
-    position: fixed;
-    z-index: 1000;
-    background: #1e2133;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.6);
-    min-width: 260px;
-    padding: 6px 0;
-    display: none;
-    font-size: .78rem;
+    position: fixed; z-index: 2000;
+    background: #1e2133; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.6);
+    min-width: 270px; padding: 6px 0; display: none; font-size: .78rem;
   }
   #ctx-menu.visible { display: block; }
   .ctx-path {
-    padding: 6px 12px 8px;
-    border-bottom: 1px solid var(--border);
-    color: var(--muted);
-    font-size: .65rem;
-    font-family: 'Consolas', monospace;
-    word-break: break-all;
-    line-height: 1.4;
+    padding: 6px 12px 8px; border-bottom: 1px solid var(--border);
+    color: var(--muted); font-size: .65rem;
+    font-family: 'Consolas', monospace; word-break: break-all; line-height: 1.4;
   }
   .ctx-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 7px 12px;
-    background: none;
-    border: none;
-    color: var(--fg);
-    font-size: .78rem;
-    font-family: var(--font);
-    cursor: pointer;
-    text-align: left;
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 7px 12px; background: none; border: none;
+    color: var(--fg); font-size: .78rem; font-family: var(--font);
+    cursor: pointer; text-align: left;
   }
   .ctx-btn:hover { background: rgba(124,58,237,.18); color: #a78bfa; }
-  .ctx-btn .ctx-icon { width: 14px; text-align: center; flex-shrink: 0; }
+  .ctx-btn .ctx-icon { width: 16px; text-align: center; flex-shrink: 0; }
   .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
   .ctx-note {
-    padding: 5px 12px;
-    font-size: .62rem;
-    color: var(--muted);
-    line-height: 1.4;
+    padding: 5px 12px; font-size: .62rem;
+    color: var(--muted); line-height: 1.4; font-family: 'Consolas', monospace;
+    word-break: break-all;
   }
 
   /* Copy-to modal */
   #copy-modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.6);
-    z-index: 1100;
-    display: none;
-    align-items: center;
-    justify-content: center;
+    position: fixed; inset: 0; background: rgba(0,0,0,.65);
+    z-index: 1100; display: none; align-items: center; justify-content: center;
   }
   #copy-modal-overlay.visible { display: flex; }
   #copy-modal {
-    background: #1e2133;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    width: 420px;
-    max-width: 95vw;
+    background: #1e2133; border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; width: 420px; max-width: 95vw;
     box-shadow: 0 16px 48px rgba(0,0,0,.7);
   }
   #copy-modal h2 { font-size: .9rem; margin-bottom: 14px; }
   .cm-preview {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-    padding: 8px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding: 8px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 6px;
   }
   .cm-preview img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
   .cm-preview-src { font-size: .6rem; color: var(--muted); font-family: 'Consolas', monospace; word-break: break-all; line-height: 1.4; }
   .cm-field { margin-bottom: 12px; }
   .cm-field label { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 4px; }
   .cm-field select, .cm-field input[type=text] {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--fg);
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: .82rem;
-    font-family: var(--font);
-    outline: none;
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    color: var(--fg); border-radius: 6px; padding: 6px 10px;
+    font-size: .82rem; font-family: var(--font); outline: none;
   }
   .cm-field select:focus, .cm-field input[type=text]:focus { border-color: var(--accent); }
-  .cm-dest-preview {
-    margin-top: 4px;
-    font-size: .6rem;
-    color: var(--muted);
-    font-family: 'Consolas', monospace;
-  }
+  .cm-dest-preview { margin-top: 4px; font-size: .6rem; color: var(--muted); font-family: 'Consolas', monospace; }
   .cm-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-  .cm-btn {
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: .8rem;
-    font-family: var(--font);
-    cursor: pointer;
-    border: 1px solid var(--border);
-  }
+  .cm-btn { padding: 6px 16px; border-radius: 6px; font-size: .8rem; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); }
   .cm-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .cm-btn-primary:hover { background: var(--accent-hover); }
   .cm-btn-secondary { background: var(--panel); color: var(--fg); }
@@ -262,6 +214,56 @@
   .cm-status { font-size: .72rem; margin-top: 8px; min-height: 1.2em; }
   .cm-status.ok { color: var(--green); }
   .cm-status.err { color: var(--red); }
+
+  /* Preview modal */
+  #preview-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.82);
+    z-index: 1200; display: none; align-items: center; justify-content: center;
+  }
+  #preview-overlay.visible { display: flex; }
+  #preview-modal {
+    background: #1e2133; border: 1px solid var(--border);
+    border-radius: 12px; max-width: 520px; width: 95vw;
+    max-height: 92vh;
+    box-shadow: 0 24px 64px rgba(0,0,0,.8);
+    display: flex; flex-direction: column; overflow: hidden; position: relative;
+  }
+  #preview-close-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(0,0,0,.5); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 5px; width: 26px; height: 26px;
+    cursor: pointer; font-size: .75rem; display: flex;
+    align-items: center; justify-content: center; z-index: 1; line-height: 1;
+  }
+  #preview-close-btn:hover { color: var(--fg); border-color: var(--accent); }
+  #preview-img-wrap {
+    background: #13151f; display: flex; align-items: center;
+    justify-content: center; padding: 24px;
+    flex: 1; min-height: 0; overflow: hidden;
+  }
+  #preview-img {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .preview-info { padding: 14px 16px 6px; }
+  .preview-name { font-size: .95rem; font-weight: 600; margin-bottom: 4px; word-break: break-all; }
+  .preview-path-text {
+    font-size: .62rem; color: var(--muted);
+    font-family: 'Consolas', monospace; word-break: break-all; line-height: 1.5;
+  }
+  .preview-btns {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 12px 16px 16px; border-top: 1px solid var(--border); margin-top: 10px;
+  }
+  .pv-btn {
+    padding: 6px 11px; border-radius: 6px; font-size: .76rem;
+    font-family: var(--font); cursor: pointer; border: 1px solid var(--border);
+    background: var(--panel); color: var(--fg); display: flex; align-items: center; gap: 5px;
+  }
+  .pv-btn:hover { border-color: var(--accent); color: #a78bfa; }
+  .pv-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; margin-left: auto; }
+  .pv-btn.primary:hover { background: var(--accent-hover); }
 </style>
 </head>
 <body>
@@ -276,11 +278,17 @@
     <select id="folderFilter">
       <option value="">All folders</option>
     </select>
+    <select id="sortBy">
+      <option value="name-asc">Name A→Z</option>
+      <option value="name-desc">Name Z→A</option>
+      <option value="folder-asc">Folder A→Z</option>
+    </select>
     <div class="size-row">
       <label>Size</label>
       <input type="range" id="thumbSize" min="40" max="160" value="72" step="8">
       <label id="sizeLabel">72px</label>
     </div>
+    <button class="folder-btn" id="setFolderBtn" title="Pick your images/ root for direct saves — no dialog every time">📁 Set images/ folder</button>
   </div>
   <div class="stats" id="stats"></div>
 </header>
@@ -289,22 +297,24 @@
 <div class="pagination" id="pagination"></div>
 <div class="toast" id="toast"></div>
 
+<!-- Context menu -->
 <div id="ctx-menu">
   <div class="ctx-path" id="ctx-path-label"></div>
   <button class="ctx-btn" id="ctx-copy-web"><span class="ctx-icon">📋</span>Copy web path</button>
   <button class="ctx-btn" id="ctx-copy-win"><span class="ctx-icon">📂</span>Copy Windows path</button>
   <button class="ctx-btn" id="ctx-copy-name"><span class="ctx-icon">🏷️</span>Copy filename</button>
+  <button class="ctx-btn" id="ctx-copy-imgtag"><span class="ctx-icon">🖼️</span>Copy &lt;img&gt; tag</button>
   <div class="ctx-sep"></div>
-  <button class="ctx-btn" id="ctx-save-as"><span class="ctx-icon">💾</span>Copy to images/ …</button>
+  <button class="ctx-btn" id="ctx-save-as"><span class="ctx-icon">💾</span>Save to images/ …</button>
   <div class="ctx-sep"></div>
-  <button class="ctx-btn" id="ctx-open-folder"><span class="ctx-icon">🗂️</span>Open containing folder</button>
+  <button class="ctx-btn" id="ctx-open-folder"><span class="ctx-icon">🗂️</span>Copy explorer /select command</button>
   <div class="ctx-note" id="ctx-explorer-hint"></div>
 </div>
 
 <!-- Copy-to modal -->
 <div id="copy-modal-overlay">
   <div id="copy-modal">
-    <h2>Copy icon to images/</h2>
+    <h2>Save icon to images/</h2>
     <div class="cm-preview">
       <img id="cm-thumb" src="" alt="">
       <div class="cm-preview-src" id="cm-src-label"></div>
@@ -335,98 +345,292 @@
   </div>
 </div>
 
+<!-- Preview modal -->
+<div id="preview-overlay">
+  <div id="preview-modal">
+    <button id="preview-close-btn">✕</button>
+    <div id="preview-img-wrap">
+      <img id="preview-img" src="" alt="">
+    </div>
+    <div class="preview-info">
+      <div class="preview-name" id="preview-name"></div>
+      <div class="preview-path-text" id="preview-path-text"></div>
+    </div>
+    <div class="preview-btns">
+      <button class="pv-btn" id="pv-copy-path">📋 Copy path</button>
+      <button class="pv-btn" id="pv-copy-win">📂 Win path</button>
+      <button class="pv-btn" id="pv-copy-imgtag">🖼️ &lt;img&gt; tag</button>
+      <button class="pv-btn primary" id="pv-save">💾 Save to images/…</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   const PER_PAGE = 150;
   let filtered = [];
   let page = 0;
+  let kbFocusIdx = -1;
 
-  // Derive the absolute Windows root from the current page URL.
-  // When opened as file:///C:/Users/.../CommandPostWebsite/icon-browser.html
-  // we strip the filename to get the base directory.
+  // ---- Windows path helpers ----
   function getWinBase() {
     const href = location.href;
     if (!href.startsWith('file:///')) return null;
-    // Remove 'file:///' prefix and the filename, convert / → \
     const raw = decodeURIComponent(href.replace('file:///', '').replace(/\/[^/]+$/, ''));
     return raw.replace(/\//g, '\\');
   }
-
   function toWinPath(relPath) {
     const base = getWinBase();
-    if (!base) return relPath;
+    if (!base) return '';
     return base + '\\' + relPath.replace(/\//g, '\\');
   }
+  function getFilename(p) { return p.split('/').pop(); }
 
-  // ---- Context menu ----
-  const ctxMenu   = document.getElementById('ctx-menu');
-  const ctxLabel  = document.getElementById('ctx-path-label');
-  const ctxHint   = document.getElementById('ctx-explorer-hint');
-  let ctxPath = '';
+  // ---- Thumb size — persisted ----
+  const thumbInput = document.getElementById('thumbSize');
+  const sizeLbl    = document.getElementById('sizeLabel');
+  function applyThumbSize(v) {
+    document.documentElement.style.setProperty('--thumb-size', v + 'px');
+    sizeLbl.textContent = v + 'px';
+  }
+  const savedSize = parseInt(localStorage.getItem('icon-browser-thumb') || '72', 10);
+  thumbInput.value = savedSize;
+  applyThumbSize(savedSize);
+  thumbInput.addEventListener('input', () => {
+    const v = +thumbInput.value;
+    applyThumbSize(v);
+    localStorage.setItem('icon-browser-thumb', v);
+  });
 
-  function showCtx(e, relPath) {
-    e.preventDefault();
-    ctxPath = relPath;
-    const winPath = toWinPath(relPath);
-    const winFolder = winPath.substring(0, winPath.lastIndexOf('\\'));
-    const folderUrl  = 'file:///' + winFolder.replace(/\\/g, '/');
-
-    ctxLabel.textContent = winPath || relPath;
-
-    // "Open containing folder" — file:// link to the parent folder
-    const openBtn = document.getElementById('ctx-open-folder');
-    openBtn.onclick = () => {
-      // Try opening the folder directly via file:// href in a new tab
-      window.open(folderUrl, '_blank');
-      hideCtx();
-    };
-
-    document.getElementById('ctx-save-as').onclick = () => {
-      openCopyModal(relPath);
-      hideCtx();
-    };
-
-    // Hint: also show the explorer /select command
-    if (winPath) {
-      ctxHint.textContent = 'Or run: explorer /select,"' + winPath + '"';
-    } else {
-      ctxHint.textContent = 'Open icon-browser.html as file:// for full Windows paths.';
-    }
-
-    // Position
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const mw = 270, mh = 200;
-    let x = e.clientX, y = e.clientY;
-    if (x + mw > vw) x = vw - mw - 4;
-    if (y + mh > vh) y = vh - mh - 4;
-    ctxMenu.style.left = x + 'px';
-    ctxMenu.style.top  = y + 'px';
-    ctxMenu.classList.add('visible');
+  // ---- IndexedDB for directory handle ----
+  function idbOpen() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('icon-browser-v1', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('kv');
+      req.onsuccess = e => res(e.target.result);
+      req.onerror = () => rej(req.error);
+    });
+  }
+  async function idbGet(key) {
+    try {
+      const db = await idbOpen();
+      return new Promise(res => {
+        const r = db.transaction('kv', 'readonly').objectStore('kv').get(key);
+        r.onsuccess = () => res(r.result || null);
+        r.onerror   = () => res(null);
+      });
+    } catch { return null; }
+  }
+  async function idbSet(key, val) {
+    try {
+      const db = await idbOpen();
+      return new Promise((res, rej) => {
+        const tx = db.transaction('kv', 'readwrite');
+        tx.objectStore('kv').put(val, key);
+        tx.oncomplete = res;
+        tx.onerror = rej;
+      });
+    } catch { }
   }
 
-  function hideCtx() { ctxMenu.classList.remove('visible'); }
+  // ---- Directory handle (direct save) ----
+  let imagesRootHandle = null;
+  const folderBtn = document.getElementById('setFolderBtn');
 
-  document.addEventListener('click', hideCtx);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideCtx(); });
+  function updateFolderBtn() {
+    folderBtn.innerHTML = '';
+    if (imagesRootHandle) {
+      folderBtn.classList.add('set');
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      folderBtn.appendChild(dot);
+      folderBtn.append('\u2002📁 ' + imagesRootHandle.name);
+    } else {
+      folderBtn.classList.remove('set');
+      folderBtn.textContent = '📁 Set images/ folder';
+    }
+  }
 
-  document.getElementById('ctx-copy-web').onclick = () => {
-    copyText(ctxPath);
-    showToast('Copied web path: ' + ctxPath);
-    hideCtx();
-  };
-  document.getElementById('ctx-copy-win').onclick = () => {
-    const wp = toWinPath(ctxPath);
-    copyText(wp || ctxPath);
-    showToast('Copied Windows path');
-    hideCtx();
-  };
-  document.getElementById('ctx-copy-name').onclick = () => {
-    const fn = ctxPath.split('/').pop();
-    copyText(fn);
-    showToast('Copied: ' + fn);
-    hideCtx();
+  async function initFolderHandle() {
+    const h = await idbGet('imagesRoot');
+    if (!h) return;
+    imagesRootHandle = h;
+    updateFolderBtn();
+  }
+  initFolderHandle();
+
+  folderBtn.addEventListener('click', async () => {
+    if (!window.showDirectoryPicker) {
+      showToast('Directory picker requires Chrome or Edge');
+      return;
+    }
+    try {
+      const h = await window.showDirectoryPicker({ mode: 'readwrite' });
+      imagesRootHandle = h;
+      await idbSet('imagesRoot', h);
+      updateFolderBtn();
+      showToast('Folder set: ' + h.name);
+    } catch (e) {
+      if (e.name !== 'AbortError') showToast('Could not open folder picker');
+    }
+  });
+
+  async function ensureFolderPermission() {
+    if (!imagesRootHandle) return false;
+    const opts = { mode: 'readwrite' };
+    if (await imagesRootHandle.queryPermission(opts) === 'granted') return true;
+    return (await imagesRootHandle.requestPermission(opts)) === 'granted';
+  }
+
+  async function writeToImagesFolder(subfolder, filename, blob) {
+    let dir = imagesRootHandle;
+    if (subfolder) dir = await imagesRootHandle.getDirectoryHandle(subfolder, { create: true });
+    const fh = await dir.getFileHandle(filename, { create: true });
+    const w = await fh.createWritable();
+    await w.write(blob); await w.close();
+  }
+
+  // ---- Folder dropdown ----
+  const folderSel = document.getElementById('folderFilter');
+  if (window.ICON_FOLDERS) {
+    ICON_FOLDERS.forEach(f => {
+      const o = document.createElement('option');
+      o.value = f; o.textContent = f;
+      folderSel.appendChild(o);
+    });
+  }
+  const totalLabel = document.getElementById('totalLabel');
+  if (window.ICON_PATHS) {
+    totalLabel.textContent = ICON_PATHS.length.toLocaleString() + ' icons indexed';
+  }
+
+  // ---- Filter + Sort ----
+  function filter() {
+    const q      = document.getElementById('search').value.trim().toLowerCase();
+    const folder = folderSel.value;
+    const sort   = document.getElementById('sortBy').value;
+
+    filtered = (window.ICON_PATHS || []).filter(p => {
+      if (folder && !p.includes(folder)) return false;
+      if (q) {
+        const fn = getFilename(p).toLowerCase();
+        return fn.includes(q) || p.toLowerCase().includes(q);
+      }
+      return true;
+    });
+
+    if (sort === 'name-asc')    filtered.sort((a, b) => getFilename(a).localeCompare(getFilename(b)));
+    else if (sort === 'name-desc') filtered.sort((a, b) => getFilename(b).localeCompare(getFilename(a)));
+    else if (sort === 'folder-asc') filtered.sort((a, b) => a.localeCompare(b));
+
+    page = 0; kbFocusIdx = -1;
+    render();
+  }
+
+  // ---- Render ----
+  function render() {
+    const grid  = document.getElementById('grid');
+    const stats = document.getElementById('stats');
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    if (page >= totalPages) page = totalPages - 1;
+
+    stats.textContent = total.toLocaleString() + ' results';
+
+    const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+    if (!slice.length) {
+      grid.innerHTML = '<div class="empty">No icons match your search.</div>';
+      renderPagination(0, 0); return;
+    }
+
+    const frag = document.createDocumentFragment();
+    slice.forEach((path, i) => {
+      const card = document.createElement('div');
+      card.className = 'icon-card' + (i === kbFocusIdx ? ' kb-focus' : '');
+      card.tabIndex = 0;
+      card.title    = path;
+      card.dataset.idx = i;
+
+      const img = document.createElement('img');
+      img.src = path; img.loading = 'lazy'; img.alt = '';
+      img.onerror = () => { img.style.opacity = '.2'; };
+
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = getFilename(path).replace('.png', '');
+
+      card.appendChild(img);
+      card.appendChild(name);
+
+      card.addEventListener('click',       ()  => openPreview(path));
+      card.addEventListener('contextmenu', e   => showCtx(e, path));
+      card.addEventListener('focus',       ()  => { kbFocusIdx = i; });
+
+      frag.appendChild(card);
+    });
+
+    grid.innerHTML = '';
+    grid.appendChild(frag);
+    renderPagination(page, totalPages);
+    window.scrollTo(0, 0);
+  }
+
+  // ---- Keyboard navigation ----
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+    if (document.getElementById('preview-overlay').classList.contains('visible'))  return;
+    if (document.getElementById('copy-modal-overlay').classList.contains('visible')) return;
+
+    const cards = document.querySelectorAll('.icon-card');
+    if (!cards.length) return;
+
+    const thumbPx = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--thumb-size')) || 72;
+    const cols = Math.max(1, Math.floor(document.getElementById('grid').offsetWidth / (thumbPx + 6)));
+
+    let next = kbFocusIdx < 0 ? -1 : kbFocusIdx;
+
+    if      (e.key === 'ArrowRight') { next = next < 0 ? 0 : Math.min(next + 1, cards.length - 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft')  { next = next < 0 ? 0 : Math.max(next - 1, 0);               e.preventDefault(); }
+    else if (e.key === 'ArrowDown')  { next = next < 0 ? 0 : Math.min(next + cols, cards.length - 1); e.preventDefault(); }
+    else if (e.key === 'ArrowUp')    { next = next < 0 ? 0 : Math.max(next - cols, 0);             e.preventDefault(); }
+    else if (e.key === 'Enter' && kbFocusIdx >= 0) {
+      e.preventDefault();
+      openPreview(filtered[page * PER_PAGE + kbFocusIdx]);
+      return;
+    } else return;
+
+    kbFocusIdx = next;
+    cards.forEach((c, i) => c.classList.toggle('kb-focus', i === kbFocusIdx));
+    cards[kbFocusIdx].focus({ preventScroll: false });
+    cards[kbFocusIdx].scrollIntoView({ block: 'nearest' });
+  });
+
+  function renderPagination(cur, total) {
+    const el = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+    el.innerHTML = `
+      <button ${cur===0?'disabled':''} onclick="goPage(0)">«</button>
+      <button ${cur===0?'disabled':''} onclick="goPage(${cur-1})">‹ Prev</button>
+      <span class="page-info">Page <input type="number" value="${cur+1}" min="1" max="${total}" onchange="goPage(+this.value-1)"> of ${total}</span>
+      <button ${cur>=total-1?'disabled':''} onclick="goPage(${cur+1})">Next ›</button>
+      <button ${cur>=total-1?'disabled':''} onclick="goPage(${total-1})">»</button>
+    `;
+  }
+  window.goPage = function(n) {
+    const total = Math.ceil(filtered.length / PER_PAGE);
+    page = Math.max(0, Math.min(total - 1, n));
+    kbFocusIdx = -1; render();
   };
 
+  let searchTimer;
+  document.getElementById('search').addEventListener('input', () => {
+    clearTimeout(searchTimer); searchTimer = setTimeout(filter, 150);
+  });
+  folderSel.addEventListener('change', filter);
+  document.getElementById('sortBy').addEventListener('change', filter);
+
+  // ---- Copy helpers ----
   function copyText(t) {
     navigator.clipboard.writeText(t).catch(() => {
       const ta = document.createElement('textarea');
@@ -436,146 +640,138 @@
     });
   }
 
-  // Thumb size
-  const thumbInput = document.getElementById('thumbSize');
-  const sizeLabel  = document.getElementById('sizeLabel');
-  function applyThumbSize(v) {
-    document.documentElement.style.setProperty('--thumb-size', v + 'px');
-    sizeLabel.textContent = v + 'px';
-  }
-  thumbInput.addEventListener('input', () => { applyThumbSize(+thumbInput.value); });
-  applyThumbSize(72);
-
-  // Populate folder dropdown
-  const folderSel = document.getElementById('folderFilter');
-  if (window.ICON_FOLDERS) {
-    ICON_FOLDERS.forEach(f => {
-      const o = document.createElement('option');
-      o.value = f; o.textContent = f;
-      folderSel.appendChild(o);
-    });
-  }
-
-  const totalLabel = document.getElementById('totalLabel');
-  if (window.ICON_PATHS) {
-    totalLabel.textContent = ICON_PATHS.length.toLocaleString() + ' icons indexed';
-  }
-
-  function getFilename(p) {
-    return p.split('/').pop();
-  }
-
-  function filter() {
-    const q = document.getElementById('search').value.trim().toLowerCase();
-    const folder = folderSel.value;
-    filtered = (window.ICON_PATHS || []).filter(p => {
-      if (folder && !p.includes(folder)) return false;
-      if (q) {
-        // Match against filename or full path
-        const fn = getFilename(p).toLowerCase();
-        const fp = p.toLowerCase();
-        return fn.includes(q) || fp.includes(q);
-      }
-      return true;
-    });
-    page = 0;
-    render();
-  }
-
-  function render() {
-    const grid = document.getElementById('grid');
-    const stats = document.getElementById('stats');
-    const total = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-    if (page >= totalPages) page = totalPages - 1;
-
-    stats.textContent = total.toLocaleString() + ' results';
-
-    const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
-
-    if (!slice.length) {
-      grid.innerHTML = '<div class="empty">No icons match your search.</div>';
-      renderPagination(0, 0);
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    slice.forEach(path => {
-      const card = document.createElement('div');
-      card.className = 'icon-card';
-      card.title = path;
-
-      const img = document.createElement('img');
-      img.src = path;
-      img.loading = 'lazy';
-      img.alt = '';
-      img.onerror = () => { img.style.opacity = '.2'; };
-
-      const name = document.createElement('div');
-      name.className = 'name';
-      name.textContent = getFilename(path).replace('.png','');
-
-      const copied = document.createElement('div');
-      copied.className = 'copied-lbl';
-      copied.textContent = '✓ Copied!';
-
-      card.appendChild(img);
-      card.appendChild(name);
-      card.appendChild(copied);
-
-      card.addEventListener('click', () => {
-        copyText(path);
-        card.classList.add('copied');
-        showToast('Copied: ' + path);
-        setTimeout(() => card.classList.remove('copied'), 1500);
-      });
-
-      card.addEventListener('contextmenu', e => showCtx(e, path));
-
-      frag.appendChild(card);
-    });
-
-    grid.innerHTML = '';
-    grid.appendChild(frag);
-
-    renderPagination(page, totalPages);
-    window.scrollTo(0,0);
-  }
-
-  function renderPagination(cur, total) {
-    const el = document.getElementById('pagination');
-    if (total <= 1) { el.innerHTML = ''; return; }
-    el.innerHTML = `
-      <button id="pgFirst" ${cur===0?'disabled':''} onclick="goPage(0)">«</button>
-      <button id="pgPrev"  ${cur===0?'disabled':''} onclick="goPage(${cur-1})">‹ Prev</button>
-      <span class="page-info">Page <input type="number" id="pgInput" value="${cur+1}" min="1" max="${total}" onchange="goPage(+this.value-1)"> of ${total}</span>
-      <button id="pgNext"  ${cur>=total-1?'disabled':''} onclick="goPage(${cur+1})">Next ›</button>
-      <button id="pgLast"  ${cur>=total-1?'disabled':''} onclick="goPage(${total-1})">»</button>
-    `;
-  }
-
-  window.goPage = function(n) {
-    const total = Math.ceil(filtered.length / PER_PAGE);
-    page = Math.max(0, Math.min(total-1, n));
-    render();
-  };
-
-  let searchTimer;
-  document.getElementById('search').addEventListener('input', () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(filter, 150);
-  });
-  folderSel.addEventListener('change', filter);
-
-  // Toast
+  // ---- Toast ----
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  // ---- Global Escape handler ----
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    hideCtx(); closePreview(); closeCopyModal();
+  });
+
+  // ---- Context menu ----
+  const ctxMenu  = document.getElementById('ctx-menu');
+  const ctxLabel = document.getElementById('ctx-path-label');
+  const ctxHint  = document.getElementById('ctx-explorer-hint');
+  let ctxPath = '';
+
+  function showCtx(e, relPath) {
+    e.preventDefault();
+    ctxPath = relPath;
+    const winPath = toWinPath(relPath);
+    ctxLabel.textContent = winPath || relPath;
+
+    document.getElementById('ctx-save-as').onclick = () => { openCopyModal(relPath); hideCtx(); };
+
+    // "Open containing folder" → copy the explorer /select command
+    document.getElementById('ctx-open-folder').onclick = () => {
+      if (winPath) {
+        copyText('explorer /select,"' + winPath + '"');
+        showToast('Command copied — paste into Run (Win+R)');
+      } else {
+        showToast('Open as file:// to get Windows paths');
+      }
+      hideCtx();
+    };
+
+    ctxHint.textContent = winPath ? 'explorer /select,"' + winPath + '"' : 'Open as file:// for Windows path support.';
+
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mw = 280, mh = 260;
+    let x = e.clientX, y = e.clientY;
+    if (x + mw > vw) x = vw - mw - 4;
+    if (y + mh > vh) y = vh - mh - 4;
+    ctxMenu.style.left = x + 'px';
+    ctxMenu.style.top  = y + 'px';
+    ctxMenu.classList.add('visible');
+  }
+
+  function hideCtx() { ctxMenu.classList.remove('visible'); }
+  document.addEventListener('click', hideCtx);
+
+  document.getElementById('ctx-copy-web').onclick = () => {
+    copyText(ctxPath); showToast('Copied: ' + ctxPath); hideCtx();
+  };
+  document.getElementById('ctx-copy-win').onclick = () => {
+    const wp = toWinPath(ctxPath);
+    copyText(wp || ctxPath); showToast('Copied Windows path'); hideCtx();
+  };
+  document.getElementById('ctx-copy-name').onclick = () => {
+    const fn = getFilename(ctxPath);
+    copyText(fn); showToast('Copied: ' + fn); hideCtx();
+  };
+  document.getElementById('ctx-copy-imgtag').onclick = () => {
+    copyText('<img src="' + ctxPath + '" alt="">');
+    showToast('Copied <img> tag'); hideCtx();
+  };
+
+  // ---- Preview modal ----
+  const previewOverlay = document.getElementById('preview-overlay');
+  let previewPath = '';
+
+  function openPreview(relPath) {
+    previewPath = relPath;
+    const img = document.getElementById('preview-img');
+    // Clear any previous sizing before load
+    img.style.width = ''; img.style.height = '';
+    img.onload = () => {
+      const nw = img.naturalWidth, nh = img.naturalHeight;
+      if (!nw || !nh) return;
+      // Available display area inside the modal (modal = min(520,95vw), padding 24px each side,
+      // minus ~150px for the info bar + buttons + modal chrome below the image).
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const modalW = Math.min(520, vw * 0.95);
+      const availW = modalW - 48;           // 24px padding × 2
+      const availH = vh * 0.92 - 150;      // modal max-height minus info/buttons
+
+      const maxSide = Math.max(nw, nh);
+      let displayW, displayH;
+
+      if (maxSide <= 256) {
+        // Small pixel-art icon: scale up with the largest integer that still fits.
+        const scaleUp = Math.floor(Math.min(availW / nw, availH / nh));
+        const scale   = Math.max(1, Math.min(scaleUp, Math.floor(256 / maxSide)));
+        displayW = nw * scale;
+        displayH = nh * scale;
+      } else {
+        // Large image: scale down to fit available area, never upscale.
+        const scale = Math.min(1, availW / nw, availH / nh);
+        displayW = Math.round(nw * scale);
+        displayH = Math.round(nh * scale);
+      }
+
+      img.style.width  = displayW + 'px';
+      img.style.height = displayH + 'px';
+    };
+    img.src = relPath;
+    document.getElementById('preview-name').textContent = getFilename(relPath).replace('.png', '');
+    document.getElementById('preview-path-text').textContent = relPath;
+    previewOverlay.classList.add('visible');
+  }
+  function closePreview() { previewOverlay.classList.remove('visible'); }
+
+  document.getElementById('preview-close-btn').onclick = closePreview;
+  previewOverlay.addEventListener('click', e => { if (e.target === previewOverlay) closePreview(); });
+
+  document.getElementById('pv-copy-path').onclick = () => {
+    copyText(previewPath); showToast('Copied: ' + previewPath);
+  };
+  document.getElementById('pv-copy-win').onclick = () => {
+    const wp = toWinPath(previewPath);
+    copyText(wp || previewPath); showToast('Copied Windows path');
+  };
+  document.getElementById('pv-copy-imgtag').onclick = () => {
+    copyText('<img src="' + previewPath + '" alt="">'); showToast('Copied <img> tag');
+  };
+  document.getElementById('pv-save').onclick = () => {
+    closePreview(); openCopyModal(previewPath);
+  };
 
   // ---- Copy-to modal ----
   const modalOverlay = document.getElementById('copy-modal-overlay');
@@ -588,63 +784,67 @@
   function updateDestPreview() {
     const sub  = cmSubfolder.value;
     const name = cmFilename.value.trim() || 'filename.png';
-    const dest = 'images/' + (sub ? sub + '/' : '') + name;
-    cmDestPrev.textContent = '→ ' + dest;
+    cmDestPrev.textContent = '→ images/' + (sub ? sub + '/' : '') + name;
   }
-
   cmSubfolder.addEventListener('change', updateDestPreview);
   cmFilename.addEventListener('input', updateDestPreview);
 
   function openCopyModal(relPath) {
     cmSourcePath = relPath;
-    const origName = relPath.split('/').pop();
-    cmFilename.value = origName;
+    cmFilename.value = getFilename(relPath);
     document.getElementById('cm-thumb').src = relPath;
     document.getElementById('cm-src-label').textContent = relPath;
-    cmStatus.textContent = '';
-    cmStatus.className = 'cm-status';
+    cmStatus.textContent = ''; cmStatus.className = 'cm-status';
+    // Show "Save directly" if folder handle is ready, else "Save file…"
+    document.getElementById('cm-save').textContent = imagesRootHandle ? 'Save directly' : 'Save file…';
     updateDestPreview();
     modalOverlay.classList.add('visible');
-    cmFilename.focus();
-    cmFilename.select();
+    cmFilename.focus(); cmFilename.select();
   }
-
-  function closeCopyModal() {
-    modalOverlay.classList.remove('visible');
-  }
-
+  function closeCopyModal() { modalOverlay.classList.remove('visible'); }
   document.getElementById('cm-cancel').onclick = closeCopyModal;
   modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeCopyModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCopyModal(); });
 
   document.getElementById('cm-save').onclick = async () => {
     const name = cmFilename.value.trim();
     if (!name) { cmStatus.textContent = 'Enter a filename.'; cmStatus.className = 'cm-status err'; return; }
     const safeName = name.endsWith('.png') ? name : name + '.png';
-    const sub = cmSubfolder.value;
+    const sub      = cmSubfolder.value;
     const destHint = 'images/' + (sub ? sub + '/' : '') + safeName;
 
-    cmStatus.textContent = '';
-    cmStatus.className = 'cm-status';
+    cmStatus.textContent = 'Reading source…'; cmStatus.className = 'cm-status';
 
-    // Fetch the source image as a blob
     let blob;
     try {
       const resp = await fetch(cmSourcePath);
       if (!resp.ok) throw new Error('fetch failed');
       blob = await resp.blob();
     } catch {
-      // Fallback: load via canvas
-      try {
-        blob = await imgToBlob(cmSourcePath);
-      } catch (err) {
-        cmStatus.textContent = 'Could not read source image: ' + err.message;
-        cmStatus.className = 'cm-status err';
-        return;
+      try { blob = await imgToBlob(cmSourcePath); }
+      catch (err) {
+        cmStatus.textContent = 'Could not read source: ' + err.message;
+        cmStatus.className = 'cm-status err'; return;
       }
     }
 
-    // Try File System Access API (Save As dialog)
+    // Path 1: direct write via stored directory handle
+    if (imagesRootHandle) {
+      const ok = await ensureFolderPermission();
+      if (ok) {
+        try {
+          await writeToImagesFolder(sub, safeName, blob);
+          cmStatus.textContent = '✓ Saved to ' + destHint;
+          cmStatus.className = 'cm-status ok';
+          showToast('Saved: ' + destHint); return;
+        } catch (err) {
+          cmStatus.textContent = 'Write failed: ' + err.message;
+          cmStatus.className = 'cm-status err'; return;
+        }
+      }
+      // Permission denied — fall through to picker
+    }
+
+    // Path 2: Save As dialog
     if (window.showSaveFilePicker) {
       try {
         const handle = await window.showSaveFilePicker({
@@ -652,29 +852,27 @@
           types: [{ description: 'PNG Image', accept: { 'image/png': ['.png'] } }],
         });
         const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        cmStatus.textContent = '✓ Saved! Remember to put it in: ' + destHint;
+        await writable.write(blob); await writable.close();
+        cmStatus.textContent = '✓ Saved! Move to: ' + destHint;
         cmStatus.className = 'cm-status ok';
-        showToast('Saved as ' + safeName);
-        return;
+        showToast('Saved as ' + safeName); return;
       } catch (err) {
-        if (err.name === 'AbortError') return; // user cancelled
-        // Fall through to download fallback
+        if (err.name === 'AbortError') { cmStatus.textContent = ''; return; }
       }
     }
 
-    // Fallback: trigger browser download
+    // Path 3: download fallback
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = safeName;
     document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    cmStatus.textContent = '✓ Downloading as ' + safeName + ' — move it to ' + destHint;
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    cmStatus.textContent = '✓ Downloading — move to: ' + destHint;
     cmStatus.className = 'cm-status ok';
     showToast('Downloaded ' + safeName);
   };
+
+  cmFilename.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cm-save').click(); });
 
   function imgToBlob(src) {
     return new Promise((resolve, reject) => {
@@ -691,10 +889,7 @@
     });
   }
 
-  // Enter key in filename field triggers save
-  cmFilename.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cm-save').click(); });
-
-  // Init
+  // ---- Init ----
   filter();
 })();
 </script>
