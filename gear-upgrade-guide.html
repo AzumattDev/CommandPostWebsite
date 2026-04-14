@@ -25,6 +25,14 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 .tabs{display:flex;gap:6px;margin-bottom:1.5rem}.tab{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text3);font-family:inherit;text-align:center;transition:all .15s}
 .tab:hover{background:var(--surface2);color:var(--text2)}.tab.active{background:var(--accent-bg);border-color:rgba(167,139,250,.25);color:var(--accent)}
 .role-panel{display:none}.role-panel.active{display:block}
+.phase-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:1rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.phase-table th{background:var(--surface2);padding:8px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.phase-table td{padding:9px 12px;border-top:1px solid var(--border);vertical-align:top}
+.phase-num{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1rem;color:var(--amber)}
+.hero-equiv-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:1rem;background:var(--surface);border-radius:var(--radius);overflow:hidden}
+.hero-equiv-table th{background:var(--surface2);padding:8px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.hero-equiv-table td{padding:9px 12px;border-top:1px solid var(--border)}
+.hero-equiv-table .eq-role{font-size:.78rem;color:var(--text3);font-style:italic}
 </style>
 </head>
 <body>
@@ -35,10 +43,10 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 <div class="section">
 <h2>The 4 gear slots</h2>
 <div class="gear-grid">
-  <div class="gear-slot"><div class="gear-icon">🔫</div><div class="gear-name">Gun (Cannon)</div><div class="gear-stat">Boosts Attack power</div><div class="gear-who for-atk">DPS heroes first</div></div>
-  <div class="gear-slot"><div class="gear-icon">💾</div><div class="gear-name">Chip</div><div class="gear-stat">Crit Rate + secondary damage</div><div class="gear-who for-atk">DPS heroes first</div></div>
-  <div class="gear-slot"><div class="gear-icon">🛡️</div><div class="gear-name">Armor</div><div class="gear-stat">Physical damage resistance</div><div class="gear-who for-def">Tank heroes first</div></div>
-  <div class="gear-slot"><div class="gear-icon">📡</div><div class="gear-name">Radar</div><div class="gear-stat">Energy damage resistance + survivability</div><div class="gear-who for-all">Everyone needs this</div></div>
+  <div class="gear-slot"><div class="gear-icon"><img src="images/gear/gear_cannon_orange.png" alt="gear_cannon_orange"></div><div class="gear-name">Gun (Cannon)</div><div class="gear-stat">Boosts Attack power</div><div class="gear-who for-atk">DPS heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon"><img src="images/gear/gear_datachip_orange.png" alt="gear_datachip_orange"></div><div class="gear-name">Chip</div><div class="gear-stat">Crit Rate + secondary damage</div><div class="gear-who for-atk">DPS heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon"><img src="images/gear/gear_armor_orange.png" alt="gear_armor_orange"></div><div class="gear-name">Armor</div><div class="gear-stat">Physical damage resistance</div><div class="gear-who for-def">Tank heroes first</div></div>
+  <div class="gear-slot"><div class="gear-icon"><img src="images/gear/gear_radar_orange.png" alt="gear_radar_orange"></div><div class="gear-name">Radar</div><div class="gear-stat">Energy damage resistance + survivability</div><div class="gear-who for-all">Everyone needs this</div></div>
 </div>
 <div class="tip-box"><h3>Radar is universally valuable</h3><p>Radar reduces incoming skill/energy damage and increases survivability for ALL heroes. Every serious player eventually puts Radar on everyone in their main team. It works equally well for PvE and PvP, making it the safest upgrade choice when in doubt.</p></div>
 </div>
@@ -121,6 +129,70 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
     <li><div class="c-title">Williams / Murphy — Armor to 4★</div><div class="c-desc">Frontline defense stars up.</div></li>
     <li><div class="c-title">Kim / Stet / Marshall — Radar to 4★</div><div class="c-desc">Continue progressing attacker radars.</div></li>
   </ol>
+
+  <table class="phase-table">
+    <thead><tr><th>Phase</th><th>Milestone</th><th>What unlocks</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="phase-num">1</span></td>
+        <td style="font-weight:600">All gear → Lv 10 immediately on creation</td>
+        <td style="color:var(--text2)">First stat attribute activates. Never leave new gear below Lv 10.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-num">2</span></td>
+        <td style="font-weight:600">Priority gear → Lv 20, then star upgrades</td>
+        <td style="color:var(--text2)">Second attribute unlocks at Lv 20. Blueprint-based star upgrades begin here. DPS gear first.</td>
+      </tr>
+      <tr>
+        <td><span class="phase-num">3</span></td>
+        <td style="font-weight:600">All gear → Lv 40 + push stars on priority pieces</td>
+        <td style="color:var(--text2)">All four attributes active. The 2★ and 4★ jumps are the biggest power spikes. Focus blueprints on Kimberly's Gun first.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:.74rem;color:var(--text3);margin:.5rem 0 1.5rem">— <em>#1223 uMeME</em></p>
+
+  <div class="card" style="margin-top:1rem">
+    <span class="label label-tip">Hero equivalents across squad types</span>
+    <h3 style="margin-bottom:.35rem">Same role, different squad — apply this guide to Air or Missile too</h3>
+    <p style="font-size:.82rem;color:var(--text3);margin-bottom:.75rem">The upgrade order above is written for Tank squad. Use this table to map each hero to the equivalent role in other squad types. The <em>gear priority sequence stays identical</em> — just substitute the hero name.</p>
+    <table class="hero-equiv-table">
+      <thead><tr><th>Role</th><th style="color:#60a5fa">Tank squad</th><th style="color:#a78bfa">Aircraft squad</th><th style="color:#f87171">Missile squad</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="eq-role">Primary DPS<br><span style="color:var(--text3);font-size:.72rem">Gun → Chip → Radar</span></td>
+          <td style="font-weight:600;color:#60a5fa">Kimberly</td>
+          <td style="font-weight:600;color:#a78bfa">DVA</td>
+          <td style="font-weight:600;color:#f87171">Tesla</td>
+        </tr>
+        <tr>
+          <td class="eq-role">Sustained DPS<br><span style="color:var(--text3);font-size:.72rem">Gun → Chip → Radar</span></td>
+          <td style="color:#60a5fa">Stetmann</td>
+          <td style="color:#a78bfa">Morrison</td>
+          <td style="color:#f87171">Swift</td>
+        </tr>
+        <tr>
+          <td class="eq-role">Buffer / Support<br><span style="color:var(--text3);font-size:.72rem">Gun → Radar → Chip</span></td>
+          <td style="color:#60a5fa">Marshall</td>
+          <td style="color:#a78bfa">Schuyler</td>
+          <td style="color:#f87171">Fiona</td>
+        </tr>
+        <tr>
+          <td class="eq-role">Off-Tank<br><span style="color:var(--text3);font-size:.72rem">Radar → Armor → Gun</span></td>
+          <td style="color:#60a5fa">Williams</td>
+          <td style="color:#a78bfa">Lucius</td>
+          <td style="color:#f87171">Adam</td>
+        </tr>
+        <tr>
+          <td class="eq-role">Main Tank<br><span style="color:var(--text3);font-size:.72rem">Armor → Radar → (Gun)</span></td>
+          <td style="color:#60a5fa">Murphy</td>
+          <td style="color:#a78bfa">Carlie</td>
+          <td style="color:#f87171">McGregor</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.74rem;color:var(--text3);margin-top:.75rem">— by #1939 Kyshihū · inspired by u/SHADOWSTRIKE1</p>
+  </div>
 </div>
 
 <div class="role-panel" id="panel-tank">

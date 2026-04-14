@@ -129,6 +129,28 @@
 .rule-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem .75rem;font-size:.8rem;color:var(--text2);display:flex;gap:7px}
 
 .export-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+.map-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;margin-bottom:.75rem}
+.tap-hint{display:none;font-size:.72rem;font-family:'JetBrains Mono',monospace;padding:6px 10px;border-radius:6px;text-align:center;margin-bottom:.5rem;border:1px solid var(--border);background:var(--surface2);color:var(--text3)}
+.tap-hint.selecting{color:var(--cs-rb);background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.3)}
+.tap-hint.db-mode{color:var(--cs-db);background:rgba(14,116,144,.08);border-color:rgba(14,116,144,.3)}
+.player-chip.tap-selected{border-color:var(--accent) !important;background:rgba(124,58,237,.12);box-shadow:0 0 0 2px rgba(124,58,237,.2)}
+@media(max-width:860px){
+  .sidebar{position:static;top:0}
+  .player-list{max-height:180px}
+  .map-outer{min-width:580px;margin-bottom:0}
+  .tap-hint{display:block}
+}
+@media(max-width:500px){
+  .assign-grid{grid-template-columns:repeat(2,1fr)}
+  .hq-grid{grid-template-columns:1fr}
+  .rules-grid{grid-template-columns:1fr}
+  .export-row{flex-direction:column}
+  .cs-btn{width:100%;justify-content:center}
+  .action-btns{flex-direction:column}
+  .faction-btns{flex-direction:column}
+}
 </style>
 </head>
 <body>
@@ -182,10 +204,13 @@
   <div id="csMainArea">
 
     <div class="panel" style="margin-bottom:.75rem">
-      <div class="panel-title">Map — Drag players onto buildings. Click a name to remove.</div>
-      <div class="map-outer" id="csMap">
-        <div class="map-grid-overlay"></div>
-        <!-- building nodes injected by JS -->
+      <div class="panel-title">Map — Drag players onto buildings, or tap a player then tap a building on mobile. Click a name to remove.</div>
+      <div id="csTapHint" class="tap-hint">Tap a player chip to select, then tap a building to assign</div>
+      <div class="map-wrap">
+        <div class="map-outer" id="csMap">
+          <div class="map-grid-overlay"></div>
+          <!-- building nodes injected by JS -->
+        </div>
       </div>
       <div class="panel-title" style="margin-top:.5rem">Assignment Overview</div>
       <div class="assign-grid" id="csAssignGrid"></div>
@@ -299,7 +324,7 @@ const TACTIC_PRIORITY_CS = {
   rush:       ['sw1','sw2','sw3','sw4','pt','vl','sf1','sf2','ds1','ds2','dc1','dc2'],
 };
 
-let csPlayers=[], csAssignments={}, csFac='rb', csTactic='defensive', csUID=1, csDragId=null;
+let csPlayers=[], csAssignments={}, csFac='rb', csTactic='defensive', csUID=1, csDragId=null, csSelectedChip=null;
 
 /* ── Init ─────────────────────────────────────────────────────── */
 (function init(){
@@ -329,6 +354,13 @@ function buildMap(){
     el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
     el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
     el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');csDropPlayer(b.id);});
+    el.addEventListener('click',()=>{
+      if(csSelectedChip===null) return;
+      csDropPlayer(b.id, csSelectedChip);
+      csSelectedChip=null;
+      document.querySelectorAll('.player-chip').forEach(c=>c.classList.remove('tap-selected'));
+      updateCsTapHint();
+    });
     map.appendChild(el);
   });
 }
@@ -361,7 +393,7 @@ function renderSidebar(){
     const assigned=assignedSet.has(p.id);
     const allyBadge=csFac==='db'&&!p.isSub?`<span class="alliance-badge ${p.alliance==='b'?'badge-b':'badge-a'}">${p.alliance==='b'?'B':'A'}</span>`:'';
     return `<div class="player-chip${p.isSub?' is-sub':''}${p.alliance==='b'?' alliance-b':''}" id="cchip-${p.id}"
-              draggable="true" ondragstart="csDragStart(${p.id})" ondragend="csDragEnd(${p.id})">
+              draggable="true" ondragstart="csDragStart(${p.id})" ondragend="csDragEnd(${p.id})" onclick="csTapChip(${p.id})">
       <div class="player-chip-top">
         <span class="role-dot" style="background:${r.c}"></span>
         <span class="chip-name">${esc(p.name)}</span>
@@ -483,15 +515,16 @@ function buildPlan(){
 /* ── Drag & Drop ──────────────────────────────────────────────── */
 function csDragStart(id){csDragId=id;setTimeout(()=>{const c=document.getElementById('cchip-'+id);if(c)c.classList.add('dragging');},0);}
 function csDragEnd(id){csDragId=null;const c=document.getElementById('cchip-'+id);if(c)c.classList.remove('dragging');}
-function csDropPlayer(bId){
-  if(csDragId===null) return;
+function csDropPlayer(bId, tapId){
+  const pid = tapId !== undefined ? tapId : csDragId;
+  if(pid===null || pid===undefined) return;
   const b=CS_BUILDINGS.find(x=>x.id===bId);
   if(!b) return;
   const ids=csAssignments[bId];
-  if(ids.includes(csDragId)) return;
+  if(ids.includes(pid)) return;
   if(ids.length>=b.cap){alert(`${b.name} is full (${b.cap}/${b.cap})`);return;}
-  CS_BUILDINGS.forEach(bi=>{csAssignments[bi.id]=csAssignments[bi.id].filter(i=>i!==csDragId);});
-  csAssignments[bId].push(csDragId);
+  CS_BUILDINGS.forEach(bi=>{csAssignments[bi.id]=csAssignments[bi.id].filter(i=>i!==pid);});
+  csAssignments[bId].push(pid);
   renderAll();
 }
 function csUnassign(bId,id){csAssignments[bId]=csAssignments[bId].filter(i=>i!==id);renderAll();}
@@ -592,6 +625,32 @@ function csBuildTxt(){
 }
 function csExportTxt(){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(csBuildTxt());a.download='canyon-storm-plan.txt';a.click();}
 function csExportClipboard(){navigator.clipboard.writeText(csBuildTxt()).then(()=>{const btn=event.target;const o=btn.innerHTML;btn.innerHTML='✅ Copied!';setTimeout(()=>btn.innerHTML=o,2000);}).catch(()=>alert('Copy failed.'));}
+
+/* ── Tap-to-assign (mobile) ───────────────────────────────────── */
+window.csTapChip = function(id) {
+  if(csSelectedChip===id){
+    csSelectedChip=null;
+    document.getElementById('cchip-'+id)?.classList.remove('tap-selected');
+  } else {
+    csSelectedChip=id;
+    document.querySelectorAll('.player-chip').forEach(c=>c.classList.remove('tap-selected'));
+    document.getElementById('cchip-'+id)?.classList.add('tap-selected');
+  }
+  updateCsTapHint();
+};
+function updateCsTapHint(){
+  const hint=document.getElementById('csTapHint');
+  if(!hint) return;
+  const isDb=csFac==='db';
+  if(csSelectedChip!==null){
+    const p=csPlayers.find(x=>x.id===csSelectedChip);
+    hint.className='tap-hint selecting'+(isDb?' db-mode':'');
+    hint.textContent=p?`Tap a building to assign ${p.name} — tap chip again to deselect`:'';
+  } else {
+    hint.className='tap-hint';
+    hint.textContent='Tap a player chip to select, then tap a building to assign';
+  }
+}
 
 /* ── Persistence ──────────────────────────────────────────────── */
 function saveState(){try{localStorage.setItem('cs-planner',JSON.stringify({players:csPlayers,assignments:csAssignments,faction:csFac,tactic:csTactic,uid:csUID}));}catch(e){}}

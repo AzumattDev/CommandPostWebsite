@@ -138,12 +138,39 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
   .page-tabs{gap:4px;}
   .page-tab{padding:8px 14px;font-size:.82rem;}
 }
+/* Skill priority rows (squad skill guides) -------------------------------- */
+.skill-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.15rem;margin-top:1rem;margin-bottom:.25rem}
+.skill-block-head{font-size:.78rem;font-weight:600;margin-bottom:.35rem;color:var(--text2)}
+.skill-block-note{font-size:.8rem;color:var(--text3);margin-bottom:.9rem;line-height:1.5}
+.skill-prio-row{display:flex;gap:9px;align-items:flex-start;margin-bottom:8px}
+.sp-badge{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:3px}
+.sp-p1{background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.sp-p2{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+.sp-p3{background:rgba(107,105,128,.12);color:var(--text3);border:1px solid var(--border)}
+.sp-skills{display:flex;flex-wrap:wrap;gap:5px}
+.sp-skill{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:.79rem;color:var(--text)}
+/* 5-star chain */
+.star-chain-wrap{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--border)}
+.star-chain-lbl{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:.6rem}
+.star-chain{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.star-chain .hero-slot{min-width:68px;flex:none;padding:6px 6px}
+.star-chain-arrow{color:var(--text3);font-size:.9rem;flex-shrink:0}
+.star-chain-note{font-size:.78rem;color:var(--text2);margin-top:.6rem;line-height:1.5}
+/* Decoration tier table */
+.dec-table{width:100%;border-collapse:collapse;font-size:.84rem;background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:.75rem}
+.dec-table th{background:var(--surface2);padding:8px 12px;text-align:left;color:var(--text3);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.dec-table td{padding:9px 12px;border-top:1px solid var(--border);vertical-align:top}
+.dec-t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.05rem}
+.dec-ts{color:var(--green)}.dec-ta{color:var(--blue)}.dec-tb{color:var(--purple)}.dec-tc{color:var(--amber)}.dec-td{color:var(--text3)}
+.dec-stat{font-size:.78rem;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.dec-items{display:flex;flex-wrap:wrap;gap:5px}
+.dec-item{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.78rem;color:var(--text2)}
 </style>
 </head>
 <body>
 <div class="container">
   <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
-    <img src="images/formation.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
+    <img src="images/formation.png" style="width:80px;height:80px;object-fit:contain;flex-shrink:0" alt="">
     <h1 style="margin:0"><span>Squad Builder & Formations</span></h1>
   </div>
   <p class="subtitle">Last War: Survival — Counter system, meta formations, and when to build what</p>
@@ -228,6 +255,53 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <div class="form-desc">A 4+1 hybrid that swaps Stetmann for Adam (Missile) to counter Aircraft-heavy servers. Adam's Exclusive Weapon lets him survive much longer against Aircraft than a standard Tank hero. You drop from +20% to +15% type bonus, but gain a critical matchup advantage. Best used when your server is dominated by Air squads.</div>
         <div class="form-notes"><strong>Trade-off:</strong> -5% type bonus for a specific counter capability. Only worth it in Aircraft-dominated metas.</div>
       </div>
+
+      <div class="skill-block">
+        <div class="skill-block-head">Tank Squad — Skill Priority</div>
+        <div class="skill-block-note">Level Prio 1 skills to Lv 10+ before spending medals on Prio 2. — <em>#1210 Aethernis</em></div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p1">Prio 1</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Barrage Strike</span>
+            <span class="sp-skill">Lightning Rush</span>
+            <span class="sp-skill">Iron Will</span>
+            <span class="sp-skill">All-Around Armor</span>
+            <span class="sp-skill">Ironclad Barrier</span>
+            <span class="sp-skill">Command Strategy</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p2">Prio 2</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Energy Soul</span>
+            <span class="sp-skill">Energy Assault</span>
+            <span class="sp-skill">Critical Charge</span>
+            <span class="sp-skill">Stand Firm</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p3">Prio 3</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Orb Lightning</span>
+            <span class="sp-skill">Tried Harmony</span>
+          </div>
+        </div>
+        <div class="star-chain-wrap">
+          <div class="star-chain-lbl">5-Star order — upgrade in this sequence</div>
+          <div class="star-chain">
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_kimberly.png" alt="Kimberly"><div class="hero-name">Kimberly</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_stetmann.png" alt="Stetmann"><div class="hero-name">Stetmann</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_williams.png" alt="Williams"><div class="hero-name">Williams</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_murphy.png" alt="Murphy"><div class="hero-name">Murphy</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_marshall.png" alt="Marshall"><div class="hero-name">Marshall</div></div>
+          </div>
+          <div class="star-chain-note">Kimberly's star level is your highest DPS multiplier — star her first. Stetmann second for sustained damage. Williams and Murphy follow for frontline durability. Marshall last; his buffs are strong but he doesn't benefit as much from stars as DPS heroes.</div>
+        </div>
+      </div>
     </div>
 
     <!-- AIRCRAFT -->
@@ -257,6 +331,54 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         <div class="form-desc">The most feared squad in high-level PvP. Murphy's Exclusive Weapon and high-level Tactics Cards make him a better pure damage sponge than Carlie. You lose the 5-hero bonus (dropping to 15%), but Murphy's individual tankiness gives your Air backline significantly more time to delete the enemy.</div>
         <div class="form-notes"><strong>Requires:</strong> Season 4+ Tactics Cards. Murphy at high stars with Exclusive Weapon. <strong>Don't use this</strong> if your Murphy isn't heavily invested — vanilla Carlie is better at low investment.</div>
       </div>
+
+      <div class="skill-block">
+        <div class="skill-block-head">Aircraft Squad — Skill Priority</div>
+        <div class="skill-block-note">Prioritize burst and armor-shred skills first — Aircraft wins by deleting the enemy before they act. — <em>#1210 Aethernis</em></div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p1">Prio 1</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Steel Barrage</span>
+            <span class="sp-skill">Knight's Spirit</span>
+            <span class="sp-skill">Inferno Blaze</span>
+            <span class="sp-skill">Armor-Piercing Shot</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p2">Prio 2</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Vortex Missile</span>
+            <span class="sp-skill">Energy Adaption</span>
+            <span class="sp-skill">Full-Auto Machine</span>
+            <span class="sp-skill">Blast Frenzy</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p3">Prio 3</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Armament Upgrade</span>
+            <span class="sp-skill">Lightning Triple Strike</span>
+            <span class="sp-skill">Dual-string Rocket</span>
+            <span class="sp-skill">Lightning Chain</span>
+            <span class="sp-skill">Antimatter Armor</span>
+          </div>
+        </div>
+        <div class="star-chain-wrap">
+          <div class="star-chain-lbl">5-Star order — upgrade in this sequence</div>
+          <div class="star-chain">
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_dva.png" alt="DVA"><div class="hero-name">DVA</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_morrison.png" alt="Morrison"><div class="hero-name">Morrison</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_lucius.png" alt="Lucius"><div class="hero-name">Lucius</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_carlie.png" alt="Carlie"><div class="hero-name">Carlie</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_schuyler.png" alt="Schuyler"><div class="hero-name">Schuyler</div></div>
+          </div>
+          <div class="star-chain-note">DVA is the top burst DPS — star her first. Morrison provides critical armor shred; star him before Lucius so your backline damage bypasses defenses earlier. Lucius' tank value scales more with gear and Exclusive Weapon than stars. Carlie and Schuyler last.</div>
+        </div>
+      </div>
     </div>
 
     <!-- MISSILE -->
@@ -285,6 +407,55 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
         </div>
         <div class="form-desc">Season 5 promotes Venom to UR rarity, making the full 5-man Missile team significantly more viable. With Fiona's Exclusive Weapon, missiles can now reliably burst down Aircraft squads. This is the strongest Missile formation has ever been.</div>
         <div class="form-notes"><strong>Requires:</strong> Season 5 (Golden Wasteland). Venom's UR promotion. Fiona's Exclusive Weapon for full effectiveness.</div>
+      </div>
+
+      <div class="skill-block">
+        <div class="skill-block-head">Missile Squad — Skill Priority</div>
+        <div class="skill-block-note">Skills are numbered in strict upgrade order — do not skip ahead. — <em>#659 · LD9 Taco Legion</em></div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p1">1–5</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Targeted Strike</span>
+            <span class="sp-skill">Weakness Targeting</span>
+            <span class="sp-skill">Electric Grid Lockdown</span>
+            <span class="sp-skill">Spike Ascent</span>
+            <span class="sp-skill">Double Trajectory</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p2">6–10</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Lightning Chain</span>
+            <span class="sp-skill">Counter Defense</span>
+            <span class="sp-skill">Cosmic Blast</span>
+            <span class="sp-skill">Unyielding Heart</span>
+          </div>
+        </div>
+        <div class="skill-prio-row">
+          <span class="sp-badge sp-p3">11–15</span>
+          <div class="sp-skills">
+            <span class="sp-skill">Precise Guidance</span>
+            <span class="sp-skill">Electric Power Boost</span>
+            <span class="sp-skill">Mk42 Vehicle-Mounted MG</span>
+            <span class="sp-skill">Ballistic Boost</span>
+            <span class="sp-skill">Forward Rush</span>
+          </div>
+        </div>
+        <div class="star-chain-wrap">
+          <div class="star-chain-lbl">5-Star order — upgrade in this sequence</div>
+          <div class="star-chain">
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_swift.png" alt="Swift"><div class="hero-name">Swift</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_tesla.png" alt="Tesla"><div class="hero-name">Tesla</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_adam.png" alt="Adam"><div class="hero-name">Adam</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_fiona.png" alt="Fiona"><div class="hero-name">Fiona</div></div>
+            <span class="star-chain-arrow">→</span>
+            <div class="hero-slot"><img class="hero-portrait" src="images/hero_mcgregor.png" alt="McGregor"><div class="hero-name">McGregor</div></div>
+          </div>
+          <div class="star-chain-note">Swift is the primary finisher — starring her increases burst significantly. Tesla follows for precision single-target damage. Adam and McGregor are frontline tanks whose value scales more with gear than stars, but higher stars still provide meaningful HP/DEF for the whole squad.</div>
+        </div>
       </div>
     </div>
 
@@ -388,6 +559,32 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <div class="form-desc">Tesla gets the best attack gear, then Swift, then Fiona. If Adam's frontline skill level is low, replace him with DVA. Marshall is mandatory — without his buffs, missile damage falls off dramatically. No Missile squad? Use your top 4 damage dealers (DVA, Kimberly, Statesman, Mason, Schuyler) with Marshall as the 5th slot.</div>
       <div class="form-notes"><strong>Gear priority:</strong> 1) Tesla &nbsp; 2) Swift &nbsp; 3) Fiona &nbsp; — Marshall is always the 5th hero regardless of squad type.</div>
     </div>
+
+    <div class="skill-block" style="margin-top:1rem">
+      <div class="skill-block-head">Hero substitution priority — when you're missing someone</div>
+      <div class="skill-block-note">Use these ranked lists to fill flex slots if your primary heroes are under-leveled or unavailable. — <em>#1223 uMeME</em></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.25rem">
+        <div>
+          <div style="font-size:.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--tank);margin-bottom:.5rem">Code 87 · DVA flex slot</div>
+          <div class="sp-skills" style="flex-direction:column;gap:4px">
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green);min-width:16px">1</span> Kimberly</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">2</span> Stetmann</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">3</span> Mason</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">4</span> DVA</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--air);margin-bottom:.5rem">Code 39 · Kimberly flex slot</div>
+          <div class="sp-skills" style="flex-direction:column;gap:4px">
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green);min-width:16px">1</span> DVA</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">2</span> Morrison</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">3</span> Kimberly</span>
+            <span class="sp-skill" style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);min-width:16px">4</span> Schuyler</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--text3);margin-top:.5rem">Stetmann / Mason are also valid subs</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="section">
@@ -400,6 +597,56 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
       <h3>Upgrade your type center building</h3>
       <p>The Tank/Air/Missile Center buildings provide stat bonuses to all heroes of that type, plus march speed. Upgrade your main squad's center first. This is a base-wide multiplier that affects every battle.</p>
     </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <h2>Base decoration priority</h2>
+    <p style="color:var(--text2);font-size:.88rem;margin-bottom:1.25rem;">Decorations passively boost combat stats for all squads. S-tier gives DMG Reduction + ATK; A-tier gives CRIT + ATK + Skill; lower tiers give diminishing returns. Aim for Lv 3 on every decoration before pushing any to Lv 4.</p>
+    <table class="dec-table">
+      <thead>
+        <tr>
+          <th style="width:40px">Tier</th>
+          <th>Stats</th>
+          <th>Decorations</th>
+          <th style="width:80px">Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="dec-t dec-ts">S</span></td>
+          <td><span class="dec-stat">DMG Reduction · ATK</span></td>
+          <td><div class="dec-items"><span class="dec-item">Armored Vehicle</span><span class="dec-item">Combat Statue</span><span class="dec-item">War Trophy</span></div></td>
+          <td style="color:var(--green);font-size:.8rem;font-weight:600">First — always</td>
+        </tr>
+        <tr>
+          <td><span class="dec-t dec-ta">A</span></td>
+          <td><span class="dec-stat">CRIT Rate · ATK · Skill DMG</span></td>
+          <td><div class="dec-items"><span class="dec-item">Hero Portrait</span><span class="dec-item">Medal Display</span><span class="dec-item">Flag Rack</span></div></td>
+          <td style="color:var(--blue);font-size:.8rem;font-weight:600">Second</td>
+        </tr>
+        <tr>
+          <td><span class="dec-t dec-tb">B</span></td>
+          <td><span class="dec-stat">ATK (major) · DEF · HP</span></td>
+          <td><div class="dec-items"><span class="dec-item">Bookshelf</span><span class="dec-item">Tactical Map</span><span class="dec-item">Wall Plaque</span></div></td>
+          <td style="color:var(--purple);font-size:.8rem;font-weight:600">Third</td>
+        </tr>
+        <tr>
+          <td><span class="dec-t dec-tc">C</span></td>
+          <td><span class="dec-stat">ATK (minor) · DEF · HP</span></td>
+          <td><div class="dec-items"><span class="dec-item">Potted Plant</span><span class="dec-item">Clock</span><span class="dec-item">Rug</span></div></td>
+          <td style="color:var(--amber);font-size:.8rem;font-weight:600">Only after S–B max</td>
+        </tr>
+        <tr>
+          <td><span class="dec-t dec-td">D</span></td>
+          <td><span class="dec-stat">Utility (production, etc.)</span></td>
+          <td><div class="dec-items"><span class="dec-item">Decorative items with no combat stats</span></div></td>
+          <td style="color:var(--text3);font-size:.8rem">Last / skip</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.74rem;color:var(--text3);margin-bottom:1rem">Tier list by #1054 Ombre Braxy. Decoration names shown above are approximate — verify exact names in-game. The tier ranking and stat bonuses are confirmed.</p>
   </div>
   </div><!-- /panel-page-guide -->
 

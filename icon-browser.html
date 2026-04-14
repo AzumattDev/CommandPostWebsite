@@ -119,6 +119,16 @@
     line-height: 1.3;
     max-width: 100%;
   }
+  .icon-card .alias {
+    font-size: .46rem;
+    color: #7c5cbf;
+    margin-top: 2px;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.2;
+    max-width: 100%;
+    opacity: .8;
+  }
 
   .pagination {
     display: flex; align-items: center; justify-content: center;
@@ -504,6 +514,381 @@
     totalLabel.textContent = ICON_PATHS.length.toLocaleString() + ' icons indexed';
   }
 
+  // ---- Pinyin → English keyword map ----
+  // Keys are lowercase pinyin segments from Last War asset filenames.
+  // Values are arrays of English synonyms used for search matching.
+  const PINYIN_MAP = {
+    // Buildings
+    'gongchang':          ['factory','workshop','plant'],
+    'jiagongchang':       ['processing factory','refinery','fabrication','workshop'],
+    'yongbingchang':      ['mercenary','barracks','recruiter','merc'],
+    'yongbinggongchang':  ['mercenary factory','merc factory','merc'],
+    'yingfang':           ['barracks','billet','dormitory'],
+    'yingdi':             ['camp','base','outpost'],
+    'jidi':               ['base','headquarters','hq','command'],
+    'zongbu':             ['headquarters','hq','command center'],
+    'zhongxin':           ['center','hub','central'],
+    'yiyuan':             ['hospital','medical','clinic','heal'],
+    'paotai':             ['cannon','turret','tower','gun'],
+    'chengqiang':         ['wall','fortress','fortification'],
+    'cangku':             ['warehouse','storage','depot','stockpile'],
+    'nongchang':          ['farm','field','crop','agriculture'],
+    'mujia':              ['lumber yard','sawmill','wood','lumber'],
+    'muchang':            ['lumber','forest','wood','timber'],
+    'kuangshan':          ['mine','ore','mineral'],
+    'kuang':              ['mine','ore','mining'],
+    'youjing':            ['oil well','oil','petroleum','derrick'],
+    'youjingjia':         ['oil rig','oil derrick','oil'],
+    'fadian':             ['power plant','generator','energy'],
+    'xunlian':            ['training','drill','exercise'],
+    'xunlianying':        ['training camp','drill ground'],
+    'yanjiu':             ['research','study','lab'],
+    'yanjiusuo':          ['research lab','institute','laboratory'],
+    'keji':               ['science','tech','technology'],
+    'jianshe':            ['construction','build','upgrade'],
+    'sheshi':             ['facility','infrastructure','building'],
+    'baowei':             ['garrison','fortify','defend','guard'],
+    'fangyu':             ['defense','shield','protection'],
+    'gongshi':            ['siege','offensive','attack'],
+    'zhengfu':            ['government','capitol','administration'],
+    'guohui':             ['senate','congress','council'],
+    'juxing':             ['rally','gather','muster'],
+    // Troops / Military
+    'bubing':             ['infantry','soldier','ground troops'],
+    'jipao':              ['artillery','cannon','mortar','howitzer'],
+    'paojian':            ['rocket','missile','launcher'],
+    'jipaobing':          ['artilleryman','gunner'],
+    'leida':              ['radar','sensor','detection'],
+    'feiji':              ['aircraft','plane','air force','helicopter'],
+    'zhishengji':         ['helicopter','chopper','rotary'],
+    'tanke':              ['tank','armor','armored vehicle'],
+    'zhuanjiache':        ['vehicle','transport','armored'],
+    'qianfeng':           ['vanguard','frontline','spearhead','advance'],
+    'tejun':              ['special forces','elite troops','spec ops'],
+    'jundui':             ['military','army','troops','force'],
+    'shibing':            ['soldier','private','grunt'],
+    'zhanshi':            ['warrior','fighter','combatant'],
+    'budui':              ['unit','squad','detachment'],
+    'lujun':              ['ground forces','army'],
+    'kongjun':            ['air force','aviation','air'],
+    'haijun':             ['navy','naval','sea'],
+    // Heroes
+    'yingxiong':          ['hero','champion','legendary'],
+    'toumu':              ['leader','commander','chief'],
+    'silinguan':          ['commander','officer','general'],
+    'zhanjiang':          ['warlord','general','marshal'],
+    // Resources
+    'liangshi':           ['food','grain','ration','supply'],
+    'tiexu':              ['iron ore','ore','metal'],
+    'tie':                ['iron','steel','metal'],
+    'jinbi':              ['gold','coin','currency','money'],
+    'zuanshi':            ['diamond','gem','crystal','jewel'],
+    'shitou':             ['stone','rock'],
+    'mucai':              ['wood','lumber','timber'],
+    'youqi':              ['fuel','oil','gas','petroleum'],
+    'nengyuan':           ['energy','power source'],
+    'ziyuan':             ['resource','supply'],
+    'ziliao':             ['material','resource','supply'],
+    'jianshecailiao':     ['building material','construction material'],
+    'jiasuqi':            ['speedup','accelerator','time boost','boost'],
+    'jiasu':              ['speedup','boost','accelerate'],
+    // Gear / Equipment
+    'zhuangbei':          ['gear','equipment','armor','item'],
+    'wuqi':               ['weapon','arms','armament'],
+    'kuijia':             ['armor','suit','plate mail'],
+    'toukui':             ['helmet','headgear','head armor'],
+    'xiongkai':           ['chestplate','torso armor','chest'],
+    'shouba':             ['gauntlet','glove','bracer'],
+    'xuezi':              ['boot','footwear','leg armor'],
+    'jiezhi':             ['ring'],
+    'xianglian':          ['necklace','amulet'],
+    'wangu':              ['bracelet','wristband'],
+    'huizhang':           ['badge','medal','insignia'],
+    // Drones
+    'wurenji':            ['drone','uav','unmanned'],
+    'wurenjia':           ['drone frame','drone armor','drone'],
+    // Events / Activities
+    'huodong':            ['event','activity','limited time'],
+    'zhan':               ['war','battle','combat'],
+    'zhandou':            ['fight','combat','battle'],
+    'duizhan':            ['duel','pvp','versus','vs'],
+    'lianmeng':           ['alliance','guild','coalition'],
+    'lianmengzhan':       ['alliance war','guild war'],
+    'shengcun':           ['survival','survive','zombie'],
+    'mosha':              ['massacre','purge','kill'],
+    'baodie':             ['bunker','fortified position'],
+    'zhenying':           ['camp','encampment','field camp'],
+    // UI / Interface
+    'anniu':              ['button','btn','ui'],
+    'beijing':            ['background','bg','backdrop'],
+    'bianjie':            ['border','frame','edge'],
+    'tubiao':             ['icon','symbol'],
+    'qi':                 ['flag','banner'],
+    'jiang':              ['reward','prize','award'],
+    'jiangbei':           ['trophy','prize','reward'],
+    'jiangpai':           ['medal','badge','plaque'],
+    'jiangzhang':         ['reward','medal'],
+    'xing':               ['star','rating'],
+    'dengji':             ['level','rank','grade','tier'],
+    'shuiping':           ['level','tier','rank'],
+    'tisheng':            ['upgrade','level up','promote'],
+    'shengji':            ['upgrade','ascend','rank up'],
+    'suipian':            ['fragment','shard','piece'],
+    'baoxiang':           ['treasure chest','loot box','chest'],
+    'bao':                ['treasure','chest','loot'],
+    // Colors
+    'lan':                ['blue'],
+    'hong':               ['red'],
+    'huang':              ['yellow','gold'],
+    'lv':                 ['green'],
+    'zi':                 ['purple'],
+    'cheng':              ['orange'],
+    'bai':                ['white','silver'],
+    'hei':                ['black','dark'],
+    'jin':                ['gold','golden'],
+    'yin':                ['silver'],
+    'hui':                ['gray','grey'],
+    // Quality / Rarity
+    'putong':             ['common','normal','standard','basic'],
+    'jingying':           ['elite','rare'],
+    'shishi':             ['epic'],
+    'chuanshuo':          ['legendary','mythic'],
+    'shenqi':             ['divine','mythic','god'],
+    'baijin':             ['platinum','rare'],
+    // Directions
+    'zuo':                ['left'],
+    'you':                ['right'],
+    'shang':              ['top','upper'],
+    'xia':                ['bottom','lower'],
+    'zhong':              ['center','middle'],
+    'qian':               ['front','forward'],
+    'hou':                ['back','rear'],
+    // Common modifiers
+    'da':                 ['large','big','major','grand'],
+    'xiao':               ['small','minor','little'],
+    'zhong':              ['medium','mid','center','middle'],
+    'qiang':              ['strong','powerful','mighty'],
+    'chao':               ['super','ultra','hyper'],
+    'gaoji':              ['advanced','high level','superior'],
+    'teshu':              ['special','unique'],
+    'tezhong':            ['special','unique'],
+    'xin':                ['new','fresh'],
+    'lao':                ['old','veteran'],
+    'kuai':               ['fast','quick','speed'],
+    'man':                ['slow'],
+    'gao':                ['high','tall'],
+    'di':                 ['low','ground','floor'],
+    'zhong2':             ['heavy','weight'],
+    'qing':               ['light','clear','green'],
+    're':                 ['hot','fire'],
+    'leng':               ['cold','ice','freeze'],
+    // More buildings / structures
+    'fangkong':           ['anti-air','air defense','AA'],
+    'paotaizhan':         ['cannon post','gun emplacement'],
+    'zhandao':            ['passage','corridor','bridge'],
+    'qiaoliang':          ['bridge','crossing'],
+    'suosuo':             ['lock','chain','gate'],
+    'menmen':             ['gate','door','entrance'],
+    'men':                ['gate','door','entrance'],
+    'zhan':               ['station','post','stand','battle','war'],
+    'zhanzhi':            ['outpost','forward base'],
+    'dianta':             ['tower','pylon','antenna'],
+    'ta':                 ['tower','pagoda'],
+    'zhan2':              ['station','outpost','war'],
+    'dian':               ['power','electric','shop','store'],
+    'dianpu':             ['shop','store'],
+    'shichang':           ['market','bazaar','exchange'],
+    'maoyi':              ['trade','trading','commerce'],
+    'jiaohuan':           ['exchange','swap','trade'],
+    'renkou':             ['population','people'],
+    'jumin':              ['resident','civilian'],
+    'min':                ['people','civilian','folk'],
+    'jun':                ['army','military','uniform'],
+    'junying':            ['military camp','barracks'],
+    'junshi':             ['military','warfare','strategy'],
+    'junhuo':             ['arms','munitions','supplies'],
+    'wubei':              ['armament','munitions','weapons'],
+    'tupo':               ['breakthrough','advance','assault'],
+    'chongfeng':          ['charge','rush','breakthrough'],
+    'zhengyao':           ['suppress','raid','strike'],
+    'zhandao2':           ['combat','fighting'],
+    'shouwei':            ['guard','sentry','watch'],
+    'jingbei':            ['alert','standby','ready'],
+    'jingbao':            ['alarm','alert','warning'],
+    'baojing':            ['alert','alarm','emergency'],
+    // More resources / items
+    'wuzi':               ['supplies','material','goods'],
+    'wuliao':             ['material','goods','cargo'],
+    'kuaidi':             ['courier','delivery','fast supply'],
+    'bu':                 ['cloth','fabric','supply'],
+    'tong':               ['copper','bronze','barrel'],
+    'gang':               ['steel','iron','strong'],
+    'meitan':             ['coal','fuel','carbon'],
+    'shiyou':             ['petroleum','crude oil'],
+    'tianranqi':          ['gas','natural gas'],
+    'heli':               ['nuclear','reactor','atomic'],
+    'he':                 ['nuclear','atomic'],
+    'dianchi':            ['battery','cell','power'],
+    'ranliao':            ['fuel','combustible'],
+    'huohua':             ['spark','ignite'],
+    'zhadan':             ['bomb','explosive'],
+    'daopian':            ['blade','knife','shrapnel'],
+    'zidan':              ['bullet','ammo','round'],
+    'pao':                ['cannon','gun','shell'],
+    'paoke':              ['shell','projectile','round'],
+    'daodan':             ['missile','rocket','guided'],
+    'leiting':            ['thunder','lightning','electric'],
+    'bingdong':           ['ice','frozen','cryo'],
+    'huoyan':             ['flame','fire','inferno'],
+    'du':                 ['poison','toxic','venom'],
+    'bing':               ['ice','soldier','troop'],
+    // More hero / character
+    'nvzhan':             ['female warrior','woman soldier'],
+    'nvying':             ['heroine','female hero'],
+    'lao2':               ['old man','veteran','senior'],
+    'shaonian':           ['youth','young','teen'],
+    'qingchun':           ['young','youthful'],
+    'zhuanghan':          ['strong man','warrior'],
+    'moli':               ['magic','supernatural'],
+    'guai':               ['monster','creature','mutant'],
+    'bingbian':           ['zombie','infected','mutant'],
+    'sangshi':            ['zombie','undead','infected'],
+    'guaiwu':             ['monster','creature','boss'],
+    'yemian':             ['wild','feral','savage'],
+    'yeren':              ['savage','wild man'],
+    'tuzhu':              ['native','indigenous','local'],
+    'zhandui':            ['squad','strike team'],
+    'fendui':             ['platoon','unit','division'],
+    'lian':               ['company','brigade','link'],
+    'ying':               ['battalion','camp','hawk'],
+    'tuan':               ['regiment','group','team'],
+    'shi':                ['division','master','teacher'],
+    'jun2':               ['corps','army group'],
+    'duizhang':           ['captain','team leader'],
+    'banjian':            ['class','squad leader'],
+    'zhongwei':           ['lieutenant','officer'],
+    'shangwei':           ['captain','lieutenant'],
+    'shaowei':            ['second lieutenant'],
+    'zhongxiao':          ['lieutenant colonel'],
+    'shangxiao':          ['colonel'],
+    'zhunjiang':          ['brigadier general'],
+    'shaojiang':          ['major general'],
+    'zhongjiang':         ['lieutenant general'],
+    'shangjiang':         ['general'],
+    'da2':                ['marshal','grand'],
+    'yuanshuai':          ['marshal','field marshal'],
+    // Skills / Abilities / Buffs
+    'jishu':              ['skill','technique','ability'],
+    'jinneng':            ['skill','ability','talent'],
+    'nengli':             ['power','ability','strength'],
+    'liliang':            ['strength','force','power'],
+    'gongji':             ['attack','assault','offensive'],
+    'fangyu2':            ['defense','resist','guard'],
+    'xuehong':            ['blood','hp','health'],
+    'xuetiao':            ['health bar','hp bar'],
+    'huifu':              ['recover','restore','heal'],
+    'zhiliao':            ['heal','treatment','cure'],
+    'fusu':               ['revive','resurrect','respawn'],
+    'chenghao':           ['title','rank','honor'],
+    'rongyao':            ['glory','honor','prestige'],
+    'shengwang':          ['prestige','fame','renown'],
+    'mingyu':             ['reputation','fame'],
+    'xinyong':            ['credit','trust'],
+    'chaoji':             ['super','extra','hyper'],
+    'jujiang':            ['giant','boss','titan'],
+    'shouhu':             ['guardian','protect','keeper'],
+    'tiaozhan':           ['challenge','duel','contest'],
+    'bisai':              ['competition','tournament','race'],
+    'duoqu':              ['capture','seize','grab'],
+    'zhanling':           ['occupy','capture','hold'],
+    'zhanqu':             ['war zone','combat area'],
+    'zhanyi':             ['campaign','operation','battle'],
+    'zuozhan':            ['combat','operation','warfare'],
+    'zhengzhan':          ['war','conflict','fighting'],
+    'zhandouji':          ['fighter jet','combat aircraft'],
+    'bombed':             ['bomb','bomber','strike'],
+    'hongzha':            ['bomb','air strike','bombing'],
+    'paoji':              ['bombard','shell','fire'],
+    'sheling':            ['shell','fire','shoot'],
+    'fashe':              ['launch','fire','shoot'],
+    'baofa':              ['explode','burst','outbreak'],
+    'baozha':             ['explosion','blast','detonate'],
+    'raozhe':             ['orbit','circle','surround'],
+    'baowei2':            ['surround','encircle','besiege'],
+    // Map / Territory
+    'ditu':               ['map','chart','territory'],
+    'quyu':               ['region','zone','area'],
+    'lingtu':             ['territory','domain','land'],
+    'bianjing':           ['border','frontier','boundary'],
+    'fangxian':           ['front line','boundary'],
+    'zhendi':             ['position','front','trench'],
+    'zhendi':             ['stronghold','position'],
+    'duikang':            ['confrontation','standoff','versus'],
+    'duili':              ['opposition','rival','enemy'],
+    'diren':              ['enemy','foe','opponent'],
+    'guanjun':            ['champion','winner','victor'],
+    'sheng2':             ['victory','win','triumph'],
+    'bai2':               ['defeat','loss','fail'],
+    'pingju':             ['draw','tie','stalemate'],
+    // Specific Last War game modes / events
+    'momojie':            ['doomsday','apocalypse','end'],
+    'mori':               ['doomsday','apocalypse','last day'],
+    'zuihou':             ['last','final','ultimate'],
+    'zhan3':              ['last war','final battle'],
+    'shengcun2':          ['survival','last survivor'],
+    'bingqi':             ['weapon','arms','military'],
+    'moban':              ['template','pattern','model'],
+    'biaoqian':           ['tag','label','badge'],
+    'chengcai':           ['achievement','title','rank'],
+    'chengjiuxitong':     ['achievement system'],
+    'chengjiu':           ['achievement','accomplishment'],
+    'renwu':              ['mission','quest','task'],
+    'zhurenwu':           ['main quest','main mission'],
+    'zhixian':            ['side quest','daily mission'],
+    'meirirenwu':         ['daily mission','daily task'],
+    'meiri':              ['daily','every day'],
+    'zhouqi':             ['weekly','cycle'],
+    'zhoujiesuan':        ['weekly reset','weekly settlement'],
+    'jiesuan':            ['settlement','calculation','reset'],
+    'jieduan':            ['phase','stage','tier'],
+    'jilu':               ['record','score','log'],
+    'paiming':            ['ranking','leaderboard','rank'],
+    'paihang':            ['ranking','leaderboard'],
+    'bangdan':            ['list','leaderboard','chart'],
+    // Numbers (common in asset names)
+    'yi':                 ['one','1','first'],
+    'er':                 ['two','2','second'],
+    'san':                ['three','3','third'],
+    'si':                 ['four','4','fourth'],
+    'wu':                 ['five','5','fifth'],
+    'liu':                ['six','6','sixth'],
+    'qi2':                ['seven','7','seventh'],
+    'ba':                 ['eight','8','eighth'],
+    'jiu':                ['nine','9','ninth'],
+    'shi2':               ['ten','10'],
+  };
+
+  // Precomputed alias cache for performance
+  const aliasCache = new Map();
+  function getEnglishAlias(p) {
+    if (aliasCache.has(p)) return aliasCache.get(p);
+    const fn = getFilename(p).replace(/\.png$/i, '').toLowerCase();
+    const parts = fn.split('_');
+    const words = new Set();
+    for (let i = 0; i < parts.length; i++) {
+      const seg = parts[i];
+      if (PINYIN_MAP[seg]) PINYIN_MAP[seg].forEach(w => words.add(w));
+      // also try two adjacent segments merged (e.g. yongbing+gongchang)
+      if (i < parts.length - 1) {
+        const merged = parts[i] + parts[i + 1];
+        if (PINYIN_MAP[merged]) PINYIN_MAP[merged].forEach(w => words.add(w));
+      }
+    }
+    const result = [...words].join(' ');
+    aliasCache.set(p, result);
+    return result;
+  }
+
   // ---- Filter + Sort ----
   function filter() {
     const q      = document.getElementById('search').value.trim().toLowerCase();
@@ -514,7 +899,7 @@
       if (folder && !p.includes(folder)) return false;
       if (q) {
         const fn = getFilename(p).toLowerCase();
-        return fn.includes(q) || p.toLowerCase().includes(q);
+        return fn.includes(q) || p.toLowerCase().includes(q) || getEnglishAlias(p).includes(q);
       }
       return true;
     });
@@ -548,8 +933,10 @@
       const card = document.createElement('div');
       card.className = 'icon-card' + (i === kbFocusIdx ? ' kb-focus' : '');
       card.tabIndex = 0;
-      card.title    = path;
       card.dataset.idx = i;
+
+      const alias = getEnglishAlias(path);
+      card.title = path + (alias ? '\n\u{1F4AC} ' + alias : '');
 
       const img = document.createElement('img');
       img.src = path; img.loading = 'lazy'; img.alt = '';
@@ -561,6 +948,14 @@
 
       card.appendChild(img);
       card.appendChild(name);
+
+      if (alias) {
+        const aliasEl = document.createElement('div');
+        aliasEl.className = 'alias';
+        // Show up to 3 keywords so the card doesn't get too tall
+        aliasEl.textContent = alias.split(' ').slice(0, 3).join(' · ');
+        card.appendChild(aliasEl);
+      }
 
       card.addEventListener('click',       ()  => openPreview(path));
       card.addEventListener('contextmenu', e   => showCtx(e, path));

@@ -77,7 +77,9 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
 .week-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:1.5rem}
 @media(max-width:540px){.week-cal{grid-template-columns:repeat(4,1fr)}}
 .cal-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 4px;text-align:center}
-.cal-day .cd-name{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.cal-day .cd-name{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+/* VS day icons in the weekly calendar */
+.cal-day .cd-vs{width:30px;height:30px;object-fit:contain;display:block;margin:0 auto 5px;opacity:.85}
 .cal-day .cd-action{font-size:.68rem;font-weight:600;padding:2px 5px;border-radius:3px;display:inline-block;margin-bottom:4px}
 .cal-day .cd-note{font-size:.63rem;color:var(--text3);line-height:1.35}
 .action-spend{background:rgba(52,211,153,.12);color:var(--green)}
@@ -339,38 +341,46 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
   <h2 id="weekly-calendar">Weekly spending calendar</h2>
   <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem;">Alliance Duel runs Monday–Saturday. This is your default weekly stamina rhythm.</p>
   <div class="week-cal">
+    <!-- VS day icons: swap images/allianceduel/vs_*.png for the exact in-game event icons if you have higher-res versions -->
     <div class="cal-day">
       <div class="cd-name">Sun</div>
+      <img src="images/allianceduel/vs_stamina.png" class="cd-vs" alt="Prep day">
       <div class="cd-action action-prep">Prep</div>
       <div class="cd-note">Stack radar missions. Don't claim yet.</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Mon</div>
+      <img src="images/allianceduel/vs_radar.png" class="cd-vs" alt="Radar Training">
       <div class="cd-action action-spend">Spend</div>
       <div class="cd-note">Claim stacked radars. Dump stamina + Battle Data + Drone Parts.</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Tue</div>
+      <img src="images/allianceduel/vs_building.png" class="cd-vs" alt="Base Expansion">
       <div class="cd-action action-save">Save</div>
       <div class="cd-note">Building speedup day. Stack radar missions.</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Wed</div>
+      <img src="images/allianceduel/vs_research.png" class="cd-vs" alt="Age of Science">
       <div class="cd-action action-mix">Mix</div>
       <div class="cd-note">Claim stacked radars. Spend Valor Badges. Moderate stamina.</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Thu</div>
+      <img src="images/allianceduel/vs_levelup.png" class="cd-vs" alt="Train Heroes">
       <div class="cd-action action-save">Save</div>
       <div class="cd-note">Hero XP/shards day. Stack radar missions.</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Fri</div>
+      <img src="images/allianceduel/vs_training.png" class="cd-vs" alt="Total Mobilization">
       <div class="cd-action action-prep">Prep</div>
       <div class="cd-note">Claim stacked radars. Train troops. Shield up before sleep!</div>
     </div>
     <div class="cal-day">
       <div class="cd-name">Sat</div>
+      <img src="images/allianceduel/vs_combat.png" class="cd-vs" alt="Enemy Buster">
       <div class="cd-action action-spend">Spend</div>
       <div class="cd-note">4-point day. Enemy kills. Dump ALL remaining resources.</div>
     </div>

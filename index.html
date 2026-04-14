@@ -121,6 +121,21 @@ body::before {
   font-size: .85rem; transition: all .2s;
 }
 .guide-card:hover .card-arrow { color: var(--text); transform: translateX(3px); }
+/* Card icon images — 26px fits the 40px container with padding */
+.card-icon img { width: 26px; height: 26px; object-fit: contain; display: block; }
+/* Hero portrait strip below the hero stats */
+.hero-portraits {
+  display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 1.75rem;
+  opacity: 0; animation: fadeUp .6s ease .4s forwards;
+}
+.hero-portraits img {
+  width: 52px; height: 52px; object-fit: cover;
+  border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface); opacity: .75;
+  transition: opacity .2s, transform .2s, border-color .2s;
+}
+.hero-portraits img:hover { opacity: 1; transform: translateY(-3px); border-color: var(--border2); }
 
 .ic-purple { background: var(--purple-bg); border: 1px solid rgba(167,139,250,.2); color: var(--purple); }
 .ic-green { background: var(--green-bg); border: 1px solid rgba(52,211,153,.2); color: var(--green); }
@@ -176,6 +191,19 @@ body::before {
       <div class="hero-stat"><div class="num">S1–S5</div><div class="lbl">Seasons covered</div></div>
       <div class="hero-stat"><div class="num">100%</div><div class="lbl">Interactive</div></div>
     </div>
+    <!-- Hero portrait strip — replace with your preferred hero images (52×52 cropped portraits work best) -->
+    <div class="hero-portraits">
+      <img src="images/hero_murphy.png"    alt="Murphy">
+      <img src="images/hero_kimberly.png"  alt="Kimberly">
+      <img src="images/hero_williams.png"  alt="Williams">
+      <img src="images/hero_lucius.png"    alt="Lucius">
+      <img src="images/hero_dva.png"       alt="DVA">
+      <img src="images/hero_morrison.png"  alt="Morrison">
+      <img src="images/hero_fiona.png"     alt="Fiona">
+      <img src="images/hero_tesla.png"     alt="Tesla">
+      <img src="images/hero_adam.png"      alt="Adam">
+      <img src="images/hero_mcgregor.png"  alt="McGregor">
+    </div>
   </section>
 
   <div class="section-header">
@@ -186,7 +214,8 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="desert-storm-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">🏜️</div>
+        <!-- REPLACE: desert storm battle art — images/allianceduel/vs_combat.png is a good stand-in -->
+        <div class="card-icon ic-amber"><img src="images/allianceduel/vs_combat.png" alt="Desert Storm"></div>
         <span class="card-badge bd-amber">Interactive</span>
       </div>
       <div class="card-title">Desert Storm Planner</div>
@@ -196,7 +225,8 @@ body::before {
     </a>
     <a class="guide-card" href="canyon-storm-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-purple">🏔️</div>
+        <!-- REPLACE: canyon storm art — vs_building used as placeholder for building-capture theme -->
+        <div class="card-icon ic-purple"><img src="images/allianceduel/vs_building.png" alt="Canyon Storm"></div>
         <span class="card-badge bd-purple">Interactive</span>
       </div>
       <div class="card-title">Canyon Storm Planner</div>
@@ -214,7 +244,8 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="alliance-duel-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-purple">⚔️</div>
+        <!-- REPLACE: Alliance Duel VS logo — vs_logo.png is the exact in-game icon -->
+        <div class="card-icon ic-purple"><img src="images/allianceduel/vs_logo.png" alt="Alliance Duel"></div>
         <span class="card-badge bd-purple">Interactive</span>
       </div>
       <div class="card-title">Alliance Duel VS — Daily Planner</div>
@@ -224,7 +255,7 @@ body::before {
     </a>
     <a class="guide-card" href="stamina-roi-guide.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">⚡</div>
+        <div class="card-icon ic-amber"><img src="images/resources/res_stamina.png" alt="Stamina"></div>
         <span class="card-badge bd-amber">Interactive</span>
       </div>
       <div class="card-title">Stamina &amp; Resource ROI Guide</div>
@@ -234,7 +265,8 @@ body::before {
     </a>
     <a class="guide-card" href="power-progression.html">
       <div class="card-top">
-        <div class="card-icon ic-green">📈</div>
+        <!-- REPLACE: could use a T10 troop or HQ building icon from your game assets -->
+        <div class="card-icon ic-green"><img src="images/troops/troop_t10.png" alt="Power Progression"></div>
         <span class="card-badge bd-green">3 Paths</span>
       </div>
       <div class="card-title">Power Progression Guide</div>
@@ -252,7 +284,8 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="waterfall-training.html">
       <div class="card-top">
-        <div class="card-icon ic-blue">🌊</div>
+        <!-- REPLACE: troop_t8 or troop_t9 — high-tier troop feels right for "waterfall" rung racing -->
+        <div class="card-icon ic-blue"><img src="images/troops/troop_t8.png" alt="Waterfall Training"></div>
         <span class="card-badge bd-blue">Calculator</span>
       </div>
       <div class="card-title">Waterfall Troop Training</div>
@@ -262,7 +295,8 @@ body::before {
     </a>
     <a class="guide-card" href="squad-builder.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">🎯</div>
+        <!-- REPLACE: formation.png is the in-game formations icon — good fit -->
+        <div class="card-icon ic-amber"><img src="images/formation.png" alt="Squad Builder"></div>
         <span class="card-badge bd-amber">Meta</span>
       </div>
       <div class="card-title">Squad Builder & Formations</div>
@@ -280,7 +314,8 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="research-priority-path.html">
       <div class="card-top">
-        <div class="card-icon ic-red">🧪</div>
+        <!-- REPLACE: sci_tree_specialforces is the Special Forces research tree icon — fits T10 research theme -->
+        <div class="card-icon ic-red"><img src="images/research/sci_tree_specialforces.png" alt="Research"></div>
         <span class="card-badge bd-red">Flowchart</span>
       </div>
       <div class="card-title">Research Priority Path</div>
@@ -290,7 +325,7 @@ body::before {
     </a>
     <a class="guide-card" href="vip-diamond-guide.html">
       <div class="card-top">
-        <div class="card-icon ic-cyan">💎</div>
+        <div class="card-icon ic-cyan"><img src="images/resources/res_diamonds.png" alt="Diamonds"></div>
         <span class="card-badge bd-cyan">Economy</span>
       </div>
       <div class="card-title">VIP & Diamond Spending</div>
@@ -300,7 +335,8 @@ body::before {
     </a>
     <a class="guide-card" href="gear-upgrade-guide.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">🔧</div>
+        <!-- REPLACE: quality_legendary is the gold gear rarity icon — exact in-game asset -->
+        <div class="card-icon ic-amber"><img src="images/gear/quality_legendary.png" alt="Gear"></div>
         <span class="card-badge bd-amber">By Role</span>
       </div>
       <div class="card-title">Gear Crafting & Upgrade Order</div>
@@ -310,7 +346,7 @@ body::before {
     </a>
     <a class="guide-card" href="drone-upgrade-guide.html">
       <div class="card-top">
-        <div class="card-icon ic-green">🛸</div>
+        <div class="card-icon ic-green"><img src="images/allianceduel/dronedata.png" alt="Drone"></div>
         <span class="card-badge bd-green">Deep Dive</span>
       </div>
       <div class="card-title">Drone Upgrade Priority</div>
@@ -328,7 +364,7 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="hero-exp-calculator.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">🧮</div>
+        <div class="card-icon ic-amber"><img src="images/allianceduel/heroxp.png" alt="Hero EXP"></div>
         <span class="card-badge bd-amber">Calculator</span>
       </div>
       <div class="card-title">Hero EXP Calculator</div>
@@ -338,7 +374,7 @@ body::before {
     </a>
 <a class="guide-card" href="hq-upgrade-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-blue">🏗️</div>
+        <div class="card-icon ic-blue"><img src="images/headquarters.png" alt="HQ"></div>
         <span class="card-badge bd-blue">Calculator</span>
       </div>
       <div class="card-title">HQ Upgrade Planner</div>
@@ -348,7 +384,8 @@ body::before {
     </a>
     <a class="guide-card" href="server-tracker.html">
       <div class="card-top">
-        <div class="card-icon ic-cyan">🌐</div>
+        <!-- REPLACE: ui/Home.png is the in-game home/base icon — swap for a server/world map icon if you have one -->
+        <div class="card-icon ic-cyan"><img src="images/ui/Home.png" alt="Server Tracker"></div>
         <span class="card-badge bd-cyan">Multi-Server</span>
       </div>
       <div class="card-title">Server Tracker</div>
@@ -358,7 +395,7 @@ body::before {
     </a>
     <a class="guide-card" href="speedup-calculator.html">
       <div class="card-top">
-        <div class="card-icon ic-purple">⏱️</div>
+        <div class="card-icon ic-purple"><img src="images/resources/res_time.png" alt="Speedups"></div>
         <span class="card-badge bd-purple">Calculator</span>
       </div>
       <div class="card-title">Speedup Calculator</div>
@@ -368,7 +405,8 @@ body::before {
     </a>
     <a class="guide-card" href="daily-checklist.html">
       <div class="card-top">
-        <div class="card-icon ic-green">✅</div>
+        <!-- REPLACE: a "daily tasks" or checklist icon from your game UI would be ideal here -->
+        <div class="card-icon ic-green"><img src="images/resources/res_stamina.png" alt="Daily Checklist"></div>
         <span class="card-badge bd-green">Daily</span>
       </div>
       <div class="card-title">Daily Checklist</div>
@@ -386,7 +424,8 @@ body::before {
   <div class="guides-grid">
     <a class="guide-card" href="capital-war-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">🏛️</div>
+        <!-- REPLACE: capital.png or ui/capitol.png — use whichever is the cleaner capitol building icon -->
+        <div class="card-icon ic-amber"><img src="images/capital.png" alt="Capital War"></div>
         <span class="card-badge bd-amber">Planner</span>
       </div>
       <div class="card-title">Capital War Planner</div>
@@ -396,7 +435,8 @@ body::before {
     </a>
     <a class="guide-card" href="hex-warzone-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-red">🗺️</div>
+        <!-- REPLACE: swap for a zoomed-in hex/map tile or warzone UI icon when you have the page art ready -->
+        <div class="card-icon ic-red"><img src="images/preseason_map.png" alt="Hex Warzone" style="width:26px;height:26px;object-fit:cover;border-radius:4px"></div>
         <span class="card-badge bd-red">Hex Tool</span>
       </div>
       <div class="card-title">Hex Warzone Planner</div>
@@ -406,7 +446,8 @@ body::before {
     </a>
     <a class="guide-card" href="city-capture-planner.html">
       <div class="card-top">
-        <div class="card-icon ic-amber">📍</div>
+        <!-- REPLACE: alliancecity_level.png is the in-game alliance city icon — good for city capture -->
+        <div class="card-icon ic-amber"><img src="images/ui/alliancecity_level.png" alt="City Capture"></div>
         <span class="card-badge bd-amber">Flowchart</span>
       </div>
       <div class="card-title">City Capture Path Planner</div>
@@ -416,7 +457,8 @@ body::before {
     </a>
     <a class="guide-card" href="hive-strategy-guide.html">
       <div class="card-top">
-        <div class="card-icon ic-blue">🏘️</div>
+        <!-- REPLACE: use a "hive" or base cluster icon from your game art when available -->
+        <div class="card-icon ic-blue"><img src="images/ui/alliancecity_level.png" alt="Hive Strategy"></div>
         <span class="card-badge bd-blue">Strategy</span>
       </div>
       <div class="card-title">Hive Positioning & Shield Guide</div>

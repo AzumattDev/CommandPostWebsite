@@ -229,6 +229,30 @@
 .cloud-bar.show{display:flex}
 .cloud-status{font-size:.68rem;font-family:'JetBrains Mono',monospace;color:var(--text3);flex:1;min-width:0}
 .cloud-status.ok{color:var(--green)}.cloud-status.err{color:var(--red)}.cloud-status.busy{color:var(--cw-gold)}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media(max-width:860px){
+  .sidebar{position:static;top:0}
+  .alliance-list{max-height:220px}
+  .add-meta-row{grid-template-columns:1fr 1fr}
+  .pb-btns{margin-left:0}
+}
+@media(max-width:500px){
+  .add-meta-row{grid-template-columns:1fr}
+  .add-tag-row{flex-wrap:wrap}
+  .add-tag-row input[type=text]:first-child{width:70px}
+  .war-clock{gap:.5rem}
+  .wc-divider{display:none}
+  .node-assign-grid{grid-template-columns:repeat(2,1fr)}
+  .zone-grid{grid-template-columns:repeat(2,1fr)}
+  .rules-grid{grid-template-columns:1fr}
+  .export-row{flex-direction:column}
+  .cw-btn{width:100%;justify-content:center}
+  .pb-btns{width:100%;justify-content:stretch}
+  .pb-btn{flex:1;text-align:center}
+  .bg-scroll-wrap{height:280px}
+  .tl-track{font-size:.48rem}
+}
 </style>
 </head>
 <body>

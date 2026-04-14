@@ -1,6 +1,6 @@
 (function(){
 const NAV_LINKS = [
-  {label:'Home', href:'index.html', icon:'🏠'},
+  {label:'Home', href:'index.html', icon:'images/home_icon.png'},
   {label:'Events', children:[
     {label:'Desert Storm Planner', href:'desert-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
     {label:'Canyon Storm Planner', href:'canyon-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
@@ -61,7 +61,7 @@ style.textContent = `
 .cp-brand:hover{color:#7dd3fc}
 .cp-brand span{font-size:.65rem;color:#6b6980;font-family:'JetBrains Mono',monospace;font-weight:400}
 .cp-links{display:flex;align-items:center;gap:2px}
-.cp-link{color:#9d9baf;text-decoration:none;font-size:.8rem;padding:6px 10px;border-radius:6px;transition:all .15s;position:relative;cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit}
+.cp-link{color:#9d9baf;text-decoration:none;font-size:.8rem;padding:6px 10px;border-radius:6px;transition:all .15s;position:relative;cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
 .cp-link:hover{color:#e8e6f0;background:rgba(255,255,255,.05)}
 .cp-link.active{color:#a78bfa;background:rgba(167,139,250,.08)}
 .cp-dropdown{position:absolute;top:100%;left:0;background:#14151b;border:1px solid #262838;border-radius:10px;padding:6px;min-width:200px;display:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -121,7 +121,8 @@ NAV_LINKS.forEach(item => {
     });
     navHTML += `</div></div>`;
   } else {
-    navHTML += `<a class="cp-link${isActive(item.href)?' active':''}" href="${item.href}">${item.icon||''} ${item.label}</a>`;
+    const icn = item.icon ? `<img src="${item.icon}" style="width:16px;height:16px;object-fit:contain;opacity:.85;flex-shrink:0" alt="">` : '';
+    navHTML += `<a class="cp-link${isActive(item.href)?' active':''}" href="${item.href}">${icn}${item.label}</a>`;
   }
 });
 
@@ -142,7 +143,8 @@ NAV_LINKS.forEach(item => {
     });
     navHTML += `</div>`;
   } else {
-    navHTML += `<div class="cp-mob-section"><a class="cp-mob-link${isActive(item.href)?' active':''}" href="${item.href}" onclick="document.getElementById('cpMobile').classList.remove('open')">${item.icon||''} ${item.label}</a></div>`;
+    const micn = item.icon ? `<img src="${item.icon}" style="width:18px;height:18px;object-fit:contain;opacity:.85;flex-shrink:0" alt="">` : '';
+    navHTML += `<div class="cp-mob-section"><a class="cp-mob-link${isActive(item.href)?' active':''}" href="${item.href}" onclick="document.getElementById('cpMobile').classList.remove('open')">${micn}${item.label}</a></div>`;
   }
 });
 navHTML += `</div>`;

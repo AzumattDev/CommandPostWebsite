@@ -142,7 +142,11 @@
             gap: .75rem;
             flex-wrap: wrap
         }
-        .cloud-bar.show { display: flex }
+
+        .cloud-bar.show {
+            display: flex
+        }
+
         .cloud-status {
             font-size: .68rem;
             font-family: 'JetBrains Mono', monospace;
@@ -150,9 +154,18 @@
             flex: 1;
             min-width: 0
         }
-        .cloud-status.ok  { color: var(--green) }
-        .cloud-status.err { color: var(--red) }
-        .cloud-status.busy { color: var(--ps) }
+
+        .cloud-status.ok {
+            color: var(--green)
+        }
+
+        .cloud-status.err {
+            color: var(--red)
+        }
+
+        .cloud-status.busy {
+            color: var(--ps)
+        }
 
         .npf-field {
             display: flex;
@@ -238,9 +251,17 @@
             flex-shrink: 0
         }
 
-        .panel.collapsed .panel-title::after { transform: rotate(-90deg); }
-        .panel.collapsed .panel-title { margin-bottom: 0; }
-        .panel.collapsed > *:not(.panel-title) { display: none !important; }
+        .panel.collapsed .panel-title::after {
+            transform: rotate(-90deg);
+        }
+
+        .panel.collapsed .panel-title {
+            margin-bottom: 0;
+        }
+
+        .panel.collapsed > *:not(.panel-title) {
+            display: none !important;
+        }
 
         .panel-title .cnt {
             font-size: .65rem;
@@ -505,7 +526,9 @@
             flex-shrink: 0
         }
 
-        .mode-export-btn:hover { background: rgba(167,139,250,.15); }
+        .mode-export-btn:hover {
+            background: rgba(167, 139, 250, .15);
+        }
 
         .action-btns {
             display: flex;
@@ -606,18 +629,21 @@
             border-top: none;
             border-radius: 0 0 6px 6px;
         }
+
         .map-legend {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 10px;
         }
+
         .map-legend-label {
             font-size: .58rem;
             font-family: 'DM Sans', sans-serif;
             color: var(--muted);
             margin-right: 2px;
         }
+
         .map-legend-row {
             display: flex;
             align-items: center;
@@ -626,12 +652,13 @@
             font-family: 'DM Sans', sans-serif;
             color: var(--fg);
         }
+
         .map-legend-dot {
             width: 10px;
             height: 10px;
             border-radius: 2px;
             flex-shrink: 0;
-            box-shadow: 0 0 0 1px rgba(0,0,0,.35);
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .35);
         }
 
         .map-zoom-hint {
@@ -687,10 +714,17 @@
             fill-opacity: .95 !important;
             animation: pp-pulse 1s ease-in-out 3;
         }
+
         @keyframes pp-pulse {
-            0%   { fill-opacity: .95 }
-            50%  { fill-opacity: .35 }
-            100% { fill-opacity: .95 }
+            0% {
+                fill-opacity: .95
+            }
+            50% {
+                fill-opacity: .35
+            }
+            100% {
+                fill-opacity: .95
+            }
         }
 
         /* NAP toggle button on alliance chip */
@@ -707,50 +741,152 @@
             flex-shrink: 0;
             line-height: 1.4;
         }
-        .nap-btn:hover { border-color: var(--green); color: var(--green); }
-        .nap-btn.on { background: rgba(52,211,153,.12); border-color: rgba(52,211,153,.4); color: var(--green); }
-        .a-chip.is-nap { border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.05); }
+
+        .nap-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .nap-btn.on {
+            background: rgba(52, 211, 153, .12);
+            border-color: rgba(52, 211, 153, .4);
+            color: var(--green);
+        }
+
+        .a-chip.is-nap {
+            border-color: rgba(52, 211, 153, .4);
+            background: rgba(52, 211, 153, .05);
+        }
 
         /* Power Plan panel */
         .pp-self-row {
-            display: flex; align-items: center; gap: 6px;
-            margin-bottom: .6rem; font-size: .72rem; color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: .6rem;
+            font-size: .72rem;
+            color: var(--text2);
         }
+
         .pp-self-row select {
-            background: var(--surface2); border: 1px solid var(--border);
-            border-radius: 5px; color: var(--text);
-            font-family: 'Chakra Petch', sans-serif; font-size: .72rem;
-            padding: 3px 6px; cursor: pointer; flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: .72rem;
+            padding: 3px 6px;
+            cursor: pointer;
+            flex: 1;
         }
-        .pp-target-list { display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; padding-right: 4px; scrollbar-gutter: stable; }
-        .pp-group { margin-bottom: .55rem; }
+
+        .pp-target-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+            scrollbar-gutter: stable;
+        }
+
+        .pp-group {
+            margin-bottom: .55rem;
+        }
+
         .pp-group-hdr {
-            display: flex; align-items: center; gap: 6px;
-            font-family: 'JetBrains Mono', monospace; font-size: .6rem;
-            font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
-            color: var(--text3); margin-bottom: 3px; padding-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text3);
+            margin-bottom: 3px;
+            padding-bottom: 3px;
             border-bottom: 1px solid var(--border);
         }
-        .pp-type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        .pp-type-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
         .pp-row {
-            display: flex; align-items: center; gap: 5px;
-            padding: 3px 5px; border-radius: 5px; cursor: pointer; transition: background .12s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background .12s;
         }
-        .pp-row:hover { background: var(--surface2); }
-        .pp-row-id { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--text3); width: 20px; flex-shrink: 0; }
-        .pp-row-tag { font-family: 'Chakra Petch', sans-serif; font-size: .73rem; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .pp-row:hover {
+            background: var(--surface2);
+        }
+
+        .pp-row-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .6rem;
+            color: var(--text3);
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .pp-row-tag {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: .73rem;
+            font-weight: 700;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .pp-badge {
-            font-size: .6rem; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; line-height: 1.5;
+            font-size: .6rem;
+            padding: 1px 5px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            line-height: 1.5;
         }
-        .pp-badge.open { background: rgba(52,211,153,.12); color: var(--green); }
-        .pp-badge.enemy { background: rgba(248,113,113,.1); color: var(--red); }
+
+        .pp-badge.open {
+            background: rgba(52, 211, 153, .12);
+            color: var(--green);
+        }
+
+        .pp-badge.enemy {
+            background: rgba(248, 113, 113, .1);
+            color: var(--red);
+        }
+
         .pp-go {
-            background: none; border: none; color: var(--text3);
-            font-size: .78rem; cursor: pointer; padding: 1px 5px;
-            border-radius: 3px; flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text3);
+            font-size: .78rem;
+            cursor: pointer;
+            padding: 1px 5px;
+            border-radius: 3px;
+            flex-shrink: 0;
         }
-        .pp-go:hover { color: var(--ps); background: var(--ps-bg); }
-        .pp-empty { font-size: .75rem; color: var(--text3); padding: 4px 2px; }
+
+        .pp-go:hover {
+            color: var(--ps);
+            background: var(--ps-bg);
+        }
+
+        .pp-empty {
+            font-size: .75rem;
+            color: var(--text3);
+            padding: 4px 2px;
+        }
 
         .t-badge {
             pointer-events: all;
@@ -878,34 +1014,85 @@
         /* ── Mobile ──────────────────────────────────────────────── */
         @media (max-width: 768px) {
             /* Map first, sidebar below */
-            .planner-layout { gap: .6rem }
-            .planner-layout > div:last-child { order: -1 }
+            .planner-layout {
+                gap: .6rem
+            }
+
+            .planner-layout > div:last-child {
+                order: -1
+            }
 
             /* Sidebar: drop sticky so it doesn't eat viewport */
-            .sidebar { position: static; max-height: none; overflow-y: visible }
+            .sidebar {
+                position: static;
+                max-height: none;
+                overflow-y: visible
+            }
 
             /* Profile bar: stack vertically */
-            .profile-bar { flex-direction: column; align-items: stretch; gap: .5rem }
-            .pb-select { min-width: 0; width: 100% }
-            .pb-btns { margin-left: 0 }
-            .pb-btn { padding: 9px 14px; font-size: .8rem }
+            .profile-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .5rem
+            }
+
+            .pb-select {
+                min-width: 0;
+                width: 100%
+            }
+
+            .pb-btns {
+                margin-left: 0
+            }
+
+            .pb-btn {
+                padding: 9px 14px;
+                font-size: .8rem
+            }
 
             /* New profile form: stack fields */
-            .new-profile-form { flex-direction: column }
-            .npf-field input { width: 100% !important; box-sizing: border-box }
+            .new-profile-form {
+                flex-direction: column
+            }
+
+            .npf-field input {
+                width: 100% !important;
+                box-sizing: border-box
+            }
 
             /* Cloud bar: wrap tightly */
-            .cloud-bar { gap: .4rem }
-            .cloud-bar .pb-btn { flex: 1 }
+            .cloud-bar {
+                gap: .4rem
+            }
+
+            .cloud-bar .pb-btn {
+                flex: 1
+            }
 
             /* Mode bar: hide desktop hint */
-            .mode-hint { display: none }
-            .mode-bar { flex-wrap: wrap }
+            .mode-hint {
+                display: none
+            }
+
+            .mode-bar {
+                flex-wrap: wrap
+            }
 
             /* Map footer: stack, hide desktop zoom hint */
-            .map-footer { flex-direction: column; align-items: flex-start; gap: 5px; padding: 6px 10px }
-            .map-zoom-hint { display: none }
-            .map-touch-hint { display: block !important }
+            .map-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                padding: 6px 10px
+            }
+
+            .map-zoom-hint {
+                display: none
+            }
+
+            .map-touch-hint {
+                display: block !important
+            }
 
             /* Zone popup → bottom sheet */
             .zone-popup {
@@ -914,6 +1101,7 @@
                 box-sizing: border-box;
                 padding: 1.1rem 1rem calc(env(safe-area-inset-bottom, 0px) + 1rem)
             }
+
             .zone-popup.show {
                 position: fixed;
                 bottom: 0;
@@ -923,25 +1111,59 @@
             }
 
             /* Bigger tap targets */
-            .zp-btn { padding: 10px 4px; font-size: .82rem }
-            .zp-sel { padding: 9px 8px; font-size: .88rem }
-            .ps-btn { padding: 9px 13px }
-            .a-chip { padding: 7px 8px; min-height: 36px }
-            .a-del { padding: 5px 9px }
-            .nap-btn { padding: 4px 8px }
-            .type-row { padding: 6px 5px; min-height: 32px }
-            .pp-go { padding: 4px 9px }
+            .zp-btn {
+                padding: 10px 4px;
+                font-size: .82rem
+            }
+
+            .zp-sel {
+                padding: 9px 8px;
+                font-size: .88rem
+            }
+
+            .ps-btn {
+                padding: 9px 13px
+            }
+
+            .a-chip {
+                padding: 7px 8px;
+                min-height: 36px
+            }
+
+            .a-del {
+                padding: 5px 9px
+            }
+
+            .nap-btn {
+                padding: 4px 8px
+            }
+
+            .type-row {
+                padding: 6px 5px;
+                min-height: 32px
+            }
+
+            .pp-go {
+                padding: 4px 9px
+            }
 
             /* Lists: no max-height clamp on mobile (page scrolls) */
-            .a-list { max-height: none }
-            .pp-target-list { max-height: none }
+            .a-list {
+                max-height: none
+            }
+
+            .pp-target-list {
+                max-height: none
+            }
         }
     </style>
 </head>
 <body>
 <div class="container" style="max-width:1160px">
     <div class="ps-hero">
-        <h1><img src="images/ui/capitol.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-right:6px" alt="">Pre-Season <span class="acc">Map Planner</span></h1>
+        <h1><img src="images/ui/capitol.png"
+                 style="width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-right:6px" alt="">Pre-Season
+            <span class="acc">Map Planner</span></h1>
         <p class="sub">Assign alliances to each territory zone. Multiple server profiles supported — each stores its own
             alliance list and assignments.</p>
     </div>
@@ -979,14 +1201,18 @@
         <span class="pb-label">☁ Cloud Sync</span>
         <button class="pb-btn" onclick="psSharePlan(this)">📤 Share Plan</button>
         <button class="pb-btn" onclick="psLoadPlan(this)">📥 Load Plan</button>
-        <button class="pb-btn" onclick="psSyncAlliances(this)" title="Pull alliance list &amp; NAP flags from all shared plans for this server">👥 Sync Alliances</button>
+        <button class="pb-btn" onclick="psSyncAlliances(this)"
+                title="Pull alliance list &amp; NAP flags from all shared plans for this server">👥 Sync Alliances
+        </button>
         <span class="cloud-status" id="psCloudStatus">Local only — share to let alliance members load this plan.</span>
     </div>
 
     <div class="planner-layout">
         <div class="sidebar">
             <div class="panel">
-                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Alliances <span class="cnt" id="aCount">0</span><span style="font-size:.58rem;opacity:.6">click to filter</span></div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Alliances <span
+                        class="cnt" id="aCount">0</span><span style="font-size:.58rem;opacity:.6">click to filter</span>
+                </div>
                 <div class="add-row">
                     <input type="text" id="inTag" placeholder="TAG" maxlength="5"
                            onkeydown="if(event.key==='Enter')addAlliance()">
@@ -997,11 +1223,13 @@
                 <div class="a-list" id="aList"></div>
             </div>
             <div class="panel">
-                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Territory Types <span style="font-size:.58rem;opacity:.6">click to filter</span></div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Territory Types
+                    <span style="font-size:.58rem;opacity:.6">click to filter</span></div>
                 <div class="type-list" id="typeList"></div>
             </div>
             <div class="panel" id="ppPanel" style="display:none">
-                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Power Plan <span class="cnt" id="ppCount">0</span></div>
+                <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Power Plan <span
+                        class="cnt" id="ppCount">0</span></div>
                 <div class="pp-self-row">
                     <span>My Alliance:</span>
                     <select id="ppSelfSel" onchange="renderPowerPlan()">
@@ -1013,9 +1241,14 @@
             <div class="panel">
                 <div class="panel-title" onclick="this.closest('.panel').classList.toggle('collapsed')">Actions</div>
                 <div class="action-btns">
-                    <button class="ps-btn" onclick="exportProfile()" title="Download profile as JSON file">⬇ Export Profile</button>
-                    <button class="ps-btn" onclick="document.getElementById('importFileInput').click()" title="Load a previously exported profile JSON">⬆ Import Profile</button>
-                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importProfile(event)">
+                    <button class="ps-btn" onclick="exportProfile()" title="Download profile as JSON file">⬇ Export
+                        Profile
+                    </button>
+                    <button class="ps-btn" onclick="document.getElementById('importFileInput').click()"
+                            title="Load a previously exported profile JSON">⬆ Import Profile
+                    </button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none"
+                           onchange="importProfile(event)">
                     <button class="ps-btn ps-btn-danger" onclick="clearAll()">Clear All</button>
                 </div>
             </div>
@@ -1039,13 +1272,29 @@
             <div class="map-footer">
                 <div class="map-legend">
                     <span class="map-legend-label">Legend:</span>
-                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#8a8a8a"></div>Unclaimed</div>
-                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#c84018"></div>Enemy</div>
-                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#3a7ec0"></div>Own alliance</div>
-                    <div class="map-legend-row"><div class="map-legend-dot" style="background:#4a9e54"></div>NAP <span style="font-size:.55rem;color:var(--muted);margin-left:2px">(custom — not in-game)</span></div>
+                    <div class="map-legend-row">
+                        <div class="map-legend-dot" style="background:#8a8a8a"></div>
+                        Unclaimed
+                    </div>
+                    <div class="map-legend-row">
+                        <div class="map-legend-dot" style="background:#c84018"></div>
+                        Enemy
+                    </div>
+                    <div class="map-legend-row">
+                        <div class="map-legend-dot" style="background:#3a7ec0"></div>
+                        Own alliance
+                    </div>
+                    <div class="map-legend-row">
+                        <div class="map-legend-dot" style="background:#4a9e54"></div>
+                        NAP <span
+                            style="font-size:.55rem;color:var(--muted);margin-left:2px">(custom — not in-game)</span>
+                    </div>
                 </div>
                 <div class="map-zoom-hint">Scroll to zoom &bull; Drag to pan &bull; Dbl-click to reset</div>
-                <div class="map-touch-hint" style="display:none;font-size:.58rem;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.4">Pinch to zoom &bull; Drag to pan &bull; Tap to assign</div>
+                <div class="map-touch-hint"
+                     style="display:none;font-size:.58rem;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.4">
+                    Pinch to zoom &bull; Drag to pan &bull; Tap to assign
+                </div>
             </div>
         </div>
     </div>
@@ -1061,7 +1310,9 @@
         <select class="zp-sel" id="zpAlliance"></select></div>
     <div class="zp-field">
         <div class="zp-lbl">Territory Type</div>
-        <div class="zp-sel" id="zpType" style="padding:6px 8px;background:rgba(255,255,255,.07);border-radius:6px;font-size:.85rem;"></div></div>
+        <div class="zp-sel" id="zpType"
+             style="padding:6px 8px;background:rgba(255,255,255,.07);border-radius:6px;font-size:.85rem;"></div>
+    </div>
     <div class="zp-btns">
         <button class="zp-btn zp-clr" onclick="clearZone()">Clear</button>
         <button class="zp-btn" onclick="closePopup()">Cancel</button>
@@ -1800,7 +2051,11 @@
         const p = getProfile();
         const list = document.getElementById('ppList');
         const countEl = document.getElementById('ppCount');
-        if (!p) { list.innerHTML = ''; countEl.textContent = 0; return; }
+        if (!p) {
+            list.innerHTML = '';
+            countEl.textContent = 0;
+            return;
+        }
 
         const selfId = document.getElementById('ppSelfSel').value;
         const napIds = new Set(p.alliances.filter(a => a.nap).map(a => a.id));
@@ -1815,7 +2070,7 @@
             if (assignedId === selfId && selfId) return; // we own it
             if (napIds.has(assignedId)) return; // NAP — off limits
             const enemy = assignedId ? p.alliances.find(a => a.id === assignedId) : null;
-            targets.push({ t, effectiveType, enemy });
+            targets.push({t, effectiveType, enemy});
         });
 
         // Sort by type descending (6 first, then 5, 4, 3, 2, 1)
@@ -1840,7 +2095,7 @@
             .filter(tid => groups[tid])
             .map(tid => {
                 const zt = ZONE_TYPES.find(x => x.id === tid);
-                const rows = groups[tid].map(({ t, enemy }) => {
+                const rows = groups[tid].map(({t, enemy}) => {
                     const isOpen = !enemy;
                     const label = isOpen ? 'Open' : enemy.tag;
                     const cls = isOpen ? 'open' : 'enemy';
@@ -1869,7 +2124,7 @@
         // Zoom to 3× if currently below that, else keep current zoom
         const targetScale = Math.max(mpScale, 3);
         mpScale = targetScale;
-        mpX = o.offsetWidth  / 2 - t.cx * ratio * mpScale;
+        mpX = o.offsetWidth / 2 - t.cx * ratio * mpScale;
         mpY = o.offsetHeight / 2 - t.cy * ratio * mpScale;
         clampMP();
         applyMT();
@@ -1906,14 +2161,19 @@
     // fill/stroke/ptr = canvas-export fallback colors.
     // selfId = the user's own alliance id (null if not set).
     function getBannerStyle(a, selfId) {
-        if (!a)              return { img: 'images/ui/badge_name_gray.png',  fill: '#8a8a8a', stroke: '#5a5a5a', ptr: '#777' };
-        if (a.id === selfId) return { img: 'images/ui/badge_name_blue.png',  fill: '#3a7ec0', stroke: '#1a519a', ptr: '#2e6db0' };
-        if (a.nap)           return { img: 'images/ui/badge_name_green.png', fill: '#4a9e54', stroke: '#2a6830', ptr: '#3c7e42' };
-        return                      { img: 'images/ui/badge_name_red.png',   fill: '#c84018', stroke: '#8a2800', ptr: '#b03010' };
+        if (!a) return {img: 'images/ui/badge_name_gray.png', fill: '#8a8a8a', stroke: '#5a5a5a', ptr: '#777'};
+        if (a.id === selfId) return {
+            img: 'images/ui/badge_name_blue.png',
+            fill: '#3a7ec0',
+            stroke: '#1a519a',
+            ptr: '#2e6db0'
+        };
+        if (a.nap) return {img: 'images/ui/badge_name_green.png', fill: '#4a9e54', stroke: '#2a6830', ptr: '#3c7e42'};
+        return {img: 'images/ui/badge_name_red.png', fill: '#c84018', stroke: '#8a2800', ptr: '#b03010'};
     }
 
     function makeBadge(sx, sy, tid, z, a, zt, bsz, bStyle) {
-        bStyle = bStyle || { fill: BC, stroke: BD, ptr: BC };
+        bStyle = bStyle || {fill: BC, stroke: BD, ptr: BC};
         bsz = bsz || 1;
         const bh = Math.round(BH * bsz);
         const bnw = Math.round(BNW * bsz), bp = Math.round(BP * bsz), br = Math.max(2, Math.round(BR * bsz));
@@ -1947,9 +2207,9 @@
         const midSrcW = BADGE_SW - 2 * BADGE_CAP;           // 18px solid middle in source
         const midDstW = bw - 2 * capD;
         [
-            { dx: bx,               dw: capD,    vx: 0,                         vw: BADGE_CAP  }, // left cap
-            { dx: bx + capD,        dw: midDstW, vx: BADGE_CAP,                 vw: midSrcW    }, // middle
-            { dx: bx + bw - capD,   dw: capD,    vx: BADGE_SW - BADGE_CAP,      vw: BADGE_CAP  }, // right cap
+            {dx: bx, dw: capD, vx: 0, vw: BADGE_CAP}, // left cap
+            {dx: bx + capD, dw: midDstW, vx: BADGE_CAP, vw: midSrcW}, // middle
+            {dx: bx + bw - capD, dw: capD, vx: BADGE_SW - BADGE_CAP, vw: BADGE_CAP}, // right cap
         ].forEach(s => {
             if (s.dw <= 0) return;
             const outer = document.createElementNS(svgNS, 'svg');
@@ -2080,7 +2340,7 @@
             const zt = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
             const color = a ? a.color : (zt ? zt.color : null);
             const faded = (filterType !== null && effectiveType !== filterType) ||
-                          (filterAlliance !== null && (!a || a.id !== filterAlliance));
+                (filterAlliance !== null && (!a || a.id !== filterAlliance));
             const isNap = a && napIds.has(a.id);
             const poly = document.createElementNS(svgNS, 'polygon');
             poly.setAttribute('points', t.pts);
@@ -2095,7 +2355,10 @@
             if (isNap) poly.classList.add('nap-zone');
             poly.addEventListener('click', e => {
                 e.stopPropagation();
-                if (mpMoved > 5) { mpMoved = 0; return; }
+                if (mpMoved > 5) {
+                    mpMoved = 0;
+                    return;
+                }
                 openPopup(t.id, e.clientX, e.clientY)
             });
             poly.addEventListener('mouseenter', () => highlight(t.id, true));
@@ -2107,8 +2370,10 @@
 
         // Pass 2: dark overlay then re-draw matching zones on top so they pop
         const ovr = document.createElementNS(svgNS, 'rect');
-        ovr.setAttribute('x', 0); ovr.setAttribute('y', 0);
-        ovr.setAttribute('width', 685); ovr.setAttribute('height', 558);
+        ovr.setAttribute('x', 0);
+        ovr.setAttribute('y', 0);
+        ovr.setAttribute('width', 685);
+        ovr.setAttribute('height', 558);
         ovr.setAttribute('fill', 'rgba(0,0,0,.58)');
         ovr.classList.add('filter-overlay');
         fills.appendChild(ovr);
@@ -2150,6 +2415,7 @@
         const bsz = Math.min(mpScale, 3);  // badges scale with zoom, capped at 3×
         // "Chemical Plant" (longest name) at 5px/ch = ~70px base → 120 is a safe ceiling
         const bwCull = Math.round(120 * bsz), bhCull = Math.round((BH + BP) * bsz);
+        const CPATH = 'images/ui/';
         TERR_DATA.forEach(t => {
             const z = p.zones[t.id];
             const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
@@ -2161,9 +2427,11 @@
             // Cull off-screen badges
             if (sx < -bwCull || sx > o.offsetWidth + bwCull || sy < -(bhCull + 20) || sy > o.offsetHeight + 20) return;
             const faded = (filterType !== null && effectiveType !== filterType) ||
-                          (filterAlliance !== null && (!a || a.id !== filterAlliance));
+                (filterAlliance !== null && (!a || a.id !== filterAlliance));
+            // Zone icons only visible when zoomed in enough
+            const showIcons = mpScale >= 3.75;
             // Capitol icon — always rendered regardless of saved alliance data
-            if (effectiveType === 7) {
+            if (effectiveType === 7 && showIcons) {
                 const iconSz = Math.round(44 * bsz);
                 const capImg = document.createElementNS(svgNS, 'image');
                 capImg.setAttribute('x', sx - iconSz / 2);
@@ -2174,11 +2442,49 @@
                 capImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
                 capImg.classList.add('t-badge');
                 capImg.setAttribute('data-tid', t.id);
-                capImg.addEventListener('click', e => { e.stopPropagation(); if (mpMoved > 5) { mpMoved = 0; return; } openPopup(t.id, e.clientX, e.clientY); });
+                capImg.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (mpMoved > 5) {
+                        mpMoved = 0;
+                        return;
+                    }
+                    openPopup(t.id, e.clientX, e.clientY);
+                });
                 capImg.addEventListener('mouseenter', () => highlight(t.id, true));
                 capImg.addEventListener('mouseleave', () => highlight(t.id, false));
                 if (faded) capImg.classList.add('faded');
                 labels.appendChild(capImg);
+            }
+            // Chengshi city icons for zone types 1–9 (type 6 = _1, Casino 8 = _6_2, Campus 9 = _6_3)
+            const CHENGSHI_FILE = {
+                1: 'chengshi_1.png', 2: 'chengshi_2.png', 3: 'chengshi_3.png',
+                4: 'chengshi_4.png', 5: 'chengshi_5.png', 6: 'chengshi_6_1.png',
+                8: 'chengshi_6_2.png', 9: 'chengshi_6_3.png'
+            };
+            if (showIcons && CHENGSHI_FILE[effectiveType]) {
+                const iconFile = CHENGSHI_FILE[effectiveType];
+                const iconSz = Math.round(36 * bsz);
+                const zImg = document.createElementNS(svgNS, 'image');
+                zImg.setAttribute('x', sx - iconSz / 2);
+                zImg.setAttribute('y', sy - iconSz / 2);
+                zImg.setAttribute('width', iconSz);
+                zImg.setAttribute('height', iconSz);
+                zImg.setAttribute('href', CPATH + iconFile);
+                zImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                zImg.classList.add('t-badge');
+                zImg.setAttribute('data-tid', t.id);
+                zImg.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (mpMoved > 5) {
+                        mpMoved = 0;
+                        return;
+                    }
+                    openPopup(t.id, e.clientX, e.clientY);
+                });
+                zImg.addEventListener('mouseenter', () => highlight(t.id, true));
+                zImg.addEventListener('mouseleave', () => highlight(t.id, false));
+                if (faded) zImg.classList.add('faded');
+                labels.appendChild(zImg);
             }
             if (!a && !zt) return;
             const bStyle = getBannerStyle(a, selfId);
@@ -2272,9 +2578,12 @@
     /* ── Export / Import Profile ────────────────────────────────── */
     function exportProfile() {
         const p = getProfile();
-        if (!p) { alert('Select a profile first.'); return; }
+        if (!p) {
+            alert('Select a profile first.');
+            return;
+        }
         const json = JSON.stringify(p, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
+        const blob = new Blob([json], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         const slug = [p.server && 'S' + p.server, p.alliance, p.label].filter(Boolean).join('-') || 'profile';
@@ -2290,9 +2599,15 @@
         const reader = new FileReader();
         reader.onload = ev => {
             let p;
-            try { p = JSON.parse(ev.target.result); } catch { alert('Invalid JSON file.'); return; }
+            try {
+                p = JSON.parse(ev.target.result);
+            } catch {
+                alert('Invalid JSON file.');
+                return;
+            }
             if (!p || typeof p !== 'object' || !Array.isArray(p.alliances) || typeof p.zones !== 'object') {
-                alert('This file doesn\'t look like a Pre-Season Map profile.'); return;
+                alert('This file doesn\'t look like a Pre-Season Map profile.');
+                return;
             }
             // Give it a fresh ID so it doesn't collide with existing profiles
             p.id = uid();
@@ -2309,10 +2624,15 @@
     /* ── Cloud Sync ─────────────────────────────────────────────── */
     async function psSharePlan(btn) {
         const p = getProfile();
-        if (!p || !p.server) { alert('Profile needs a server number to share.'); return; }
+        if (!p || !p.server) {
+            alert('Profile needs a server number to share.');
+            return;
+        }
         const status = document.getElementById('psCloudStatus');
-        const orig = btn.textContent; btn.disabled = true;
-        status.textContent = 'Uploading…'; status.className = 'cloud-status busy';
+        const orig = btn.textContent;
+        btn.disabled = true;
+        status.textContent = 'Uploading…';
+        status.className = 'cloud-status busy';
         try {
             const planName = p.alliance || 'Default';
             const payload = {
@@ -2321,14 +2641,27 @@
                 label: p.label || '',
                 alliance: p.alliance || '',
                 updated_by: p.alliance || 'anon',
-                plan_data: JSON.stringify({ alliances: p.alliances, zones: p.zones })
+                plan_data: JSON.stringify({alliances: p.alliances, zones: p.zones})
             };
-            const r = await fetch('/api/preseason', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const r = await fetch('/api/preseason', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
             const j = await r.json();
-            if (j.ok) { status.textContent = `✓ Shared as "${planName}" at ${j.updated_at} UTC`; status.className = 'cloud-status ok'; }
-            else { status.textContent = 'Error: ' + (j.error || 'unknown'); status.className = 'cloud-status err'; }
-        } catch (e) { status.textContent = 'Network error — is the site deployed with D1?'; status.className = 'cloud-status err'; }
-        btn.disabled = false; btn.textContent = orig;
+            if (j.ok) {
+                status.textContent = `✓ Shared as "${planName}" at ${j.updated_at} UTC`;
+                status.className = 'cloud-status ok';
+            } else {
+                status.textContent = 'Error: ' + (j.error || 'unknown');
+                status.className = 'cloud-status err';
+            }
+        } catch (e) {
+            status.textContent = 'Network error — is the site deployed with D1?';
+            status.className = 'cloud-status err';
+        }
+        btn.disabled = false;
+        btn.textContent = orig;
     }
 
     function psPickPlan(plans, server) {
@@ -2353,8 +2686,11 @@
                 </div>
                 <div style="font-size:.68rem;color:var(--text2);margin-top:2px">By ${psEsc(pl.updated_by || '?')}${pl.alliance && pl.alliance !== pl.plan_name ? ' · ' + psEsc(pl.alliance) : ''}${pl.label ? ' · ' + psEsc(pl.label) : ''}</div>`;
                 item.addEventListener('mouseover', () => item.style.borderColor = 'var(--ps)');
-                item.addEventListener('mouseout',  () => item.style.borderColor = 'var(--border)');
-                item.addEventListener('click', () => { overlay.remove(); resolve(pl); });
+                item.addEventListener('mouseout', () => item.style.borderColor = 'var(--border)');
+                item.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(pl);
+                });
                 list.appendChild(item);
             });
             box.appendChild(list);
@@ -2363,7 +2699,10 @@
             const cancelBtn = document.createElement('button');
             cancelBtn.textContent = 'Cancel';
             cancelBtn.style.cssText = 'padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:"Chakra Petch",sans-serif;font-size:.8rem;cursor:pointer';
-            cancelBtn.addEventListener('click', () => { overlay.remove(); resolve(null); });
+            cancelBtn.addEventListener('click', () => {
+                overlay.remove();
+                resolve(null);
+            });
             foot.appendChild(cancelBtn);
             box.appendChild(foot);
             overlay.appendChild(box);
@@ -2373,54 +2712,116 @@
 
     async function psLoadPlan(btn) {
         const p = getProfile();
-        if (!p || !p.server) { alert('Profile needs a server number to load.'); return; }
+        if (!p || !p.server) {
+            alert('Profile needs a server number to load.');
+            return;
+        }
         const status = document.getElementById('psCloudStatus');
-        const orig = btn.textContent; btn.disabled = true;
-        status.textContent = 'Loading plans…'; status.className = 'cloud-status busy';
+        const orig = btn.textContent;
+        btn.disabled = true;
+        status.textContent = 'Loading plans…';
+        status.className = 'cloud-status busy';
         try {
             const r = await fetch(`/api/preseason?server=${encodeURIComponent(p.server)}`);
-            if (r.status === 404) { status.textContent = `No cloud plans found for S${p.server}.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            if (r.status === 404) {
+                status.textContent = `No cloud plans found for S${p.server}.`;
+                status.className = 'cloud-status err';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
             const plans = await r.json();
-            if (!Array.isArray(plans) || !plans.length) { status.textContent = `No cloud plans found for S${p.server}.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            if (!Array.isArray(plans) || !plans.length) {
+                status.textContent = `No cloud plans found for S${p.server}.`;
+                status.className = 'cloud-status err';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
 
             const chosen = plans.length === 1 ? plans[0] : await psPickPlan(plans, p.server);
-            if (!chosen) { status.textContent = 'Load cancelled.'; status.className = 'cloud-status'; btn.disabled = false; btn.textContent = orig; return; }
+            if (!chosen) {
+                status.textContent = 'Load cancelled.';
+                status.className = 'cloud-status';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
 
             let data;
-            try { data = JSON.parse(chosen.plan_data); } catch { status.textContent = 'Corrupt plan data.'; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
-            if (!confirm(`Load plan "${chosen.plan_name || '?'}" from ${chosen.updated_by || '?'} (${chosen.updated_at || '?'} UTC)?\nThis overwrites your local assignments for the active profile.`)) { btn.disabled = false; btn.textContent = orig; return; }
+            try {
+                data = JSON.parse(chosen.plan_data);
+            } catch {
+                status.textContent = 'Corrupt plan data.';
+                status.className = 'cloud-status err';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
+            if (!confirm(`Load plan "${chosen.plan_name || '?'}" from ${chosen.updated_by || '?'} (${chosen.updated_at || '?'} UTC)?\nThis overwrites your local assignments for the active profile.`)) {
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
 
             p.alliances = data.alliances || [];
             p.zones = data.zones || {};
-            saveAll(); renderAll();
-            status.textContent = `✓ Loaded "${chosen.plan_name}" from ${chosen.updated_by || '?'} · ${chosen.updated_at || '?'} UTC`; status.className = 'cloud-status ok';
-        } catch (e) { status.textContent = 'Network error'; status.className = 'cloud-status err'; }
-        btn.disabled = false; btn.textContent = orig;
+            saveAll();
+            renderAll();
+            status.textContent = `✓ Loaded "${chosen.plan_name}" from ${chosen.updated_by || '?'} · ${chosen.updated_at || '?'} UTC`;
+            status.className = 'cloud-status ok';
+        } catch (e) {
+            status.textContent = 'Network error';
+            status.className = 'cloud-status err';
+        }
+        btn.disabled = false;
+        btn.textContent = orig;
     }
 
     async function psSyncAlliances(btn) {
         const p = getProfile();
-        if (!p || !p.server) { alert('Profile needs a server number to sync.'); return; }
+        if (!p || !p.server) {
+            alert('Profile needs a server number to sync.');
+            return;
+        }
         const status = document.getElementById('psCloudStatus');
-        const orig = btn.textContent; btn.disabled = true;
-        status.textContent = 'Fetching alliance data…'; status.className = 'cloud-status busy';
+        const orig = btn.textContent;
+        btn.disabled = true;
+        status.textContent = 'Fetching alliance data…';
+        status.className = 'cloud-status busy';
         try {
             const r = await fetch(`/api/preseason?server=${encodeURIComponent(p.server)}`);
-            if (r.status === 404) { status.textContent = `No shared plans found for S${p.server} — share a plan first.`; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            if (r.status === 404) {
+                status.textContent = `No shared plans found for S${p.server} — share a plan first.`;
+                status.className = 'cloud-status err';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
             const plans = await r.json();
-            if (!Array.isArray(plans) || !plans.length) { status.textContent = 'No plans found.'; status.className = 'cloud-status err'; btn.disabled = false; btn.textContent = orig; return; }
+            if (!Array.isArray(plans) || !plans.length) {
+                status.textContent = 'No plans found.';
+                status.className = 'cloud-status err';
+                btn.disabled = false;
+                btn.textContent = orig;
+                return;
+            }
 
             // Collect all alliances from all plans, keyed by tag (uppercase)
             // NAP=true wins: if any shared plan marks it NAP, it's NAP
             const cloudByTag = {};
             plans.forEach(pl => {
                 let data;
-                try { data = JSON.parse(pl.plan_data); } catch { return; }
+                try {
+                    data = JSON.parse(pl.plan_data);
+                } catch {
+                    return;
+                }
                 (data.alliances || []).forEach(a => {
                     const tag = (a.tag || '').toUpperCase();
                     if (!tag) return;
                     if (!cloudByTag[tag]) {
-                        cloudByTag[tag] = { tag, name: a.name || tag, color: a.color || '#a78bfa', nap: !!a.nap };
+                        cloudByTag[tag] = {tag, name: a.name || tag, color: a.color || '#a78bfa', nap: !!a.nap};
                     } else {
                         // NAP=true wins; keep longest name; keep existing color
                         if (a.nap) cloudByTag[tag].nap = true;
@@ -2436,24 +2837,34 @@
             Object.values(cloudByTag).forEach(cloud => {
                 const existing = p.alliances.find(a => a.tag.toUpperCase() === cloud.tag);
                 if (existing) {
-                    if (cloud.nap && !existing.nap) { existing.nap = true; napUpdated++; }
+                    if (cloud.nap && !existing.nap) {
+                        existing.nap = true;
+                        napUpdated++;
+                    }
                 } else {
-                    p.alliances.push({ id: uid(), tag: cloud.tag, name: cloud.name, color: cloud.color, nap: cloud.nap });
+                    p.alliances.push({id: uid(), tag: cloud.tag, name: cloud.name, color: cloud.color, nap: cloud.nap});
                     added++;
                 }
             });
 
-            saveAll(); renderAll();
+            saveAll();
+            renderAll();
             const parts = [];
             if (added) parts.push(`${added} new alliance${added !== 1 ? 's' : ''} added`);
             if (napUpdated) parts.push(`${napUpdated} NAP flag${napUpdated !== 1 ? 's' : ''} updated`);
             status.textContent = parts.length ? `✓ ${parts.join(', ')}.` : '✓ Already up to date — no changes.';
             status.className = 'cloud-status ok';
-        } catch (e) { status.textContent = 'Network error'; status.className = 'cloud-status err'; }
-        btn.disabled = false; btn.textContent = orig;
+        } catch (e) {
+            status.textContent = 'Network error';
+            status.className = 'cloud-status err';
+        }
+        btn.disabled = false;
+        btn.textContent = orig;
     }
 
-    function psEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function psEsc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     /* ── Export ─────────────────────────────────────────────────── */
     function roundRect(ctx, x, y, w, h, r) {

@@ -65,11 +65,21 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .icon-note { font-size: 0.57rem; color: var(--text3); }
 .icon-missing { width: 48px; height: 48px; background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px; }
 
+@media (max-width: 768px) {
+  .score-chip { padding: 7px 10px; min-width: 64px; }
+  .icon-item { width: 54px; }
+  .icon-item img { width: 40px; height: 40px; }
+  .day-header { flex-wrap: wrap; gap: 6px; }
+  .golden-rules { padding: .85rem; }
+}
 @media (max-width: 500px) {
   .tabs { gap: 3px; }
   .tab { padding: 7px 10px; font-size: 0.8rem; }
   .score-bar { gap: 4px; }
-  .score-chip { padding: 6px 8px; min-width: 60px; }
+  .score-chip { padding: 6px 8px; min-width: 54px; }
+  .icon-item { width: 46px; }
+  .icon-item img { width: 34px; height: 34px; }
+  .pts-table { font-size: 0.72rem; }
 }
 .pts-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.5rem 0 0.35rem; font-family: 'JetBrains Mono', monospace; }
 .pts-table th { text-align: left; padding: 4px 8px; background: var(--surface2); color: var(--text3); font-size: 0.68rem; font-weight: 500; }
