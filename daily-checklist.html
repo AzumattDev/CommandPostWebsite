@@ -14,6 +14,9 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
 .date-label{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text3)}
 .reset-time{font-size:.72rem;color:var(--text3);margin-top:2px}
+.srv-clock{text-align:right}
+.srv-clock-time{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:600;color:var(--cyan)}
+.srv-clock-label{font-size:.65rem;color:var(--text3);margin-top:1px;font-family:'JetBrains Mono',monospace}
 .top-actions{display:flex;gap:8px}
 .btn-sm{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-sm:hover{border-color:var(--border2);color:var(--text)}
@@ -76,6 +79,10 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
   <div>
     <div class="date-label" id="dateLabel"></div>
     <div class="reset-time" id="resetTime"></div>
+  </div>
+  <div class="srv-clock">
+    <div class="srv-clock-time" id="dcSrvTime">--:--:--</div>
+    <div class="srv-clock-label">server time (UTC−2)</div>
   </div>
   <div class="top-actions">
     <button class="btn-sm" onclick="checkAll()">Check all</button>
@@ -239,20 +246,25 @@ function render() {
 
 // Date label + reset countdown
 function updateHeader() {
-  const now = new Date();
-  const opts = { weekday:'long', month:'long', day:'numeric' };
-  document.getElementById('dateLabel').textContent = now.toLocaleDateString(undefined, opts);
+  const serverNow = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  const opts = { weekday:'long', month:'long', day:'numeric', timeZone:'UTC' };
+  document.getElementById('dateLabel').textContent = serverNow.toLocaleDateString(undefined, opts);
 
-  const midnight = new Date();
-  midnight.setHours(24, 0, 0, 0);
-  const diff = midnight - now;
+  const now = new Date();
+  const resetToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 2, 0, 0));
+  const nextReset = resetToday > now ? resetToday : new Date(resetToday.getTime() + 86400000);
+  const diff = nextReset - now;
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   document.getElementById('resetTime').textContent = `Resets in ${h}h ${m}m`;
+
+  const p2 = n => String(n).padStart(2, '0');
+  document.getElementById('dcSrvTime').textContent =
+    `${p2(serverNow.getUTCHours())}:${p2(serverNow.getUTCMinutes())}:${p2(serverNow.getUTCSeconds())}`;
 }
 
 updateHeader();
-setInterval(updateHeader, 60000);
+setInterval(updateHeader, 1000);
 render();
 </script>
 </body>

@@ -8,8 +8,8 @@ const days = [
     icons: [],
     today: [
       { t: "Stack radar tasks (DO NOT claim)", d: "Complete radar missions but leave all rewards unclaimed. Aim for 30–35 stacked before Monday reset. This is your Monday point burst." },
-      { t: "Send ALL squads to gather", d: "Send every squad to resource tiles — gold tiles give the most points. Time the return to land after Monday's server reset so you collect and score gathering points on Monday." },
-      { t: "Start your longest buildings NOW", d: "Queue HQ, Barracks, Tech Center — whatever takes the longest. You'll blast through them with speedups on Tuesday. The timer needs to be running." },
+      { t: "Send ALL squads to gather", d: "Send every squad to resource tiles NOW — gold tiles give the most points. Watch the <strong>Action Timer</strong> above (Monday reset countdown): squads must land AFTER that reset to count as Monday gathering points. Aim for gather times that bring them home 30–60 minutes after reset — not before." },
+      { t: "Start your longest buildings NOW", d: "Queue HQ, Barracks, Tech Center — the longest ones first. You'll use speedups to finish them on Tuesday (Base Expansion). The build only needs to be <em>in progress</em>, not done — but it must be running before Tuesday reset.<br><br><strong>When to start based on build duration:</strong><table class='pts-table'><thead><tr><th>Build duration</th><th>Start by</th></tr></thead><tbody><tr><td>Under 12 hours</td><td class='pts-val'>Monday — any time</td></tr><tr><td>12 h – 1 day</td><td class='pts-val'>Monday morning</td></tr><tr><td>1 – 2 days</td><td class='pts-vs'>Sunday (today) ←</td></tr><tr><td>2 – 4 days</td><td class='pts-other'>Friday – Saturday</td></tr><tr><td>4 – 7 days</td><td class='pts-lost'>Last Wed – Thu — already behind</td></tr><tr><td>7 – 10 days</td><td class='pts-lost'>Last Sunday — must already be running</td></tr><tr><td>10+ days</td><td class='pts-lost'>Long-term planning; use a speedup to get it started now</td></tr></tbody></table>The <strong>Action Timer</strong> above shows exact time until Tuesday. Any build longer than that countdown must already be in your queue." },
       { t: "Queue a long research", d: "Start a research that takes 1–2 days. You'll finish it with speedups on Wednesday to score Tech Power + Tech Speed." },
     ],
     prep: [
@@ -170,7 +170,7 @@ const days = [
       { t: "Overlord upgrades (S2+)", d: "Season 2+ only: use Overlord Shards, Guidebooks, Certificates, Bronze Badges, and Star Badges. All five item types score as separate categories — use every one you have." },
     ],
     prep: [
-      { t: "SHIELD UP before you sleep", d: "The single most important action of the week. Apply a 24-hour shield before sleeping Friday night. Saturday is combat day — players in other time zones WILL attack unshielded bases overnight.", warn: true },
+      { t: "Shield timing — know the difference", d: "<strong>Primary (best):</strong> Be online at Saturday reset (server midnight, shown in Action Timer above) and apply your shield within the first 5 minutes. An 8h, 12h, or 24h shield applied <em>at</em> reset covers the entire combat window cleanly.<br><br><strong>Backup only — if you cannot be online at reset:</strong> Apply a 24h shield before sleeping Friday night. A shorter shield (8h/12h) applied Friday night may expire mid-Saturday and leave you exposed. Only use Friday-night shielding as a fallback when you genuinely cannot be there for Saturday reset.<br><br>Either way — do NOT go into Saturday morning without a shield active.", warn: true },
       { t: "Save healing speedups for tomorrow", d: "Don't use any healing speedups tonight. You'll need them Saturday after combat to score Healing Speed points." },
       { t: "Save Legend Tasks for tomorrow", d: "Don't finish any starred Secret Command Post tasks tonight. Legend Tasks are a clean Saturday point source." },
       { t: "Save remaining UR Truck contracts for tomorrow", d: "Hold any leftover Trade Contracts for Saturday morning truck dispatches." },
@@ -195,7 +195,7 @@ const days = [
       {img:'unitkilled.png', label:'Unit Killed'},
     ],
     today: [
-      { t: "Check shield first — before anything else", d: "Verify your shield is active. Re-apply immediately if it dropped. A dead shield Saturday morning means your base gets zeroed before you can respond." },
+      { t: "Shield check — first thing at reset", d: "If you are online at Saturday reset: apply your shield within the first 5 minutes so it covers the full combat window. If you shielded before sleep (backup method): verify it is still active and check the expiry time. Re-apply immediately if it dropped or will expire before Duel ends. A lapsed shield Saturday morning means your base gets zeroed before you can respond." },
       { t: "Send UR Trucks", pts: "~200k pts/truck", d: "Guaranteed points with zero combat risk. Use Trade Contracts to refresh for UR (orange) trucks. Only send orange — lower rarity isn't worth it." },
       { t: "Complete all saved Legend Tasks", pts: "~150k pts/task", d: "Finish every starred legendary task you've been holding from the Secret Command Post. These were saved specifically for today." },
       { t: "Dump ALL remaining speedups", pts: "~120 pts/speedup", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories. Use absolutely every speedup you have left — nothing carries over usefully." },

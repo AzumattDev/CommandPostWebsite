@@ -313,6 +313,12 @@
     <div class="wc-sub" id="wcLocalTz">---</div>
   </div>
   <div class="wc-divider"></div>
+  <div class="wc-seg">
+    <div class="wc-lbl">Server (UTC−2)</div>
+    <div class="wc-val" id="wcSrvTime" style="color:var(--cyan)">--:--:--</div>
+    <div class="wc-sub" id="wcSrvDate">---</div>
+  </div>
+  <div class="wc-divider"></div>
   <div id="wcCountdownWrap">
     <div class="wc-seg">
       <div class="wc-lbl">Next Capitol War</div>
@@ -348,6 +354,22 @@
   <div class="wcf-field"><label>Contest Start (UTC)</label><input type="time" id="wciTime" value="03:00" onchange="cwSaveClock()"></div>
   <div class="wcf-field"><label>Duration (hrs)</label><input type="number" id="wciDur" value="2" min="1" max="24" style="width:60px" onchange="cwSaveClock()"></div>
   <div style="font-size:.65rem;color:var(--text3);align-self:flex-end;padding-bottom:4px;width:100%">Both default to Sat — adjust to your server's actual schedule.</div>
+</div>
+
+<div class="tc-panel">
+  <div class="tc-title">Time converter — server (UTC−2) ↔ local</div>
+  <div class="tc-row">
+    <div class="tc-field">
+      <label class="tc-lbl">Server time (UTC−2)</label>
+      <input type="time" id="tcSrv" class="tc-inp" oninput="tcFromSrv()">
+    </div>
+    <span class="tc-arrow">⇄</span>
+    <div class="tc-field">
+      <label class="tc-lbl">Your local time</label>
+      <input type="time" id="tcLoc" class="tc-inp" oninput="tcFromLoc()">
+    </div>
+  </div>
+  <div class="tc-hint" id="tcHint"></div>
 </div>
 
 <!-- Timeline -->
@@ -686,6 +708,9 @@ function cwTick(){
   document.getElementById('wcUtcDate').textContent=`${DAYS[now.getUTCDay()]} ${now.getUTCFullYear()}-${p2(now.getUTCMonth()+1)}-${p2(now.getUTCDate())} UTC`;
   document.getElementById('wcLocalTime').textContent=`${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
   try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;document.getElementById('wcLocalTz').textContent=tz.replace('_',' ');}catch(e){document.getElementById('wcLocalTz').textContent='Local';}
+  const srv=new Date(Date.now()-2*60*60*1000);
+  document.getElementById('wcSrvTime').textContent=`${p2(srv.getUTCHours())}:${p2(srv.getUTCMinutes())}:${p2(srv.getUTCSeconds())}`;
+  document.getElementById('wcSrvDate').textContent=`${DAYS[srv.getUTCDay()]} ${srv.getUTCFullYear()}-${p2(srv.getUTCMonth()+1)}-${p2(srv.getUTCDate())} UTC−2`;
   // Local event time helper
   const tzOff=-now.getTimezoneOffset();
   function toLocal(h,m){const t=(h*60+m+tzOff+1440)%1440;return p2(Math.floor(t/60))+':'+p2(t%60);}
@@ -1825,6 +1850,40 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
   bgInit();
   cwTick();
   setInterval(cwTick,1000);
+
+  function tcInit(){
+    const sn=new Date(Date.now()-2*60*60*1000);
+    const p2=n=>String(n).padStart(2,'0');
+    document.getElementById('tcSrv').value=`${p2(sn.getUTCHours())}:${p2(sn.getUTCMinutes())}`;
+    tcFromSrv();
+  }
+  function tcFromSrv(){
+    const val=document.getElementById('tcSrv').value;
+    if(!val) return;
+    const [h,m]=val.split(':').map(Number);
+    const tzOff=new Date().getTimezoneOffset();
+    const lm=((h*60+m)+120-tzOff+2880)%1440;
+    const p2=n=>String(n).padStart(2,'0');
+    document.getElementById('tcLoc').value=`${p2(Math.floor(lm/60))}:${p2(lm%60)}`;
+    tcHint();
+  }
+  function tcFromLoc(){
+    const val=document.getElementById('tcLoc').value;
+    if(!val) return;
+    const [h,m]=val.split(':').map(Number);
+    const tzOff=new Date().getTimezoneOffset();
+    const sm=((h*60+m)-120+tzOff+2880)%1440;
+    const p2=n=>String(n).padStart(2,'0');
+    document.getElementById('tcSrv').value=`${p2(Math.floor(sm/60))}:${p2(sm%60)}`;
+    tcHint();
+  }
+  function tcHint(){
+    const off=-new Date().getTimezoneOffset()/60;
+    const diff=off-(-2);
+    const rel=diff===0?'same timezone as server':`local is ${Math.abs(diff)}h ${diff>0?'ahead of':'behind'} server`;
+    document.getElementById('tcHint').textContent=`You are UTC${off>=0?'+':''}${off} · ${rel}`;
+  }
+  tcInit();
 })();
 </script>
 </body>

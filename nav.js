@@ -103,6 +103,25 @@ style.textContent = `
 .cp-sr-url{font-size:.7rem;color:#6b6980;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .cp-search-empty{padding:2rem;text-align:center;color:#4a4b60;font-size:.88rem}
 .cp-search-hint{padding:8px 16px;font-size:.7rem;color:#4a4b60;border-top:1px solid #1e1f2a;display:flex;justify-content:space-between}
+.cp-timebar{border-top:1px solid #262838;padding:0 1.25rem}
+.cp-timebar-inner{display:flex;align-items:center;justify-content:center;height:56px;gap:0}
+.cp-tb-seg{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:0 1.75rem;flex-shrink:0}
+.cp-tb-divider{width:1px;height:30px;background:#31334a;flex-shrink:0}
+.cp-tb-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#4a4b60}
+.cp-tb-val{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:600;line-height:1.1;white-space:nowrap}
+.cp-tb-sub{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#4a4b60;white-space:nowrap;margin-top:1px}
+.cp-tb-reset{color:#fbbf24}
+.cp-tb-local{color:#9d9baf}
+.cp-tb-srv{color:#38bdf8}
+@media(max-width:700px){
+  .cp-timebar{padding:0 .85rem}
+  .cp-timebar-inner{height:38px}
+  .cp-tb-seg{padding:0 .85rem;gap:1px}
+  .cp-tb-val{font-size:.8rem}
+  .cp-tb-label{font-size:.5rem;letter-spacing:.06em}
+  .cp-tb-sub{display:none}
+  .cp-tb-divider{height:20px}
+}
 `;
 document.head.appendChild(style);
 
@@ -134,7 +153,15 @@ navHTML += `<button class="cp-search-btn" onclick="cpSearchOpen()" title="Search
 </button>`;
 navHTML += `</div>`;
 navHTML += `<button class="cp-hamburger" onclick="document.getElementById('cpMobile').classList.toggle('open')" aria-label="Menu">☰</button>`;
-navHTML += `</div></nav>`;
+navHTML += `</div>`;
+navHTML += `<div class="cp-timebar"><div class="cp-timebar-inner">`;
+navHTML += `<div class="cp-tb-seg"><div class="cp-tb-label">Next Reset</div><div class="cp-tb-val cp-tb-reset" id="cpTbReset">--:--:--</div><div class="cp-tb-sub">server midnight (00:00 UTC−2)</div></div>`;
+navHTML += `<div class="cp-tb-divider"></div>`;
+navHTML += `<div class="cp-tb-seg"><div class="cp-tb-label">Local Time</div><div class="cp-tb-val cp-tb-local" id="cpTbLocal">--:--:--</div><div class="cp-tb-sub" id="cpTbLocalTz">---</div></div>`;
+navHTML += `<div class="cp-tb-divider"></div>`;
+navHTML += `<div class="cp-tb-seg"><div class="cp-tb-label">Server (UTC−2)</div><div class="cp-tb-val cp-tb-srv" id="cpTbSrv">--:--:--</div><div class="cp-tb-sub" id="cpTbSrvDate">---</div></div>`;
+navHTML += `</div></div>`;
+navHTML += `</nav>`;
 
 navHTML += `<div class="cp-mobile-menu" id="cpMobile">`;
 NAV_LINKS.forEach(item => {
@@ -225,5 +252,33 @@ document.addEventListener('keydown', function(e) {
     cpSearchOpen();
   }
 });
+
+function cpTickClock(){
+  const now=new Date();
+  const sn=new Date(Date.now()-2*60*60*1000);
+  const p2=n=>String(n).padStart(2,'0');
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  const rt=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),2,0,0));
+  const nr=rt>now?rt:new Date(rt.getTime()+86400000);
+  const diff=nr-now;
+  const rh=Math.floor(diff/3600000);
+  const rm=Math.floor((diff%3600000)/60000);
+  const rs=Math.floor((diff%60000)/1000);
+  const re=document.getElementById('cpTbReset');
+  if(re) re.textContent=`${p2(rh)}:${p2(rm)}:${p2(rs)}`;
+
+  const le=document.getElementById('cpTbLocal');
+  if(le) le.textContent=`${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+  const ltz=document.getElementById('cpTbLocalTz');
+  if(ltz){try{ltz.textContent=Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g,' ');}catch(e){ltz.textContent='Local';}}
+
+  const se=document.getElementById('cpTbSrv');
+  if(se) se.textContent=`${p2(sn.getUTCHours())}:${p2(sn.getUTCMinutes())}:${p2(sn.getUTCSeconds())}`;
+  const sd=document.getElementById('cpTbSrvDate');
+  if(sd) sd.textContent=`${DAYS[sn.getUTCDay()]} ${sn.getUTCFullYear()}-${p2(sn.getUTCMonth()+1)}-${p2(sn.getUTCDate())} UTC−2`;
+}
+setInterval(cpTickClock,1000);
+cpTickClock();
 
 })();

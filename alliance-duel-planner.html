@@ -88,6 +88,29 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .pts-table .pts-vs { color: var(--red); font-weight: 600; }
 .pts-table .pts-other { color: var(--amber); font-weight: 600; }
 .pts-table .pts-lost { color: var(--text3); }
+
+/* Day timer banner */
+.day-banner{display:flex;align-items:center;gap:12px;border-radius:var(--radius-lg);padding:10px 14px;margin-bottom:1.25rem}
+.day-banner.db-active{background:rgba(251,191,36,.05);border:1px solid var(--amber-border)}
+.day-banner.banner-future{background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.15)}
+.db-icon{font-size:1.2rem;flex-shrink:0}
+.db-body{flex:1;min-width:0}
+.db-label{font-size:.73rem;color:var(--text3);font-weight:500;margin-bottom:2px}
+.db-time{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700}
+.db-active .db-time{color:var(--amber)}
+.banner-future .db-time{color:#38bdf8}
+
+/* Action timers */
+.at-list{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.at-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px}
+.at-left{flex:1;min-width:0}
+.at-label{font-size:.85rem;font-weight:500;color:var(--text)}
+.at-note{font-size:.73rem;color:var(--text3);margin-top:2px;line-height:1.3}
+.at-cd{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:700;flex-shrink:0;white-space:nowrap}
+.at-urgent{color:var(--red)!important}
+.at-soon{color:var(--amber)!important}
+.at-later{color:#38bdf8!important}
+.at-section-label{background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.15)}
 </style>
 </head>
 <body>
@@ -106,6 +129,22 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
     <div class="score-chip"><div class="day">Thu</div><div class="chip-theme">Train Heroes</div><div class="pts pts-2">2 pts</div></div>
     <div class="score-chip"><div class="day">Fri</div><div class="chip-theme">Total Mobilization</div><div class="pts pts-2">2 pts</div></div>
     <div class="score-chip"><div class="day">Sat</div><div class="chip-theme">Enemy Buster</div><div class="pts pts-4">4 pts</div></div>
+  </div>
+
+  <div class="tc-panel">
+    <div class="tc-title">Time converter — server (UTC−2) ↔ local</div>
+    <div class="tc-row">
+      <div class="tc-field">
+        <label class="tc-lbl">Server time (UTC−2)</label>
+        <input type="time" id="tcSrv" class="tc-inp" oninput="tcFromSrv()">
+      </div>
+      <span class="tc-arrow">⇄</span>
+      <div class="tc-field">
+        <label class="tc-lbl">Your local time</label>
+        <input type="time" id="tcLoc" class="tc-inp" oninput="tcFromLoc()">
+      </div>
+    </div>
+    <div class="tc-hint" id="tcHint"></div>
   </div>
 
   <div class="golden-rules">
@@ -128,6 +167,8 @@ const contentEl = document.getElementById('content');
 let activeIdx = 0;
 
 function render() {
+  const srvDay = new Date(Date.now() - 2*60*60*1000).getUTCDay();
+
   tabsEl.innerHTML = days.map((d, i) =>
     `<button class="tab${i === activeIdx ? ' active' : ''}" onclick="setDay(${i})">${d.tab}</button>`
   ).join('');
@@ -140,6 +181,15 @@ function render() {
       html += `<span class="day-value ${vc}">${d.value}</span>`;
     }
     html += `</div><hr class="rule">`;
+
+    // Day timer banner
+    if (i === srvDay) {
+      html += `<div class="day-banner db-active"><div class="db-icon">⚡</div><div class="db-body"><div class="db-label">Scoring window closes in</div><div class="db-time" id="db-time-${i}">--:--:--</div></div></div>`;
+    } else {
+      const daysAhead = (i - srvDay + 7) % 7;
+      const bannerLabel = daysAhead > 0 ? 'Opens in' : 'Opens again in';
+      html += `<div class="day-banner banner-future"><div class="db-icon">⏰</div><div class="db-body"><div class="db-label">${bannerLabel}</div><div class="db-time" id="db-time-${i}">--:--:--</div></div></div>`;
+    }
 
     if (d.icons && d.icons.length) {
       html += `<div class="icons-grid">`;
@@ -155,6 +205,16 @@ function render() {
         html += `</div>`;
       });
       html += `</div>`;
+    }
+
+    // Action timers
+    const timers = DAY_TIMERS[i];
+    if (timers && timers.length) {
+      html += `<div class="section"><span class="section-label at-section-label">Action Timers</span><div class="at-list">`;
+      timers.forEach((t, ti) => {
+        html += `<div class="at-row"><div class="at-left"><div class="at-label">${t.label}</div><div class="at-note">${t.note}</div></div><div class="at-cd at-later" id="at-cd-${i}-${ti}">--:--:--</div></div>`;
+      });
+      html += `</div></div>`;
     }
 
     if (d.today.length) {
@@ -180,6 +240,8 @@ function render() {
     html += `</div>`;
     return html;
   }).join('');
+
+  tickDuelTimers();
 }
 
 function applyHash() {
@@ -209,9 +271,147 @@ window.addEventListener('hashchange', () => {
   scrollToSection();
 });
 
-applyHash();
+// Timer helpers
+function msUntilServerDay(d) {
+  const now = new Date();
+  const du = (d - now.getUTCDay() + 7) % 7;
+  const t = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + du, 2, 0, 0));
+  if (t <= now) t.setUTCDate(t.getUTCDate() + 7);
+  return t - now;
+}
+function fmtMs(ms) {
+  if (ms <= 0) return '00:00:00';
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const p2 = n => String(n).padStart(2, '0');
+  if (d > 0) return `${d}d ${p2(h)}h ${p2(m)}m`;
+  return `${p2(h)}:${p2(m)}:${p2(sec)}`;
+}
+function cdCls(ms, force) {
+  if (force || ms < 3600000) return 'at-urgent';
+  if (ms < 14400000) return 'at-soon';
+  return 'at-later';
+}
+
+const DAY_TIMERS = [
+  // 0 Sunday
+  [
+    { label:'Gather window — squads must be OUT before this', note:'Send every squad NOW and time returns to land AFTER this reset. Gathering only scores on Monday if squads return after reset. Also: claim all stacked radar tasks at this moment.', targetDay:1 },
+    { label:'Buildings must be queued by — Tuesday', note:'Any build longer than this countdown must already be running. 1–2 day builds: start today. Under 12h: can wait until Monday.', targetDay:2 },
+    { label:'Research must be running by — Wednesday', note:'Queue a 1–2 day research now; finish it with speedups on Wednesday for Age of Science points', targetDay:3 },
+  ],
+  // 1 Monday
+  [
+    { label:'Radar stack window — claim on Wednesday', note:'Keep completing radar missions without claiming; build the stack all the way to Wednesday morning', targetDay:3 },
+    { label:'Tech speedup lock-in — Wednesday', note:'Save every tech speedup and Valor Badge; do not spend any before Wednesday', targetDay:3 },
+    { label:'Hero resource lock-in — Thursday', note:'Save all Hero XP, Shards, and Skill Medals; Thursday earns the most points per item', targetDay:4 },
+  ],
+  // 2 Tuesday
+  [
+    { label:'Research must be queued — Wednesday', note:'A research needs to be running now so you can finish it with speedups on Wednesday', targetDay:3 },
+    { label:'Hero resource lock-in — Thursday', note:'Hold all Hero XP, Shards, Medals, and Recruit Tickets; do not spend before Thursday', targetDay:4 },
+    { label:'Queue troop training by — Thursday', note:'Fill barracks Thursday so troops are mid-queue and ready to promote with speedups Friday', targetDay:4 },
+  ],
+  // 3 Wednesday
+  [
+    { label:'Hero resource lock-in — Thursday', note:'Do not level heroes or spend shards today; Thursday scores more points per item', targetDay:4 },
+    { label:'Training speedup lock-in — Friday', note:'Save all training and generic speedups for Friday\'s troop promotion burst', targetDay:5 },
+    { label:'Shield prep — Saturday reset', note:'Ideal: be online at Saturday reset to shield immediately. If you need a Friday-night backup shield, it must be 24h — shorter durations may expire mid-Saturday.', targetDay:6 },
+  ],
+  // 4 Thursday
+  [
+    { label:'Training speedup lock-in — Friday', note:'Final deadline: save every training and generic speedup for tomorrow', targetDay:5 },
+    { label:'Fill barracks now — for Friday promoting', note:'Queue cheap low-tier troops tonight so Friday speedups can promote them all in bulk', targetDay:5 },
+    { label:'Saturday reset — shield up within 5 min of this', note:'Primary: be online at reset and shield immediately for full coverage. Backup only: if you cannot be there, apply 24h shield before Friday sleep.', targetDay:6, urgent:true },
+  ],
+  // 5 Friday
+  [
+    { label:'Saturday reset — shield up within 5 min', note:'Primary method: be online at this reset and apply shield immediately. If you shielded before sleep as backup, verify it is still active and will not expire before Duel ends.', targetDay:6, urgent:true },
+    { label:'Recall ALL squads before Saturday', note:'Any march still on a tile at Saturday reset is a free kill for the enemy', targetDay:6, urgent:true },
+    { label:'Save healing speedups until Saturday', note:'Do not heal tonight; Saturday combat injuries need fast healing for bonus points', targetDay:6 },
+  ],
+  // 6 Saturday
+  [
+    { label:'Duel resets — start stacking radar', note:'Immediately after reset: complete radar tasks without claiming, send gatherers, queue buildings and research', targetDay:0 },
+    { label:'Buildings should be queued for — Tuesday', note:'Queue longest buildings Sunday night; they need ~2 days running before Tuesday\'s speedup dump', targetDay:2 },
+    { label:'Research should be running for — Wednesday', note:'Start a 1–2 day research Sunday night to complete on Wednesday for Age of Science points', targetDay:3 },
+  ],
+];
+
+function tickDuelTimers() {
+  const srvDay = new Date(Date.now() - 2*60*60*1000).getUTCDay();
+
+  // Day banners
+  days.forEach((day, i) => {
+    const el = document.getElementById(`db-time-${i}`);
+    if (!el) return;
+    if (i === srvDay) {
+      const ms = msUntilServerDay((srvDay + 1) % 7);
+      el.textContent = fmtMs(ms);
+      el.className = 'db-time ' + cdCls(ms);
+    } else {
+      el.textContent = fmtMs(msUntilServerDay(i));
+    }
+  });
+
+  // Action timer countdowns
+  days.forEach((day, di) => {
+    (DAY_TIMERS[di] || []).forEach((t, ti) => {
+      const el = document.getElementById(`at-cd-${di}-${ti}`);
+      if (!el) return;
+      const ms = msUntilServerDay(t.targetDay);
+      el.textContent = fmtMs(ms);
+      el.className = 'at-cd ' + cdCls(ms, t.urgent);
+    });
+  });
+}
+setInterval(tickDuelTimers, 1000);
+
+if (location.hash) {
+  applyHash();
+} else {
+  const serverNow = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  activeIdx = serverNow.getUTCDay();
+}
 render();
 scrollToSection();
+
+function tcInit(){
+  const sn=new Date(Date.now()-2*60*60*1000);
+  const p2=n=>String(n).padStart(2,'0');
+  document.getElementById('tcSrv').value=`${p2(sn.getUTCHours())}:${p2(sn.getUTCMinutes())}`;
+  tcFromSrv();
+}
+function tcFromSrv(){
+  const val=document.getElementById('tcSrv').value;
+  if(!val) return;
+  const [h,m]=val.split(':').map(Number);
+  const tzOff=new Date().getTimezoneOffset();
+  const lm=((h*60+m)+120-tzOff+2880)%1440;
+  const p2=n=>String(n).padStart(2,'0');
+  document.getElementById('tcLoc').value=`${p2(Math.floor(lm/60))}:${p2(lm%60)}`;
+  tcHint();
+}
+function tcFromLoc(){
+  const val=document.getElementById('tcLoc').value;
+  if(!val) return;
+  const [h,m]=val.split(':').map(Number);
+  const tzOff=new Date().getTimezoneOffset();
+  const sm=((h*60+m)-120+tzOff+2880)%1440;
+  const p2=n=>String(n).padStart(2,'0');
+  document.getElementById('tcSrv').value=`${p2(Math.floor(sm/60))}:${p2(sm%60)}`;
+  tcHint();
+}
+function tcHint(){
+  const off=-new Date().getTimezoneOffset()/60;
+  const diff=off-(-2);
+  const rel=diff===0?'same timezone as server':`local is ${Math.abs(diff)}h ${diff>0?'ahead of':'behind'} server`;
+  document.getElementById('tcHint').textContent=`You are UTC${off>=0?'+':''}${off} · ${rel}`;
+}
+tcInit();
 </script>
 </body>
 </html>
