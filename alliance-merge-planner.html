@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alliance Merge Planner — Last War: Survival</title>
+<meta name="description" content="Plan your Last War: Survival alliance merge. Compare rosters, assign R4 roles, handle the 100-member cap, and export a clean merge plan.">
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<style>
+:root {
+  --r5:#f0c040; --r5-bg:rgba(240,192,64,.10); --r5-border:rgba(240,192,64,.30);
+  --r4:#c084ff; --r4-bg:rgba(192,132,255,.10); --r4-border:rgba(192,132,255,.30);
+  --r3:#60a5fa; --r3-bg:rgba(96,165,250,.10); --r3-border:rgba(96,165,250,.28);
+  --r2:#34d399; --r2-bg:rgba(52,211,153,.10); --r2-border:rgba(52,211,153,.28);
+  --r1:#9d9baf; --r1-bg:rgba(157,155,175,.07); --r1-border:rgba(157,155,175,.20);
+  --merge-a:#38bdf8; --merge-a-bg:rgba(56,189,248,.08); --merge-a-border:rgba(56,189,248,.28);
+  --merge-b:#fb923c; --merge-b-bg:rgba(251,146,60,.08); --merge-b-border:rgba(251,146,60,.28);
+  --active:#34d399; --inactive:#f87171;
+}
+
+/* ── Page hero ──────────────────────────────────────────────── */
+.mp-hero { padding: 1.75rem 0 1.2rem; }
+.mp-hero h1 { font-family:'Chakra Petch',sans-serif; font-size:clamp(1.3rem,3.5vw,1.9rem); font-weight:700; margin-bottom:.3rem; }
+.mp-hero h1 .acc { color:var(--r5); }
+.mp-hero .sub { font-size:.88rem; color:var(--text2); max-width:640px; }
+
+/* ── Section headers ────────────────────────────────────────── */
+.mp-section-head {
+  display:flex; align-items:center; gap:10px; margin:1.5rem 0 .85rem;
+}
+.mp-section-head .line { flex:1; height:1px; background:linear-gradient(90deg,var(--border2),transparent); }
+.mp-section-head .tag {
+  font-family:'JetBrains Mono',monospace; font-size:.68rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:.12em; color:var(--text3);
+  padding:3px 10px; border:1px solid var(--border); border-radius:20px; background:var(--surface);
+  white-space:nowrap;
+}
+
+/* ── Two-column alliance setup ──────────────────────────────── */
+.alliance-setup { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:700px){ .alliance-setup { grid-template-columns:1fr; } }
+
+.alliance-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.alliance-panel.panel-a { border-top:3px solid var(--merge-a); }
+.alliance-panel.panel-b { border-top:3px solid var(--merge-b); }
+
+.ap-header {
+  padding:.75rem 1rem; display:flex; align-items:center; gap:.6rem;
+  border-bottom:1px solid var(--border); background:var(--surface2);
+}
+.ap-badge {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:4px;
+  flex-shrink:0;
+}
+.badge-a { background:var(--merge-a-bg); color:var(--merge-a); border:1px solid var(--merge-a-border); }
+.badge-b { background:var(--merge-b-bg); color:var(--merge-b); border:1px solid var(--merge-b-border); }
+.ap-title { font-family:'Chakra Petch',sans-serif; font-size:.9rem; font-weight:600; color:var(--text); }
+
+.ap-body { padding:.85rem 1rem; display:flex; flex-direction:column; gap:.55rem; }
+
+.field-row { display:flex; flex-direction:column; gap:3px; }
+.field-row label {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--text3);
+}
+.field-row input, .field-row select {
+  background:var(--surface2); border:1px solid var(--border); border-radius:7px;
+  padding:6px 10px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.88rem;
+  transition:border-color .15s;
+}
+.field-row input:focus, .field-row select:focus { outline:none; border-color:var(--border2); }
+.panel-a .field-row input:focus, .panel-a .field-row select:focus { border-color:var(--merge-a); }
+.panel-b .field-row input:focus, .panel-b .field-row select:focus { border-color:var(--merge-b); }
+
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:.55rem; }
+
+/* ── Roster section ─────────────────────────────────────────── */
+.roster-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:700px){ .roster-grid { grid-template-columns:1fr; } }
+
+.roster-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;
+}
+.roster-panel.roster-a { border-top:3px solid var(--merge-a); }
+.roster-panel.roster-b { border-top:3px solid var(--merge-b); }
+.rp-head {
+  padding:.65rem 1rem; border-bottom:1px solid var(--border); background:var(--surface2);
+  display:flex; align-items:center; gap:.6rem;
+}
+.rp-count {
+  font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--text3); margin-left:auto;
+}
+
+/* Add member form */
+.add-member-form {
+  padding:.7rem .9rem; border-bottom:1px solid var(--border); background:var(--surface2);
+  display:grid; grid-template-columns:1fr auto auto auto; gap:.4rem; align-items:end;
+}
+.amf-name-wrap { display:flex; flex-direction:column; gap:2px; }
+.amf-name-wrap label, .amf-sel-wrap label, .amf-pow-wrap label {
+  font-family:'JetBrains Mono',monospace; font-size:.58rem; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--text3);
+}
+.amf-sel-wrap { display:flex; flex-direction:column; gap:2px; }
+.amf-pow-wrap { display:flex; flex-direction:column; gap:2px; }
+.amf-input {
+  background:var(--surface); border:1px solid var(--border); border-radius:6px;
+  padding:5px 8px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.82rem; width:100%;
+}
+.amf-input:focus { outline:none; }
+.roster-a .amf-input:focus { border-color:var(--merge-a); }
+.roster-b .amf-input:focus { border-color:var(--merge-b); }
+.amf-select {
+  background:var(--surface); border:1px solid var(--border); border-radius:6px;
+  padding:5px 6px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:.78rem;
+  width:100%;
+}
+.amf-add-btn {
+  padding:5px 12px; border-radius:6px; border:none; cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.75rem; font-weight:600;
+  transition:all .15s; align-self:flex-end; white-space:nowrap; height:29px;
+}
+.roster-a .amf-add-btn { background:var(--merge-a-bg); color:var(--merge-a); border:1px solid var(--merge-a-border); }
+.roster-b .amf-add-btn { background:var(--merge-b-bg); color:var(--merge-b); border:1px solid var(--merge-b-border); }
+.amf-add-btn:hover { opacity:.8; }
+
+.add-member-form-inner {
+  padding:.5rem .9rem; border-bottom:1px solid var(--border); background:var(--surface2);
+}
+.amfi-row { display:flex; gap:.4rem; align-items:flex-end; flex-wrap:wrap; }
+.amfi-field { display:flex; flex-direction:column; gap:2px; }
+.amfi-field label {
+  font-family:'JetBrains Mono',monospace; font-size:.58rem; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--text3);
+}
+.amfi-field input, .amfi-field select {
+  background:var(--surface); border:1px solid var(--border); border-radius:6px;
+  padding:5px 8px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.82rem;
+}
+.amfi-name { width:120px; }
+.amfi-rank { width:68px; }
+.amfi-pow  { width:90px; }
+.amfi-act  { width:80px; }
+
+/* Roster list */
+.roster-list { max-height:320px; overflow-y:auto; }
+.roster-list::-webkit-scrollbar { width:4px; }
+.roster-list::-webkit-scrollbar-track { background:transparent; }
+.roster-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+.roster-empty {
+  padding:1.5rem; text-align:center; font-size:.82rem; color:var(--text3);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.member-row {
+  display:flex; align-items:center; gap:.6rem; padding:.45rem .9rem;
+  border-bottom:1px solid var(--border); transition:background .1s;
+}
+.member-row:last-child { border-bottom:none; }
+.member-row:hover { background:var(--surface2); }
+
+.mr-rank {
+  font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700;
+  padding:2px 6px; border-radius:4px; flex-shrink:0; min-width:28px; text-align:center;
+}
+.rank-r5 { background:var(--r5-bg); color:var(--r5); border:1px solid var(--r5-border); }
+.rank-r4 { background:var(--r4-bg); color:var(--r4); border:1px solid var(--r4-border); }
+.rank-r3 { background:var(--r3-bg); color:var(--r3); border:1px solid var(--r3-border); }
+.rank-r2 { background:var(--r2-bg); color:var(--r2); border:1px solid var(--r2-border); }
+.rank-r1 { background:var(--r1-bg); color:var(--r1); border:1px solid var(--r1-border); }
+
+.mr-name { flex:1; font-size:.84rem; font-weight:500; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mr-power { font-family:'JetBrains Mono',monospace; font-size:.73rem; color:var(--text2); flex-shrink:0; }
+.mr-activity {
+  font-size:.65rem; font-weight:600; padding:2px 7px; border-radius:3px; flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;
+}
+.act-active   { background:rgba(52,211,153,.1);  color:var(--active);   border:1px solid rgba(52,211,153,.25); }
+.act-inactive { background:rgba(248,113,113,.08); color:var(--inactive); border:1px solid rgba(248,113,113,.2); }
+.mr-del {
+  background:none; border:none; color:var(--text3); cursor:pointer; font-size:.85rem;
+  padding:0 2px; transition:color .12s; flex-shrink:0; line-height:1;
+}
+.mr-del:hover { color:var(--red); }
+
+/* ── Capacity bar ────────────────────────────────────────────── */
+.cap-bar-wrap {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:.85rem 1.1rem; margin-bottom:1rem;
+}
+.cap-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:.6rem; }
+.cap-label { font-family:'JetBrains Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); }
+.cap-nums { font-family:'JetBrains Mono',monospace; font-size:1rem; font-weight:700; color:var(--text); margin-left:auto; }
+.cap-nums .over { color:var(--red); }
+.cap-track { width:100%; height:10px; background:var(--surface2); border-radius:5px; overflow:hidden; position:relative; }
+.cap-fill { height:100%; border-radius:5px; transition:width .3s ease; }
+.cap-fill.ok  { background:linear-gradient(90deg, var(--merge-a), var(--merge-b)); }
+.cap-fill.warn { background:linear-gradient(90deg, var(--amber), var(--red)); }
+.cap-segments { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.5rem; }
+.cap-seg { display:flex; align-items:center; gap:5px; font-size:.75rem; color:var(--text2); }
+.cap-dot { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+.cap-dot-a { background:var(--merge-a); }
+.cap-dot-b { background:var(--merge-b); }
+.cap-status { font-size:.82rem; margin-top:.5rem; }
+.cap-status .ok  { color:var(--green); }
+.cap-status .warn{ color:var(--red); font-weight:600; }
+
+/* ── Role assignment ─────────────────────────────────────────── */
+.role-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.75rem; }
+
+.role-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.role-card-head {
+  padding:.55rem .85rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.5rem;
+}
+.role-icon { font-size:1.1rem; flex-shrink:0; }
+.role-name { font-family:'Chakra Petch',sans-serif; font-size:.82rem; font-weight:600; }
+.role-body { padding:.65rem .85rem; display:flex; flex-direction:column; gap:.4rem; }
+.role-select {
+  background:var(--surface2); border:1px solid var(--border); border-radius:7px;
+  padding:7px 10px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem;
+  width:100%; transition:border-color .15s;
+}
+.role-select:focus { outline:none; border-color:var(--border2); }
+.role-card.role-r5 .role-card-head { border-top:3px solid var(--r5); }
+.role-card.role-r5 .role-select:focus { border-color:var(--r5); }
+.role-card.role-warlord   .role-card-head { border-top:3px solid var(--r4); }
+.role-card.role-recruiter .role-card-head { border-top:3px solid var(--r3); }
+.role-card.role-butler    .role-card-head { border-top:3px solid var(--r2); }
+.role-card.role-muse      .role-card-head { border-top:3px solid var(--amber); }
+.role-hint { font-size:.73rem; color:var(--text3); line-height:1.5; }
+.role-assigned-tag {
+  display:inline-flex; align-items:center; gap:4px; font-size:.7rem;
+  padding:2px 8px; border-radius:4px; background:var(--surface3); color:var(--text2);
+  font-family:'JetBrains Mono',monospace; margin-top:2px;
+}
+
+/* ── Cut suggestions ─────────────────────────────────────────── */
+.cut-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.cut-head {
+  padding:.65rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.6rem;
+}
+.cut-head-title { font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; }
+.cut-over-badge {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; padding:2px 8px; border-radius:4px;
+  background:var(--red-bg); color:var(--red); border:1px solid rgba(248,113,113,.25); margin-left:auto;
+}
+.cut-ok-badge {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; padding:2px 8px; border-radius:4px;
+  background:var(--green-bg); color:var(--green); border:1px solid rgba(52,211,153,.25); margin-left:auto;
+}
+.cut-list { max-height:280px; overflow-y:auto; }
+.cut-row {
+  display:flex; align-items:center; gap:.6rem; padding:.42rem .9rem;
+  border-bottom:1px solid var(--border);
+}
+.cut-row:last-child { border-bottom:none; }
+.cut-priority {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; width:18px; text-align:center; color:var(--text3); flex-shrink:0;
+}
+.cut-why {
+  font-size:.7rem; color:var(--text3); margin-left:auto; font-family:'JetBrains Mono',monospace;
+  flex-shrink:0;
+}
+.cut-origin {
+  font-size:.65rem; font-weight:600; padding:1px 6px; border-radius:3px; flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;
+}
+.cut-origin-a { background:var(--merge-a-bg); color:var(--merge-a); border:1px solid var(--merge-a-border); }
+.cut-origin-b { background:var(--merge-b-bg); color:var(--merge-b); border:1px solid var(--merge-b-border); }
+.cut-empty { padding:1rem; text-align:center; font-size:.82rem; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+
+/* ── Final plan ─────────────────────────────────────────────── */
+.plan-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.plan-head {
+  padding:.65rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.6rem;
+}
+.plan-head-title { font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; }
+.plan-export-btn {
+  margin-left:auto; padding:5px 13px; border-radius:6px; cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.75rem; font-weight:600;
+  background:var(--r5-bg); color:var(--r5); border:1px solid var(--r5-border); transition:all .15s;
+}
+.plan-export-btn:hover { background:rgba(240,192,64,.18); }
+.plan-body { padding:.9rem 1rem; }
+.plan-block { margin-bottom:1.2rem; }
+.plan-block-title {
+  font-family:'Chakra Petch',sans-serif; font-size:.8rem; font-weight:600; color:var(--text2);
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:.5rem;
+  padding-bottom:.35rem; border-bottom:1px solid var(--border);
+}
+.plan-role-row {
+  display:flex; align-items:center; gap:.65rem; padding:.3rem 0;
+  border-bottom:1px solid var(--border2);
+}
+.plan-role-row:last-child { border-bottom:none; }
+.plan-role-label { font-size:.8rem; color:var(--text2); min-width:90px; }
+.plan-role-name {
+  font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; color:var(--text);
+}
+.plan-role-origin { font-size:.7rem; margin-left:auto; }
+.plan-members-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:6px; }
+.plan-member {
+  display:flex; align-items:center; gap:.5rem; padding:.3rem .6rem;
+  background:var(--surface2); border:1px solid var(--border); border-radius:7px;
+  font-size:.78rem;
+}
+.plan-member .mr-name { font-size:.78rem; }
+
+/* ── Export textarea ─────────────────────────────────────────── */
+#planText {
+  background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+  padding:.75rem 1rem; color:var(--text2); font-family:'JetBrains Mono',monospace;
+  font-size:.72rem; width:100%; resize:vertical; min-height:200px; line-height:1.7;
+  display:none;
+}
+.copy-feedback {
+  font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--green);
+  opacity:0; transition:opacity .3s;
+}
+
+/* ── Tip boxes (reuse) ───────────────────────────────────────── */
+.info-box {
+  background:var(--merge-a-bg); border:1px solid var(--merge-a-border);
+  border-left:3px solid var(--merge-a); border-radius:0 var(--radius) var(--radius) 0;
+  padding:.75rem 1rem; margin-bottom:1rem;
+}
+.info-box p { font-size:.82rem; color:var(--text2); line-height:1.6; }
+.info-box strong { color:var(--text); }
+
+/* ── Paste import ────────────────────────────────────────────── */
+.paste-toggle {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; text-decoration:underline;
+  color:var(--text3); cursor:pointer; border:none; background:none; padding:.3rem .9rem;
+  display:block; transition:color .15s;
+}
+.paste-toggle:hover { color:var(--text2); }
+.paste-area-wrap { padding:.5rem .9rem; border-bottom:1px solid var(--border); background:var(--surface2); display:none; }
+.paste-area-wrap.show { display:block; }
+.paste-area {
+  width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px;
+  padding:.5rem .75rem; color:var(--text); font-family:'JetBrains Mono',monospace;
+  font-size:.75rem; min-height:70px; resize:vertical; line-height:1.6;
+}
+.paste-hint { font-size:.68rem; color:var(--text3); margin-bottom:.4rem; line-height:1.5; }
+.paste-btn {
+  margin-top:.4rem; padding:4px 12px; border-radius:6px; border:1px solid var(--border);
+  background:var(--surface); color:var(--text2); font-family:'Chakra Petch',sans-serif;
+  font-size:.73rem; cursor:pointer; transition:all .12s;
+}
+.paste-btn:hover { color:var(--text); background:var(--surface2); }
+
+/* ── Power summary panel ─────────────────────────────────────── */
+.power-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:.85rem 1.1rem; margin-bottom:1rem;
+}
+.pw-row {
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
+}
+.pw-stat {
+  flex:1; min-width:120px; background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:.55rem .8rem;
+}
+.pw-stat-a  { border-top:2px solid var(--merge-a); }
+.pw-stat-b  { border-top:2px solid var(--merge-b); }
+.pw-stat-total { border-top:2px solid var(--r5); }
+.pw-lbl {
+  font-family:'JetBrains Mono',monospace; font-size:.58rem; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--text3); margin-bottom:4px;
+}
+.pw-val {
+  font-family:'Chakra Petch',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text);
+  white-space:nowrap;
+}
+.pw-val.pw-a     { color:var(--merge-a); }
+.pw-val.pw-b     { color:var(--merge-b); }
+.pw-val.pw-total { color:var(--r5); }
+.pw-sub { font-family:'JetBrains Mono',monospace; font-size:.62rem; color:var(--text3); margin-top:2px; }
+.pw-op {
+  font-family:'Chakra Petch',sans-serif; font-size:1.4rem; font-weight:700;
+  color:var(--border2); flex-shrink:0; align-self:center;
+}
+.pw-split-track {
+  width:100%; height:12px; border-radius:6px; overflow:hidden;
+  display:flex; gap:1px; background:var(--surface2); border:1px solid var(--border);
+}
+.pw-split-a { background:var(--merge-a); transition:width .35s ease; height:100%; }
+.pw-split-b { background:var(--merge-b); transition:width .35s ease; height:100%; }
+.pw-split-legend {
+  display:flex; gap:1.25rem; margin-top:.45rem; flex-wrap:wrap;
+}
+.pw-split-item { display:flex; align-items:center; gap:5px; font-size:.73rem; color:var(--text2); }
+.pw-split-dot  { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+.pw-split-dot-a { background:var(--merge-a); }
+.pw-split-dot-b { background:var(--merge-b); }
+.pw-note {
+  margin-top:.6rem; font-size:.7rem; color:var(--text3);
+  font-family:'JetBrains Mono',monospace; line-height:1.5;
+}
+
+/* ── Post-merge end-state ────────────────────────────────────── */
+.pw-endstate {
+  margin-top:.85rem; border-top:1px solid var(--border); padding-top:.75rem;
+}
+.pw-endstate-label {
+  font-family:'JetBrains Mono',monospace; font-size:.6rem; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--text3); margin-bottom:.55rem;
+}
+.pw-endstate-row {
+  display:flex; align-items:stretch; gap:.6rem;
+}
+.pw-endstate-item {
+  flex:1; border-radius:8px; padding:.6rem .85rem;
+  border:1px solid var(--border);
+}
+.pw-endstate-a {
+  background:var(--merge-a-bg); border-color:var(--merge-a-border);
+}
+.pw-endstate-b {
+  background:rgba(100,100,120,.07); border-color:rgba(150,150,170,.18);
+  opacity:.8;
+}
+.pw-endstate-divider {
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; color:var(--text3);
+  flex-shrink:0; padding:0 .1rem;
+}
+.pw-endstate-name {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--text3); margin-bottom:3px;
+}
+.pw-endstate-val {
+  font-family:'Chakra Petch',sans-serif; font-size:1rem; font-weight:700;
+  color:var(--merge-a);
+}
+.pw-endstate-zero {
+  color:var(--text3); font-size:.88rem;
+}
+.pw-endstate-reduced {
+  color:var(--merge-b); font-size:.95rem;
+}
+.pw-endstate-sub {
+  font-family:'JetBrains Mono',monospace; font-size:.58rem; color:var(--text3);
+  margin-top:2px;
+}
+
+/* ── Inline edit row ─────────────────────────────────────────── */
+.member-row.editing { background:var(--surface2); flex-wrap:wrap; align-items:center; }
+.mr-edit-inputs { display:flex; gap:.35rem; align-items:center; flex-wrap:wrap; width:100%; padding:.1rem 0; }
+.mr-edit-in {
+  background:var(--surface); border:1px solid var(--border2); border-radius:5px;
+  padding:4px 7px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.8rem;
+}
+.mr-edit-in:focus { outline:none; border-color:var(--purple); }
+.mr-edit-name  { flex:1; min-width:80px; }
+.mr-edit-rank  { width:58px; }
+.mr-edit-pow   { width:72px; }
+.mr-edit-act   { width:82px; }
+.mr-edit-notes { flex:2; min-width:100px; }
+.mr-save-btn {
+  padding:3px 9px; border-radius:5px; border:1px solid var(--green-border); cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.72rem; font-weight:600;
+  background:var(--green-bg); color:var(--green); transition:all .12s; flex-shrink:0;
+}
+.mr-save-btn:hover { background:rgba(52,211,153,.2); }
+.mr-cancel-btn {
+  padding:3px 9px; border-radius:5px; border:1px solid var(--border); cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.72rem; font-weight:600;
+  background:transparent; color:var(--text3); transition:all .12s; flex-shrink:0;
+}
+.mr-cancel-btn:hover { color:var(--text); }
+
+/* ── Core & edit action buttons ──────────────────────────────── */
+.mr-core-btn {
+  background:none; border:none; cursor:pointer; font-size:.85rem; padding:0 1px;
+  flex-shrink:0; transition:transform .15s; line-height:1; color:var(--r5);
+}
+.mr-core-btn.empty { color:var(--text3); }
+.mr-core-btn:hover { transform:scale(1.25); }
+.mr-edit-btn {
+  background:none; border:none; color:var(--text3); cursor:pointer; font-size:.75rem;
+  padding:0 2px; transition:color .12s; flex-shrink:0; line-height:1;
+}
+.mr-edit-btn:hover { color:var(--text2); }
+.core-badge {
+  font-size:.62rem; color:var(--r5); flex-shrink:0; line-height:1;
+}
+.mr-notes-text {
+  font-size:.68rem; color:var(--text3); font-style:italic;
+  padding:.05rem .9rem .25rem 2.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  width:100%;
+}
+
+/* ── Roster search ───────────────────────────────────────────── */
+.roster-search-wrap {
+  padding:.38rem .9rem; border-bottom:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; gap:.45rem;
+}
+.rs-icon { color:var(--text3); font-size:.78rem; flex-shrink:0; }
+.rs-input {
+  flex:1; background:none; border:none; color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:.82rem; outline:none; min-width:0;
+}
+.rs-input::placeholder { color:var(--text3); }
+.rs-clear {
+  background:none; border:none; color:var(--text3); cursor:pointer; font-size:.72rem;
+  padding:0; line-height:1; display:none; transition:color .12s;
+}
+.rs-clear.show { display:block; }
+.rs-clear:hover { color:var(--text2); }
+.rs-count { font-family:'JetBrains Mono',monospace; font-size:.62rem; color:var(--text3); flex-shrink:0; }
+
+/* ── Swap button ─────────────────────────────────────────────── */
+.swap-btn {
+  padding:4px 12px; border-radius:6px; border:1px solid var(--border2); cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.73rem; font-weight:600;
+  background:var(--surface2); color:var(--text2); transition:all .15s; white-space:nowrap;
+  flex-shrink:0;
+}
+.swap-btn:hover { color:var(--text); border-color:var(--border); background:var(--surface3); }
+
+/* ── Export / Import toolbar ─────────────────────────────────── */
+.config-toolbar {
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:.65rem 1rem; margin-bottom:1rem;
+}
+.config-toolbar .ct-label {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--text3); flex-shrink:0; margin-right:.2rem;
+}
+.ct-btn {
+  padding:5px 14px; border-radius:6px; cursor:pointer;
+  font-family:'Chakra Petch',sans-serif; font-size:.75rem; font-weight:600;
+  border:1px solid var(--border2); background:var(--surface2); color:var(--text2);
+  transition:all .15s; white-space:nowrap; display:flex; align-items:center; gap:5px;
+}
+.ct-btn:hover { color:var(--text); border-color:var(--border); background:var(--surface3); }
+.ct-btn.ct-export { border-color:rgba(56,189,248,.35); color:var(--merge-a); }
+.ct-btn.ct-export:hover { background:var(--merge-a-bg); border-color:var(--merge-a); }
+.ct-btn.ct-import { border-color:rgba(251,146,60,.35); color:var(--merge-b); }
+.ct-btn.ct-import:hover { background:var(--merge-b-bg); border-color:var(--merge-b); }
+.ct-sep { width:1px; height:1.2rem; background:var(--border); flex-shrink:0; }
+.ct-hint { font-family:'JetBrains Mono',monospace; font-size:.6rem; color:var(--text3); }
+.ct-toast {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem; color:var(--green);
+  opacity:0; transition:opacity .3s; pointer-events:none;
+}
+.ct-toast.show { opacity:1; }
+
+/* ── Departing members ───────────────────────────────────────── */
+.depart-badge {
+  font-size:.6rem; padding:1px 5px; border-radius:3px; font-family:'JetBrains Mono',monospace;
+  background:rgba(251,191,36,.12); color:#fbbf24; border:1px solid rgba(251,191,36,.25);
+  flex-shrink:0;
+}
+.mr-depart-btn {
+  background:none; border:1px solid var(--border2); border-radius:4px; cursor:pointer;
+  font-size:.75rem; padding:1px 5px; color:var(--text3); transition:all .15s; flex-shrink:0;
+}
+.mr-depart-btn:hover  { border-color:#fbbf24; color:#fbbf24; }
+.mr-depart-btn.active { border-color:#fbbf24; color:#fbbf24; background:rgba(251,191,36,.12); }
+.member-row.departing { opacity:.55; }
+.member-row.departing .mr-name { text-decoration:line-through; }
+
+/* ── R5 error flash ──────────────────────────────────────────── */
+.r5-error {
+  font-family:'JetBrains Mono',monospace; font-size:.68rem; color:var(--red);
+  padding:.25rem .9rem; background:var(--red-bg); border-bottom:1px solid rgba(248,113,113,.15);
+  display:none;
+}
+.r5-error.show { display:block; }
+
+/* ── Merge scope toggle ──────────────────────────────────────── */
+.scope-wrap { display:flex; align-items:center; gap:.4rem; margin-bottom:.6rem; flex-wrap:wrap; }
+.scope-label { font-size:.72rem; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+.scope-btn {
+  font-family:'Chakra Petch',sans-serif; font-size:.7rem; font-weight:600;
+  padding:3px 10px; border-radius:5px; border:1px solid var(--border2); cursor:pointer;
+  background:var(--surface2); color:var(--text3); transition:all .15s;
+}
+.scope-btn:hover { border-color:var(--border); color:var(--text); }
+.scope-btn.active { background:var(--accent-bg); color:var(--accent); border-color:var(--accent); }
+.cap-compare {
+  display:block; font-size:.68rem; color:var(--text3); font-family:'JetBrains Mono',monospace;
+  margin-top:.25rem; padding-left:.1rem;
+}
+
+/* ── Power floor ─────────────────────────────────────────────── */
+.pf-wrap { display:flex; align-items:center; gap:.5rem; margin-left:auto; }
+.pf-label { font-family:'JetBrains Mono',monospace; font-size:.62rem; color:var(--text3); white-space:nowrap; }
+.pf-input {
+  background:var(--surface); border:1px solid var(--border); border-radius:5px;
+  padding:3px 7px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:.75rem;
+  width:68px; transition:border-color .15s;
+}
+.pf-input:focus { outline:none; border-color:var(--amber); }
+
+/* ── Move sequence ───────────────────────────────────────────── */
+.move-seq-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;
+}
+.move-seq-head {
+  padding:.65rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.6rem;
+}
+.move-seq-title { font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; }
+.move-seq-body { padding:.75rem 1rem; }
+.move-phase { margin-bottom:1.1rem; }
+.move-phase-title {
+  font-family:'Chakra Petch',sans-serif; font-size:.76rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.05em; color:var(--text2);
+  padding:.28rem .65rem; background:var(--surface2); border-radius:6px;
+  margin-bottom:.4rem; display:flex; align-items:center; gap:.5rem;
+}
+.move-phase-num {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem; font-weight:700;
+  background:var(--border2); color:var(--text); padding:1px 6px; border-radius:3px; flex-shrink:0;
+}
+.move-step {
+  display:flex; align-items:flex-start; gap:.6rem; padding:.32rem .35rem;
+  border-bottom:1px solid var(--border2); font-size:.82rem; color:var(--text2);
+}
+.move-step:last-child { border-bottom:none; }
+.move-step-icon { flex-shrink:0; font-size:.85rem; margin-top:.05rem; }
+.move-step-body { flex:1; line-height:1.55; }
+.move-step-body strong { font-weight:600; color:var(--text); }
+.move-step-body .names {
+  color:var(--text3); font-size:.74rem; margin-top:2px;
+  font-family:'JetBrains Mono',monospace; line-height:1.6;
+}
+.move-step-body em { color:var(--text3); font-style:italic; font-size:.78rem; }
+.move-empty { padding:1.5rem; text-align:center; font-size:.82rem; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+
+/* ── Merge day checklist ─────────────────────────────────────── */
+.checklist-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;
+}
+.checklist-head {
+  padding:.65rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.6rem;
+}
+.checklist-title { font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; }
+.checklist-reset {
+  margin-left:auto; padding:4px 10px; border-radius:5px; border:1px solid var(--border);
+  background:transparent; color:var(--text3); font-family:'Chakra Petch',sans-serif;
+  font-size:.72rem; cursor:pointer; transition:all .12s;
+}
+.checklist-reset:hover { color:var(--text); border-color:var(--border2); }
+.checklist-body { padding:.6rem .75rem; }
+.checklist-section { margin-bottom:.85rem; }
+.checklist-section-title {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--text3); padding:.2rem .35rem; margin-bottom:.25rem;
+}
+.checklist-item {
+  display:flex; align-items:flex-start; gap:.55rem; padding:.28rem .35rem;
+  border-radius:6px; transition:background .1s; cursor:pointer; user-select:none;
+}
+.checklist-item:hover { background:var(--surface2); }
+.checklist-item.done .cl-text { text-decoration:line-through; color:var(--text3); }
+.cl-check {
+  width:15px; height:15px; border-radius:3px; border:1px solid var(--border2);
+  background:var(--surface2); flex-shrink:0; margin-top:2px;
+  display:flex; align-items:center; justify-content:center; font-size:.6rem;
+  color:transparent; transition:all .15s;
+}
+.checklist-item.done .cl-check { background:var(--green); border-color:var(--green); color:#0a1a0e; }
+.cl-text { font-size:.82rem; line-height:1.5; color:var(--text2); }
+.cl-who { font-family:'JetBrains Mono',monospace; font-size:.65rem; color:var(--text3); margin-top:1px; }
+
+/* ── Server Rankings ─────────────────────────────────────────── */
+.rank-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden; margin-bottom:.75rem;
+}
+.rank-panel-head {
+  padding:.65rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+}
+.rank-panel-title { font-family:'Chakra Petch',sans-serif; font-size:.88rem; font-weight:600; }
+.rank-add-row {
+  display:flex; gap:.45rem; align-items:flex-end; padding:.7rem .9rem;
+  border-bottom:1px solid var(--border); background:var(--surface2); flex-wrap:wrap;
+}
+.rank-list { max-height:360px; overflow-y:auto; }
+.rank-row {
+  display:flex; align-items:center; gap:.6rem; padding:.42rem .9rem;
+  border-bottom:1px solid var(--border); transition:background .1s;
+}
+.rank-row:last-child { border-bottom:none; }
+.rank-row.rank-merged {
+  background:rgba(240,192,64,.06); border-left:3px solid var(--r5);
+}
+.rank-pos {
+  font-family:'JetBrains Mono',monospace; font-size:.7rem; font-weight:700;
+  width:28px; text-align:center; flex-shrink:0; color:var(--text3);
+}
+.rank-pos.gold   { color:#f0c040; }
+.rank-pos.silver { color:#c0c8d8; }
+.rank-pos.bronze { color:#cd7f32; }
+.rank-name { flex:1; font-size:.84rem; font-weight:500; }
+.rank-power-val {
+  font-family:'JetBrains Mono',monospace; font-size:.73rem; color:var(--text2); flex-shrink:0;
+}
+.rank-merged-badge {
+  font-family:'JetBrains Mono',monospace; font-size:.6rem; padding:1px 6px; border-radius:3px;
+  background:rgba(240,192,64,.15); color:var(--r5); border:1px solid rgba(240,192,64,.3);
+  flex-shrink:0;
+}
+.rank-del-btn {
+  background:none; border:none; color:var(--text3); cursor:pointer; font-size:.8rem;
+  padding:0 2px; transition:color .12s; flex-shrink:0;
+}
+.rank-del-btn:hover { color:var(--red); }
+.rank-empty { padding:1rem; text-align:center; font-size:.82rem; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+
+/* ── Utility ─────────────────────────────────────────────────── */
+.mt1 { margin-top:1rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="mp-hero">
+    <h1>Alliance <span class="acc">Merge Planner</span></h1>
+    <p class="sub">Combine two alliance rosters, handle the 100-member cap, plan who moves and who stays, assign post-merge leadership, and export a step-by-step plan for merge day.</p>
+  </div>
+
+  <div class="info-box">
+    <p><strong>Alliance A</strong> is the absorbing alliance — it stays open and receives members. <strong>Alliance B</strong> dissolves — its members move to A. If you set them up backwards, use the <strong>⇄ Swap A ↔ B</strong> button in Step 1.</p>
+    <p style="margin-top:.5rem"><strong>Ranks:</strong> R5 is the sole leader (one per alliance). R4s can hold named officer roles: Warlord, Recruiter, Butler, and Muse — maximum 10 R4s per alliance. R3–R1 are general members.</p>
+    <p style="margin-top:.5rem"><strong>Key concepts:</strong> Mark members as <strong>★ Core</strong> to protect them from cuts and move them first. Mark members as <strong>✈ Departing</strong> if they're leaving to a different alliance entirely — they're excluded from all calculations. Use <strong>Core only</strong> scope if not everyone from B is joining A.</p>
+    <p style="margin-top:.5rem"><strong>Power shown is post-merge</strong> — it reflects only the members who will actually end up in the merged alliance, after cuts and exclusions.</p>
+  </div>
+
+  <!-- ── Config Export / Import ──────────────────────────── -->
+  <div class="config-toolbar">
+    <span class="ct-label">Config</span>
+    <button class="ct-btn ct-export" onclick="exportConfig()" title="Download this merge plan as a .json file to share with others">↓ Export</button>
+    <button class="ct-btn ct-import" onclick="document.getElementById('importFileInput').click()" title="Load a .json merge plan exported from this tool">↑ Import</button>
+    <input type="file" id="importFileInput" accept=".json,application/json" style="display:none" onchange="importConfig(this)">
+    <div class="ct-sep"></div>
+    <span class="ct-hint">Share a .json file to let others load your exact roster, roles, and settings.</span>
+    <span class="ct-toast" id="importToast">✓ Config loaded</span>
+  </div>
+
+  <!-- ── 1. Alliance Info ──────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 1 — Alliance Info</span>
+    <button class="swap-btn" onclick="swapAlliances()" title="Swap A and B — useful if you set them up backwards">⇄ Swap A ↔ B</button>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <div class="alliance-setup">
+    <!-- Alliance A -->
+    <div class="alliance-panel panel-a">
+      <div class="ap-header">
+        <span class="ap-badge badge-a">Alliance A</span>
+        <span class="ap-title">Stays open — receives B's members</span>
+      </div>
+      <div class="ap-body">
+        <div class="field-row">
+          <label>Alliance Name</label>
+          <input type="text" id="aName" placeholder="e.g. Last Horizon" oninput="renderAll()">
+        </div>
+        <div class="field-grid">
+          <div class="field-row">
+            <label>Tag</label>
+            <input type="text" id="aTag" placeholder="[LHZN]" maxlength="6" oninput="renderAll()">
+          </div>
+          <div class="field-row">
+            <label>Alliance Gift Level</label>
+            <input type="number" id="aLevel" placeholder="16" min="1" max="20" oninput="renderAll()">
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Total Alliance Power</label>
+          <input type="text" id="aPower" placeholder="1,222,104,695" oninput="renderAll()">
+        </div>
+      </div>
+    </div>
+    <!-- Alliance B -->
+    <div class="alliance-panel panel-b">
+      <div class="ap-header">
+        <span class="ap-badge badge-b">Alliance B</span>
+        <span class="ap-title">Dissolves — members move to A</span>
+      </div>
+      <div class="ap-body">
+        <div class="field-row">
+          <label>Alliance Name</label>
+          <input type="text" id="bName" placeholder="e.g. Nova Force" oninput="renderAll()">
+        </div>
+        <div class="field-grid">
+          <div class="field-row">
+            <label>Tag</label>
+            <input type="text" id="bTag" placeholder="[NOVF]" maxlength="6" oninput="renderAll()">
+          </div>
+          <div class="field-row">
+            <label>Alliance Gift Level</label>
+            <input type="number" id="bLevel" placeholder="14" min="1" max="20" oninput="renderAll()">
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Total Alliance Power</label>
+          <input type="text" id="bPower" placeholder="870,000,000" oninput="renderAll()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Rosters ────────────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 2 — Rosters</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:.6rem;font-family:'JetBrains Mono',monospace;">
+    <span style="color:var(--text2)">☆ Core</span> — Protected from cuts; moves first.
+    &nbsp;·&nbsp;
+    <span style="color:#fbbf24">✈ Departing</span> — Leaving to another alliance; excluded from all calculations.
+    &nbsp;·&nbsp;
+    Power is entered in <strong>millions</strong> (e.g. 350 = 350M).
+  </p>
+  <div class="roster-grid">
+    <!-- Roster A -->
+    <div class="roster-panel roster-a">
+      <div class="rp-head">
+        <span class="ap-badge badge-a">Alliance A</span>
+        <span class="ap-title" id="rHeadA">Members</span>
+        <span class="rp-count" id="rCountA">0 / 100</span>
+      </div>
+      <!-- Add member -->
+      <div class="add-member-form-inner">
+        <div class="amfi-row">
+          <div class="amfi-field"><label>Name</label><input class="amf-input amfi-name" id="aAddName" placeholder="InGameName" onkeydown="if(event.key==='Enter')addMember('a')"></div>
+          <div class="amfi-field"><label>Rank</label>
+            <select class="amf-select amfi-rank" id="aAddRank">
+              <option value="R5">R5</option>
+              <option value="R4">R4</option>
+              <option value="R3" selected>R3</option>
+              <option value="R2">R2</option>
+              <option value="R1">R1</option>
+            </select>
+          </div>
+          <div class="amfi-field"><label>Power (M)</label><input class="amf-input amfi-pow" id="aAddPow" type="number" placeholder="120" min="0"></div>
+          <div class="amfi-field"><label>Active?</label>
+            <select class="amf-select amfi-act" id="aAddAct">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <button class="amf-add-btn" onclick="addMember('a')">+ Add</button>
+        </div>
+      </div>
+      <div class="r5-error" id="r5ErrA">Alliance A already has an R5 — only one leader per alliance.</div>
+      <div class="r5-error" id="r4ErrA">Alliance A already has 10 R4s — maximum is 10 per alliance.</div>
+      <button class="paste-toggle" onclick="togglePaste('a')">⌗ Paste multiple members…</button>
+      <div class="paste-area-wrap" id="pasteWrapA">
+        <p class="paste-hint">One member per line: <code>Name, Rank, PowerMil, active/inactive</code><br>e.g. <code>Azumatt, R5, 350, active</code></p>
+        <textarea class="paste-area" id="pasteA" placeholder="Azumatt, R5, 350, active&#10;Dissonce, R4, 280, active&#10;Wifey, R4, 190, inactive"></textarea>
+        <button class="paste-btn" onclick="pasteImport('a')">Import</button>
+      </div>
+      <div class="roster-search-wrap">
+        <span class="rs-icon">⌕</span>
+        <input class="rs-input" id="searchA" placeholder="Search members…" oninput="onSearch('a')">
+        <button class="rs-clear" id="searchAClear" onclick="clearSearch('a')">✕</button>
+        <span class="rs-count" id="searchACount"></span>
+      </div>
+      <div class="roster-list" id="listA">
+        <div class="roster-empty">No members yet — add above.</div>
+      </div>
+    </div>
+    <!-- Roster B -->
+    <div class="roster-panel roster-b">
+      <div class="rp-head">
+        <span class="ap-badge badge-b">Alliance B</span>
+        <span class="ap-title" id="rHeadB">Members</span>
+        <span class="rp-count" id="rCountB">0 / 100</span>
+      </div>
+      <div class="add-member-form-inner">
+        <div class="amfi-row">
+          <div class="amfi-field"><label>Name</label><input class="amf-input amfi-name" id="bAddName" placeholder="InGameName" onkeydown="if(event.key==='Enter')addMember('b')"></div>
+          <div class="amfi-field"><label>Rank</label>
+            <select class="amf-select amfi-rank" id="bAddRank">
+              <option value="R5">R5</option>
+              <option value="R4">R4</option>
+              <option value="R3" selected>R3</option>
+              <option value="R2">R2</option>
+              <option value="R1">R1</option>
+            </select>
+          </div>
+          <div class="amfi-field"><label>Power (M)</label><input class="amf-input amfi-pow" id="bAddPow" type="number" placeholder="80" min="0"></div>
+          <div class="amfi-field"><label>Active?</label>
+            <select class="amf-select amfi-act" id="bAddAct">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <button class="amf-add-btn" onclick="addMember('b')">+ Add</button>
+        </div>
+      </div>
+      <div class="r5-error" id="r5ErrB">Alliance B already has an R5 — only one leader per alliance.</div>
+      <div class="r5-error" id="r4ErrB">Alliance B already has 10 R4s — maximum is 10 per alliance.</div>
+      <button class="paste-toggle" onclick="togglePaste('b')">⌗ Paste multiple members…</button>
+      <div class="paste-area-wrap" id="pasteWrapB">
+        <p class="paste-hint">One member per line: <code>Name, Rank, PowerMil, active/inactive</code><br>e.g. <code>Azumatt, R5, 350, active</code></p>
+        <textarea class="paste-area" id="pasteB" placeholder="Leader, R5, 210, active&#10;Officer1, R4, 150, active&#10;Member2, R2, 45, inactive"></textarea>
+        <button class="paste-btn" onclick="pasteImport('b')">Import</button>
+      </div>
+      <div class="roster-search-wrap">
+        <span class="rs-icon">⌕</span>
+        <input class="rs-input" id="searchB" placeholder="Search members…" oninput="onSearch('b')">
+        <button class="rs-clear" id="searchBClear" onclick="clearSearch('b')">✕</button>
+        <span class="rs-count" id="searchBCount"></span>
+      </div>
+      <div class="roster-list" id="listB">
+        <div class="roster-empty">No members yet — add above.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Capacity ───────────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 3 — Capacity</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <div class="cap-bar-wrap">
+    <div class="scope-wrap">
+      <span class="scope-label">Who from B is moving to A?</span>
+      <button id="scopeBtnFull" class="scope-btn active" onclick="setMergeScope('full')" title="All non-departing Alliance B members will move to A">Full merge — everyone</button>
+      <button id="scopeBtnCore" class="scope-btn" onclick="setMergeScope('core')" title="Only members you've marked ★ Core will move — everyone else in B is left behind">Core members only</button>
+    </div>
+    <div class="cap-row">
+      <span class="cap-label">Members joining the merge</span>
+      <span class="cap-nums" id="capNums">0 / 100</span>
+    </div>
+    <div class="cap-track"><div class="cap-fill ok" id="capFill" style="width:0%"></div></div>
+    <div class="cap-segments">
+      <div class="cap-seg"><div class="cap-dot cap-dot-a"></div><span id="capSegA">Alliance A: 0</span></div>
+      <div class="cap-seg"><div class="cap-dot cap-dot-b"></div><span id="capSegB">Alliance B: 0</span></div>
+    </div>
+    <div class="cap-status" id="capStatus"></div>
+  </div>
+
+  <!-- Power summary -->
+  <div class="power-panel" id="powerPanel">
+    <div class="pw-row">
+      <div class="pw-stat pw-stat-a">
+        <div class="pw-lbl">Alliance A — Existing Power</div>
+        <div class="pw-val pw-a" id="pwA">—</div>
+        <div class="pw-sub" id="pwASub">0 members entered</div>
+      </div>
+      <div class="pw-op">+</div>
+      <div class="pw-stat pw-stat-b">
+        <div class="pw-lbl">Alliance B — Power Contributed</div>
+        <div class="pw-val pw-b" id="pwB">—</div>
+        <div class="pw-sub" id="pwBSub">0 members entering</div>
+      </div>
+      <div class="pw-op">=</div>
+      <div class="pw-stat pw-stat-total">
+        <div class="pw-lbl">Alliance A — Power After Merge</div>
+        <div class="pw-val pw-total" id="pwTotal">—</div>
+        <div class="pw-sub" id="pwTotalSub">Alliance B dissolves when empty</div>
+      </div>
+    </div>
+    <div class="pw-split-track">
+      <div class="pw-split-a" id="pwBarA" style="width:50%"></div>
+      <div class="pw-split-b" id="pwBarB" style="width:50%"></div>
+    </div>
+    <div class="pw-split-legend">
+      <div class="pw-split-item"><div class="pw-split-dot pw-split-dot-a"></div><span id="pwLegA">Alliance A: 0%</span></div>
+      <div class="pw-split-item"><div class="pw-split-dot pw-split-dot-b"></div><span id="pwLegB">Alliance B contribution: 0%</span></div>
+    </div>
+    <div class="pw-endstate">
+      <div class="pw-endstate-label">After merge is complete</div>
+      <div class="pw-endstate-row">
+        <div class="pw-endstate-item pw-endstate-a">
+          <div class="pw-endstate-name" id="pwEndAName">Alliance A</div>
+          <div class="pw-endstate-val" id="pwEndAVal">—</div>
+          <div class="pw-endstate-sub">survives · receives all B members</div>
+        </div>
+        <div class="pw-endstate-divider">vs</div>
+        <div class="pw-endstate-item pw-endstate-b">
+          <div class="pw-endstate-name" id="pwEndBName">Alliance B</div>
+          <div class="pw-endstate-val pw-endstate-zero" id="pwEndBVal">—</div>
+          <div class="pw-endstate-sub" id="pwEndBSub">waiting for roster data</div>
+        </div>
+      </div>
+    </div>
+    <p class="pw-note">Reflects only members who will actually join (non-departing, non-cut, in-scope). Excludes building, territory, and research power.</p>
+  </div>
+
+  <!-- ── 3b. Server Rankings ──────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 3b — Server Rankings</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem;font-family:'JetBrains Mono',monospace;">
+    Optional. Enter other alliances from your server to see where the merged alliance would rank by power. The merged alliance's post-merge power is inserted automatically.
+  </p>
+  <div class="rank-panel">
+    <div class="rank-panel-head">
+      <span class="rank-panel-title">Alliance Power Rankings</span>
+    </div>
+    <div class="rank-add-row">
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:140px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Alliance Name</label>
+        <input class="amf-input" id="rkName" placeholder="e.g. Iron Vanguard" style="width:100%" onkeydown="if(event.key==='Enter')addRanking()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Total Power</label>
+        <input class="amf-input" id="rkPower" type="text" placeholder="1,250,000,000" style="width:160px" onkeydown="if(event.key==='Enter')addRanking()">
+      </div>
+      <button class="amf-add-btn" style="background:var(--surface3);color:var(--text2);border:1px solid var(--border2)" onclick="addRanking()">+ Add</button>
+    </div>
+    <div class="rank-list" id="rankList">
+      <div class="rank-empty">Add alliances from your server to see where you'd rank after the merge.</div>
+    </div>
+  </div>
+
+  <!-- ── 4. Role Assignment ────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 4 — Leadership Roles</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem;font-family:'JetBrains Mono',monospace;">
+    The <strong style="color:var(--text2)">R5</strong> is the sole leader — only one exists per alliance. The four officer roles (<strong style="color:var(--text2)">Warlord, Recruiter, Butler, Muse</strong>) can only be held by <strong style="color:var(--r4)">R4</strong> members. Assign these now so the move sequence includes your post-merge officer setup.
+  </p>
+  <div class="role-grid" id="roleGrid">
+    <!-- populated by JS -->
+  </div>
+
+  <!-- ── 5. Who Gets Cut ───────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 5 — Who's Not Joining</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <div class="cut-panel">
+    <div class="cut-head">
+      <span class="cut-head-title">Members Not Joining the Merge</span>
+      <div class="pf-wrap">
+        <span class="pf-label" title="Members with power below this threshold are prioritised for removal. Set to 0 to disable.">Min. power</span>
+        <input class="pf-input" id="pfInput" type="number" min="0" placeholder="0" title="Members below this power (in millions) are prioritised for cuts. Set to 0 to ignore." oninput="setPowerFloor(this.value)">
+        <span class="pf-label">M</span>
+      </div>
+      <span id="cutBadge" class="cut-ok-badge" style="margin-left:.5rem">Under cap</span>
+    </div>
+    <div class="cut-list" id="cutList">
+      <div class="cut-empty">Add members from both alliances to see cut suggestions.</div>
+    </div>
+  </div>
+  <p style="font-size:.73rem;color:var(--text3);margin-top:.5rem;font-family:'JetBrains Mono',monospace;">
+    <strong style="color:var(--text2)">Cut priority order (highest first):</strong>
+    Inactive members → below minimum power → lower rank (R1 before R2, etc.) → lower power.
+    Core members (★) and assigned role holders are always protected.
+    Alliance A members shown as <em>Remove</em> (active action); Alliance B members shown as <em>Left behind</em> (they simply don't move).
+  </p>
+
+  <!-- ── 6. Move Sequence ──────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 6 — Move Sequence</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem;font-family:'JetBrains Mono',monospace;">
+    Generated from your roster data. Only Alliance B members are described as moving — Alliance A stays open and receives them.
+    The B leader is <strong style="color:var(--text2)">second-to-last</strong> to leave B; they promote a successor immediately before departing.
+    The successor is the <strong style="color:var(--text2)">last to leave</strong>, at which point B dissolves automatically.
+  </p>
+  <div class="move-seq-panel">
+    <div class="move-seq-head">
+      <span class="move-seq-title">Merge Day Order of Operations</span>
+    </div>
+    <div class="move-seq-body" id="moveSeqBody">
+      <div class="move-empty">Add members and assign roles to generate the move sequence.</div>
+    </div>
+  </div>
+
+  <!-- ── 7. Merge Day Checklist ────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 7 — Merge Day Checklist</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <div class="checklist-panel">
+    <div class="checklist-head">
+      <span class="checklist-title">Merge Day Checklist</span>
+      <button class="checklist-reset" onclick="resetChecklist()">Reset all</button>
+    </div>
+    <div class="checklist-body" id="checklistBody"></div>
+  </div>
+
+  <!-- ── 8. Merge Plan ─────────────────────────────────────── -->
+  <div class="mp-section-head">
+    <div class="line"></div>
+    <span class="tag">Step 8 — Merge Plan</span>
+    <div class="line" style="background:linear-gradient(270deg,var(--border2),transparent)"></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem;font-family:'JetBrains Mono',monospace;">
+    A summary of everything above in a copyable format. Share in Discord, alliance chat, or with your officers before merge day.
+  </p>
+  <div class="plan-panel">
+    <div class="plan-head">
+      <span class="plan-head-title">Generated Plan</span>
+      <button class="plan-export-btn" onclick="exportPlan()">Copy to Clipboard</button>
+      <span class="copy-feedback" id="copyFeedback">Copied!</span>
+    </div>
+    <div class="plan-body" id="planBody">
+      <p style="color:var(--text3);font-size:.84rem;font-family:'JetBrains Mono',monospace">Add members and assign roles to generate the merge plan.</p>
+    </div>
+  </div>
+  <textarea id="planText" readonly></textarea>
+
+  <footer class="footer" style="margin-top:3rem">
+    <p>Built by Last Horizon. Not affiliated with FirstFun.</p>
+    <p class="footer-note">All game content belongs to its respective owners.</p>
+  </footer>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+const STATE = {
+  a: [], // { id, name, rank, power, activity, core, notes }
+  b: [],
+  roles: { r5:null, warlord:null, recruiter:null, butler:null, muse:null },
+  powerFloor: 0,
+  mergeScope: 'full', // 'full' = all B move | 'core' = only core B members move
+  rankings: [], // [{ id, name, power }] — other server alliances for ranking comparison
+};
+let nextId = 1;
+const STORAGE_KEY = 'lw_merge_planner_v2';
+const CL_KEY      = 'lw_merge_cl_v1';
+let CL_CHECKED    = {};
+
+const RANK_ORDER = { R5:5, R4:4, R3:3, R2:2, R1:1 };
+
+// ── R5 guard ──────────────────────────────────────────────────────────────────
+function hasR5(side, excludeId = null) {
+  return STATE[side].some(m => m.rank === 'R5' && m.id !== excludeId);
+}
+function flashR5Err(side) {
+  const el = document.getElementById('r5Err'+side.toUpperCase());
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── R4 cap guard (max 10 per alliance) ───────────────────────────────────────
+const R4_MAX = 10;
+function r4Count(side, excludeId = null) {
+  return STATE[side].filter(m => m.rank === 'R4' && m.id !== excludeId).length;
+}
+function atR4Cap(side, excludeId = null) {
+  return r4Count(side, excludeId) >= R4_MAX;
+}
+function flashR4Err(side) {
+  const el = document.getElementById('r4Err'+side.toUpperCase());
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Member CRUD ───────────────────────────────────────────────────────────────
+function addMember(side) {
+  const nameEl = document.getElementById(side+'AddName');
+  const rankEl = document.getElementById(side+'AddRank');
+  const powEl  = document.getElementById(side+'AddPow');
+  const actEl  = document.getElementById(side+'AddAct');
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  if (rankEl.value === 'R5' && hasR5(side)) { flashR5Err(side); nameEl.focus(); return; }
+  if (rankEl.value === 'R4' && atR4Cap(side)) { flashR4Err(side); nameEl.focus(); return; }
+  STATE[side].push({ id:nextId++, name, rank:rankEl.value, power:parseFloat(powEl.value)||0,
+    activity:actEl.value, core:false, notes:'', departing:false, side });
+  nameEl.value = ''; powEl.value = ''; nameEl.focus();
+  renderAll();
+}
+
+function removeMember(side, id) {
+  STATE[side] = STATE[side].filter(m => m.id !== id);
+  for (const role of Object.keys(STATE.roles)) {
+    if (STATE.roles[role] === id) STATE.roles[role] = null;
+  }
+  renderAll();
+}
+
+function editMember(side, id) {
+  const m = STATE[side].find(x => x.id === id);
+  if (!m) return;
+  const row = document.getElementById('mr-'+id);
+  if (!row) return;
+  row.classList.add('editing');
+  row.innerHTML = `<div class="mr-edit-inputs">
+    <select class="mr-edit-in mr-edit-rank" id="er-rank-${id}">
+      ${['R5','R4','R3','R2','R1'].map(r=>`<option value="${r}"${m.rank===r?' selected':''}>${r}</option>`).join('')}
+    </select>
+    <input class="mr-edit-in mr-edit-name" id="er-name-${id}" value="${esc(m.name)}" placeholder="Name"
+      onkeydown="if(event.key==='Enter')saveMember('${side}',${id})">
+    <input class="mr-edit-in mr-edit-pow" id="er-pow-${id}" type="number" value="${m.power||''}" placeholder="Power (M)">
+    <select class="mr-edit-in mr-edit-act" id="er-act-${id}">
+      <option value="active"${m.activity==='active'?' selected':''}>Active</option>
+      <option value="inactive"${m.activity==='inactive'?' selected':''}>Inactive</option>
+    </select>
+    <input class="mr-edit-in mr-edit-notes" id="er-notes-${id}" value="${esc(m.notes||'')}" placeholder="Notes…"
+      onkeydown="if(event.key==='Enter')saveMember('${side}',${id})">
+    <button class="mr-save-btn" onclick="saveMember('${side}',${id})">✓ Save</button>
+    <button class="mr-cancel-btn" onclick="cancelEdit('${side}')">✗</button>
+  </div>`;
+  setTimeout(() => document.getElementById('er-name-'+id)?.focus(), 10);
+}
+
+function saveMember(side, id) {
+  const m = STATE[side].find(x => x.id === id);
+  if (!m) return;
+  const name = document.getElementById('er-name-'+id)?.value.trim();
+  if (!name) return;
+  const newRank = document.getElementById('er-rank-'+id)?.value || m.rank;
+  if (newRank === 'R5' && m.rank !== 'R5' && hasR5(side, id)) { flashR5Err(side); return; }
+  if (newRank === 'R4' && m.rank !== 'R4' && atR4Cap(side, id)) { flashR4Err(side); return; }
+  m.name     = name;
+  m.rank     = newRank;
+  m.power    = parseFloat(document.getElementById('er-pow-'+id)?.value) || 0;
+  m.activity = document.getElementById('er-act-'+id)?.value || m.activity;
+  m.notes    = (document.getElementById('er-notes-'+id)?.value || '').trim();
+  // R4 named roles can only be held by R4s — clear if rank is no longer R4
+  if (m.rank !== 'R4') {
+    for (const role of ['warlord','recruiter','butler','muse']) {
+      if (STATE.roles[role] === id) STATE.roles[role] = null;
+    }
+  }
+  // R5 leader role can be R5 or R4 (promoted); clear if not either
+  if (m.rank !== 'R5' && m.rank !== 'R4') {
+    if (STATE.roles['r5'] === id) STATE.roles['r5'] = null;
+  }
+  renderAll();
+}
+
+function cancelEdit(side) { renderRoster(side); }
+
+function toggleCore(side, id) {
+  const m = STATE[side].find(x => x.id === id);
+  if (m && !m.departing) { m.core = !m.core; renderAll(); }
+}
+
+function toggleDeparting(side, id) {
+  const m = STATE[side].find(x => x.id === id);
+  if (!m) return;
+  m.departing = !m.departing;
+  if (m.departing) m.core = false; // departing members can't be core
+  renderAll();
+}
+
+// ── Paste import ──────────────────────────────────────────────────────────────
+function togglePaste(side) {
+  document.getElementById('pasteWrap'+side.toUpperCase()).classList.toggle('show');
+}
+
+function pasteImport(side) {
+  const raw = document.getElementById('paste'+side.toUpperCase()).value.trim();
+  if (!raw) return;
+  for (const line of raw.split('\n')) {
+    const parts = line.split(',').map(s => s.trim());
+    if (!parts[0]) continue;
+    const name = parts[0];
+    const rank = (['R5','R4','R3','R2','R1'].includes((parts[1]||'').toUpperCase()))
+      ? parts[1].toUpperCase() : 'R3';
+    const power = parseFloat(parts[2]) || 0;
+    const activity = (parts[3]||'').toLowerCase().includes('inactive') ? 'inactive' : 'active';
+    if (rank === 'R5' && hasR5(side)) continue;
+    if (rank === 'R4' && atR4Cap(side)) continue;
+    STATE[side].push({ id:nextId++, name, rank, power, activity, core:false, notes:'', departing:false, side });
+  }
+  document.getElementById('paste'+side.toUpperCase()).value = '';
+  document.getElementById('pasteWrap'+side.toUpperCase()).classList.remove('show');
+  renderAll();
+}
+
+// ── Rendering helpers ─────────────────────────────────────────────────────────
+function rankClass(r) { return 'rank-'+r.toLowerCase(); }
+function actClass(a)  { return a === 'active' ? 'act-active' : 'act-inactive'; }
+function actLabel(a)  { return a === 'active' ? 'Active' : 'Inactive'; }
+// p = millions (e.g. 350 → 350M). Short form for member rows.
+function fmtPower(p) {
+  if (!p) return '—';
+  if (p >= 1000000) return (p/1000000).toFixed(2)+'T';
+  if (p >= 1000)    return (p/1000).toFixed(p >= 10000 ? 1 : 2)+'B';
+  return p+'M';
+}
+// Full formatted like the game leaderboard (e.g. "1,222,104,695")
+function fmtPowerFull(millions) {
+  if (!millions) return '0';
+  const raw = Math.round(millions * 1_000_000);
+  return raw.toLocaleString();
+}
+// Compact for stat boxes (e.g. "1.222B", "850.5M")
+function fmtPowerCompact(millions) {
+  if (!millions) return '0';
+  if (millions >= 1_000_000) return (millions/1_000_000).toFixed(2)+'T';
+  if (millions >= 1_000)     return (millions/1_000).toFixed(3).replace(/\.?0+$/, '')+'B';
+  return millions.toLocaleString(undefined,{maximumFractionDigits:1})+'M';
+}
+function sumPower(arr) { return arr.reduce((s,m) => s + (m.power || 0), 0); }
+
+function memberHTML(m, side) {
+  const notesLine = m.notes ? `<span class="mr-notes-text">📝 ${esc(m.notes)}</span>` : '';
+  const departingClass = m.departing ? ' departing' : '';
+  const departBadge = m.departing ? '<span class="depart-badge" title="Leaving to another alliance — excluded from merge">✈ Departing</span>' : '';
+  return `<div class="member-row${departingClass}" id="mr-${m.id}">
+    <span class="mr-rank ${rankClass(m.rank)}">${m.rank}</span>
+    <span class="mr-name">${esc(m.name)}</span>
+    ${m.core && !m.departing ? '<span class="core-badge" title="Core — protected from cuts">★</span>' : ''}
+    ${departBadge}
+    <span class="mr-power">${fmtPower(m.power)}</span>
+    <span class="mr-activity ${actClass(m.activity)}">${actLabel(m.activity)}</span>
+    <button class="mr-depart-btn${m.departing?' active':''}" onclick="toggleDeparting('${side}',${m.id})"
+      title="${m.departing?'Mark as joining the merge':'Mark as departing to another alliance (excluded from merge)'}">✈</button>
+    <button class="mr-core-btn${m.core&&!m.departing?'':' empty'}" onclick="toggleCore('${side}',${m.id})"
+      title="${m.core?'Remove core status':'Mark as core (protected)'}"${m.departing?' disabled':''} style="${m.departing?'opacity:.3;cursor:not-allowed;':''}">${m.core&&!m.departing?'★':'☆'}</button>
+    <button class="mr-edit-btn" onclick="editMember('${side}',${m.id})" title="Edit">✏</button>
+    <button class="mr-del" onclick="removeMember('${side}',${m.id})" title="Remove">✕</button>
+    ${notesLine}
+  </div>`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Server Rankings ───────────────────────────────────────────────────────────
+function parsePowerInput(raw) {
+  // Accept: "1,250,000,000" or "1250000000" or "1.25B" or "850M" or "1.2T"
+  const s = (raw||'').trim().replace(/,/g,'');
+  if (!s) return 0;
+  const t = s.toUpperCase();
+  if (t.endsWith('T')) return parseFloat(t) * 1_000_000_000_000 / 1_000_000;
+  if (t.endsWith('B')) return parseFloat(t) * 1_000_000_000  / 1_000_000;
+  if (t.endsWith('M')) return parseFloat(t); // already in millions
+  // Raw number — assume actual game number (not millions)
+  const n = parseFloat(s);
+  return n > 1_000_000 ? n / 1_000_000 : n; // if >1M treat as raw power, else treat as millions
+}
+
+function addRanking() {
+  const nameEl  = document.getElementById('rkName');
+  const powerEl = document.getElementById('rkPower');
+  const name  = nameEl.value.trim();
+  const power = parsePowerInput(powerEl.value);
+  if (!name) { nameEl.focus(); return; }
+  STATE.rankings.push({ id: nextId++, name, power });
+  nameEl.value = ''; powerEl.value = ''; nameEl.focus();
+  renderRankings(); saveState();
+}
+
+function removeRanking(id) {
+  STATE.rankings = STATE.rankings.filter(r => r.id !== id);
+  renderRankings(); saveState();
+}
+
+function renderRankings() {
+  const el = document.getElementById('rankList');
+  if (!el) return;
+
+  const aName = document.getElementById('aName').value.trim() || 'Alliance A';
+  const aTag  = document.getElementById('aTag').value.trim();
+
+  // Get current post-merge power
+  const { cutIds, bPool, aPool } = computeCuts();
+  const survA = aPool.filter(m => !cutIds.has(m.id));
+  const survB = bPool.filter(m => !cutIds.has(m.id));
+  const mergedPower = sumPower(survA) + sumPower(survB);
+
+  const mergedName = (aTag ? aTag+' ' : '') + aName;
+
+  // Build sorted list: user-entered alliances + merged alliance
+  const entries = [
+    ...STATE.rankings.map(r => ({ id:r.id, name:r.name, power:r.power, isMerged:false })),
+    { id:-1, name:mergedName, power:mergedPower, isMerged:true },
+  ].sort((a,b) => b.power - a.power);
+
+  if (entries.length === 1 && !mergedPower) {
+    el.innerHTML = '<div class="rank-empty">Add alliances from your server to see where you\'d rank after the merge.</div>';
+    return;
+  }
+
+  const mergedPos = entries.findIndex(e => e.isMerged) + 1;
+
+  el.innerHTML = entries.map((e, i) => {
+    const pos  = i + 1;
+    const posClass = pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : '';
+    const posLabel = pos <= 3 ? ['🥇','🥈','🥉'][pos-1] : `#${pos}`;
+    if (e.isMerged) {
+      return `<div class="rank-row rank-merged">
+        <span class="rank-pos ${posClass}">${posLabel}</span>
+        <span class="rank-name">${esc(e.name)}</span>
+        <span class="rank-merged-badge">After Merge</span>
+        <span class="rank-power-val">${e.power ? fmtPowerCompact(e.power)+' · '+fmtPowerFull(e.power) : '—'}</span>
+      </div>`;
+    }
+    return `<div class="rank-row">
+      <span class="rank-pos ${posClass}">${posLabel}</span>
+      <span class="rank-name">${esc(e.name)}</span>
+      <span class="rank-power-val">${fmtPowerCompact(e.power)+' · '+fmtPowerFull(e.power)}</span>
+      <button class="rank-del-btn" onclick="removeRanking(${e.id})" title="Remove">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Full render ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderRoster('a');
+  renderRoster('b');
+  renderCapacity();
+  renderRankings();
+  renderRoles();
+  renderCuts();
+  renderMoveSequence();
+  renderChecklist();
+  renderPlan();
+  saveState();
+}
+
+function renderRoster(side) {
+  const members = STATE[side];
+  const listEl  = document.getElementById('list'+side.toUpperCase());
+  const countEl = document.getElementById('rCount'+side.toUpperCase());
+  const headEl  = document.getElementById('rHead'+side.toUpperCase());
+  const info    = document.getElementById(side+'Name');
+  const aName   = info ? info.value.trim() : '';
+  const S       = side.toUpperCase();
+
+  if (aName) headEl.textContent = aName;
+
+  // Search filter
+  const searchEl = document.getElementById('search'+S);
+  const query    = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const clearBtn = document.getElementById('search'+S+'Clear');
+  if (clearBtn) clearBtn.style.display = query ? 'inline-flex' : 'none';
+
+  // Sort: rank desc, power desc
+  const sorted = [...members].sort((a,b) => {
+    const rd = RANK_ORDER[b.rank] - RANK_ORDER[a.rank];
+    return rd !== 0 ? rd : b.power - a.power;
+  });
+
+  const filtered = query
+    ? sorted.filter(m => m.name.toLowerCase().includes(query) ||
+                         m.rank.toLowerCase().includes(query) ||
+                         (m.notes||'').toLowerCase().includes(query))
+    : sorted;
+
+  // Update count label
+  countEl.textContent = query
+    ? `${filtered.length} / ${members.length} members`
+    : members.length + ' members';
+
+  if (!members.length) {
+    listEl.innerHTML = `<div class="roster-empty">No members yet — add above.</div>`;
+    return;
+  }
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="roster-empty">No members match "<strong>${esc(query)}</strong>".</div>`;
+    return;
+  }
+  listEl.innerHTML = filtered.map(m => memberHTML(m, side)).join('');
+}
+
+function onSearch(side) {
+  renderRoster(side);
+}
+
+function clearSearch(side) {
+  const el = document.getElementById('search'+side.toUpperCase());
+  if (el) { el.value = ''; el.focus(); }
+  renderRoster(side);
+}
+
+function swapAlliances() {
+  // Swap member arrays, updating each member's side
+  const tmpA = STATE.a.map(m => ({...m, side:'b'}));
+  const tmpB = STATE.b.map(m => ({...m, side:'a'}));
+  STATE.a = tmpB;
+  STATE.b = tmpA;
+
+  // Swap the alliance info inputs (Name, Tag, Level, Power)
+  const fields = ['Name','Tag','Level','Power'];
+  for (const f of fields) {
+    const elA = document.getElementById('a'+f);
+    const elB = document.getElementById('b'+f);
+    if (elA && elB) {
+      const v = elA.value;
+      elA.value = elB.value;
+      elB.value = v;
+    }
+  }
+
+  // Validate roles still point to existing members
+  for (const k of ['r5','warlord','recruiter','butler','muse']) {
+    const cur = STATE.roles[k];
+    if (cur) {
+      const exists = [...STATE.a, ...STATE.b].find(m => m.id === cur);
+      if (!exists) STATE.roles[k] = null;
+    }
+  }
+
+  renderAll();
+}
+
+function renderCapacity() {
+  const { cutIds, bPool, aPool, leftBehindIds } = computeCuts();
+  const aName = document.getElementById('aName').value.trim() || 'Alliance A';
+  const bName = document.getElementById('bName').value.trim() || 'Alliance B';
+
+  // Scope-aware counts
+  const bMovingCount = bPool.length;
+  const bLeftCount   = STATE.b.length - bMovingCount;
+  const total        = STATE.a.length + bMovingCount;
+  const pct          = Math.min(total / 100, 1) * 100;
+  const over         = total - 100;
+
+  document.getElementById('capNums').innerHTML =
+    total > 100 ? `<span class="over">${total}</span> / 100` : `${total} / 100`;
+  const fill = document.getElementById('capFill');
+  fill.style.width = pct + '%';
+  fill.className = 'cap-fill ' + (total > 100 ? 'warn' : 'ok');
+  document.getElementById('capSegA').textContent = `${aName}: ${STATE.a.length}`;
+  document.getElementById('capSegB').textContent =
+    STATE.mergeScope === 'core'
+      ? `${bName} (core only): ${bMovingCount}`
+      : `${bName}: ${bMovingCount}`;
+
+  // Status + scope comparison note
+  const statusEl = document.getElementById('capStatus');
+  let statusHtml = '';
+  if (total === 0) {
+    statusHtml = '';
+  } else if (over <= 0) {
+    statusHtml = `<span class="ok">✓ ${-over} slot${-over!==1?'s':''} remaining after merge.</span>`;
+  } else {
+    statusHtml = `<span class="warn">✗ Over cap by ${over} member${over!==1?'s':''}. See who's not joining below.</span>`;
+  }
+  // Comparison line
+  if (STATE.b.length > 0) {
+    const coreCount = STATE.b.filter(m => m.core).length;
+    if (STATE.mergeScope === 'full' && coreCount > 0) {
+      const coreTotal = STATE.a.length + coreCount;
+      const coreOver  = coreTotal - 100;
+      statusHtml += `<span class="cap-compare">Core-only scenario: ${coreTotal} members`+
+        (coreOver > 0 ? ` — still ${coreOver} over cap` : ` — fits with ${-coreOver} slot${-coreOver!==1?'s':''} free`)+
+        `</span>`;
+    } else if (STATE.mergeScope === 'core') {
+      const fullTotal = STATE.a.length + STATE.b.length;
+      const fullOver  = fullTotal - 100;
+      statusHtml += `<span class="cap-compare">Full merge scenario: ${fullTotal} members`+
+        (fullOver > 0 ? ` — ${fullOver} over cap` : ` — fits with ${-fullOver} slot${-fullOver!==1?'s':''} free`)+
+        `</span>`;
+    }
+    if (bLeftCount > 0 && STATE.mergeScope === 'core') {
+      statusHtml += `<span class="cap-compare">${bLeftCount} non-core ${bName} member${bLeftCount!==1?'s':''} will be left behind.</span>`;
+    }
+  }
+  statusEl.innerHTML = statusHtml;
+
+  // ── Post-cut power (only non-departing members who end up in the merged alliance) ──
+  const survivingA = aPool.filter(m => !cutIds.has(m.id));
+  const survivingB = bPool.filter(m => !cutIds.has(m.id));
+  const pwA = sumPower(survivingA);
+  const pwB = sumPower(survivingB);
+  const pwT = pwA + pwB;
+
+  document.getElementById('pwA').textContent     = pwA ? fmtPowerCompact(pwA) : '—';
+  document.getElementById('pwB').textContent     = pwB ? fmtPowerCompact(pwB) : '—';
+  document.getElementById('pwTotal').textContent = pwT ? fmtPowerCompact(pwT) : '—';
+  document.getElementById('pwASub').textContent  =
+    `${survivingA.length} members · ${fmtPowerFull(pwA)}`;
+  document.getElementById('pwBSub').textContent  =
+    `${survivingB.length} moving to A · ${fmtPowerFull(pwB)}`;
+  // B remaining after merge = left-behind (scope exclusions) + cut B pool members
+  const bLeftBehind = STATE.b.filter(m => leftBehindIds.has(m.id));
+  const bCutMembers = bPool.filter(m => cutIds.has(m.id));
+  const bRemaining  = [...bLeftBehind, ...bCutMembers];
+  const pwBRemaining = sumPower(bRemaining);
+  const bDissolves  = bRemaining.length === 0;
+
+  document.getElementById('pwTotalSub').textContent =
+    pwT ? `${survivingA.length + survivingB.length} members · ${fmtPowerFull(pwT)}` : 'after merge';
+
+  // Split bar
+  const pctA = pwT > 0 ? (pwA / pwT * 100) : 50;
+  const pctB = pwT > 0 ? (pwB / pwT * 100) : 50;
+  document.getElementById('pwBarA').style.width = pctA.toFixed(1) + '%';
+  document.getElementById('pwBarB').style.width = pctB.toFixed(1) + '%';
+  document.getElementById('pwLegA').textContent = `${aName} (existing): ${pwT > 0 ? pctA.toFixed(1)+'%' : '—'}`;
+  document.getElementById('pwLegB').textContent = `${bName} (contribution): ${pwT > 0 ? pctB.toFixed(1)+'%' : '—'}`;
+
+  // End-state callout
+  document.getElementById('pwEndAName').textContent = aName;
+  document.getElementById('pwEndBName').textContent = bName;
+  document.getElementById('pwEndAVal').textContent  = pwT ? fmtPowerCompact(pwT) : '—';
+  const bEndVal = document.getElementById('pwEndBVal');
+  const bEndSub = document.getElementById('pwEndBSub');
+  if (bDissolves) {
+    bEndVal.textContent = 'Dissolved';
+    bEndVal.className   = 'pw-endstate-val pw-endstate-zero';
+    bEndSub.textContent = '0 members remaining · alliance ceases to exist';
+  } else {
+    bEndVal.textContent = pwBRemaining ? fmtPowerCompact(pwBRemaining) : `${bRemaining.length} member${bRemaining.length!==1?'s':''}`;
+    bEndVal.className   = 'pw-endstate-val pw-endstate-reduced';
+    bEndSub.textContent = `${bRemaining.length} member${bRemaining.length!==1?'s':''} remaining${pwBRemaining ? ' · '+fmtPowerFull(pwBRemaining) : ''}`;
+  }
+}
+
+function setMergeScope(v) {
+  STATE.mergeScope = v;
+  document.getElementById('scopeBtnFull').classList.toggle('active', v === 'full');
+  document.getElementById('scopeBtnCore').classList.toggle('active', v === 'core');
+  renderAll();
+}
+
+// ── Role selects ──────────────────────────────────────────────────────────────
+const ROLES = [
+  { key:'r5',        icon:'👑', name:'R5 — Leader',             hint:'The sole leader of the merged alliance. Typically the R5 of the absorbing alliance (A). Can also be an R4 promoted after the merge. There is only one R5 — choose someone trusted, active, and respected by both groups.' },
+  { key:'warlord',   icon:'⚔️', name:'Warlord',                 hint:'R4 only. Leads combat operations: rallies, flags, war planning. Assign your most active, highest-power R4 with combat experience. Ideally someone who communicates clearly and is online during peak hours.' },
+  { key:'recruiter', icon:'📣', name:'Recruiter',                hint:'R4 only. Manages invites, applications, and member vetting. Best suited to someone active daily who knows the alliance\'s power and activity standards.' },
+  { key:'butler',    icon:'🛡️', name:'Butler',                   hint:'R4 only. Handles alliance resources, gift donations, and tech priorities. Should be detail-oriented, trusted with resource decisions, and active during donation windows.' },
+  { key:'muse',      icon:'🌟', name:'Muse',                     hint:'R4 only. Morale, social engagement, and community tone. Often chosen for their communication style and positive presence — especially important when integrating two alliance cultures after a merge.' },
+];
+
+
+function buildRoleOptionsFor(key) {
+  // R5 role: any R5 or R4 (an R4 can be promoted to lead the merged alliance)
+  // Named R4 roles (warlord/recruiter/butler/muse): ONLY R4 members
+  const rankFilter = key === 'r5'
+    ? m => (m.rank === 'R5' || m.rank === 'R4') && !m.departing
+    : m => m.rank === 'R4' && !m.departing;
+
+  const eligible = [
+    ...STATE.a.filter(rankFilter),
+    ...STATE.b.filter(rankFilter),
+  ].sort((a,b) => RANK_ORDER[b.rank] - RANK_ORDER[a.rank] || b.power - a.power);
+
+  let opts = '<option value="">— Unassigned —</option>';
+  for (const m of eligible) {
+    const label = `[${m.side.toUpperCase()}] ${m.name} · ${m.rank} · ${fmtPower(m.power)}`;
+    const sel = STATE.roles[key] === m.id;
+    opts += `<option value="${m.id}" ${sel?'selected':''}>${esc(label)}</option>`;
+  }
+  return opts;
+}
+
+function renderRoles() {
+  const grid = document.getElementById('roleGrid');
+  grid.innerHTML = ROLES.map(r => `
+    <div class="role-card role-${r.key}">
+      <div class="role-card-head">
+        <span class="role-icon">${r.icon}</span>
+        <span class="role-name">${r.name}</span>
+      </div>
+      <div class="role-body">
+        <select class="role-select" onchange="assignRole('${r.key}', this.value)">
+          ${buildRoleOptionsFor(r.key)}
+        </select>
+        <p class="role-hint">${r.hint}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function assignRole(key, val) {
+  STATE.roles[key] = val ? parseInt(val) : null;
+  renderCuts();
+  renderMoveSequence();
+  renderChecklist();
+  renderPlan();
+  saveState();
+}
+
+// ── Shared cut scoring ────────────────────────────────────────────────────────
+// bPool: which B members are even considered for the merge (scope-aware).
+// Non-core B members in 'core' scope are "left behind" before scoring runs —
+// they never appear in the cut list and don't count toward the cap.
+function getBPool() {
+  const nonDeparting = STATE.b.filter(m => !m.departing);
+  return STATE.mergeScope === 'core'
+    ? nonDeparting.filter(m => m.core)
+    : nonDeparting;
+}
+
+function computeCuts() {
+  const bPool = getBPool();
+  // Departing A members (going to another alliance) also excluded from the cap pool
+  const aPool = STATE.a.filter(m => !m.departing);
+  const pool  = [...aPool, ...bPool];
+  const total = pool.length;
+  const over  = Math.max(0, total - 100);
+  const assignedIds  = new Set(Object.values(STATE.roles).filter(Boolean));
+  const coreIds      = new Set(pool.filter(m => m.core).map(m => m.id));
+  const protectedIds = new Set([...assignedIds,...coreIds]);
+  const pf = STATE.powerFloor || 0;
+
+  const scored = pool.map(m => {
+    let score = 0;
+    if (m.activity === 'inactive')              score += 1000;
+    if (pf > 0 && m.power > 0 && m.power < pf) score +=  500;
+    score += (5 - RANK_ORDER[m.rank]) * 100;
+    score -= Math.min(m.power, 999);
+    if (protectedIds.has(m.id)) score -= 99999;
+    return { ...m, score };
+  }).sort((a,b) => b.score - a.score);
+
+  const cutIds = new Set(scored.slice(0, over).map(m => m.id));
+  // leftBehindIds = non-departing B members outside the pool (scope exclusions only — not departing)
+  const departingIds  = new Set(STATE.b.filter(m => m.departing).map(m => m.id));
+  const leftBehindIds = new Set(
+    STATE.b.filter(m => !m.departing && !bPool.find(x => x.id === m.id)).map(m => m.id)
+  );
+  return { scored, cutIds, over, protectedIds, coreIds, bPool, aPool, leftBehindIds, departingIds };
+}
+
+// ── Cut list ──────────────────────────────────────────────────────────────────
+function renderCuts() {
+  const { scored, cutIds, over, protectedIds, coreIds, leftBehindIds, departingIds } = computeCuts();
+  const pool  = scored.length; // total members in scope
+  const badge = document.getElementById('cutBadge');
+  const list  = document.getElementById('cutList');
+  const pf    = STATE.powerFloor || 0;
+
+  if (STATE.a.length + STATE.b.length === 0) {
+    badge.className = 'cut-ok-badge'; badge.textContent = 'Under cap';
+    list.innerHTML = '<div class="cut-empty">Add members from both alliances to see cut suggestions.</div>';
+    return;
+  }
+  if (over <= 0 && leftBehindIds.size === 0) {
+    badge.className = 'cut-ok-badge';
+    badge.textContent = pool > 0 ? `${100 - pool} slot${100-pool!==1?'s':''} free` : 'Under cap';
+    list.innerHTML = '<div class="cut-empty" style="color:var(--green)">✓ No cuts needed. All members in scope fit.</div>';
+    return;
+  }
+  if (over > 0) {
+    badge.className = 'cut-over-badge';
+    badge.textContent = `Must cut ${over}`;
+  } else {
+    badge.className = 'cut-ok-badge';
+    badge.textContent = pool > 0 ? `${100 - pool} slot${100-pool!==1?'s':''} free` : 'Under cap';
+  }
+
+  // Scored rows (cap overflow cuts)
+  let rows = '';
+  if (over > 0) {
+    rows += scored.slice(0, Math.max(over*2, over+5)).map((m, i) => {
+      const isCut = i < over;
+      const isProtected = protectedIds.has(m.id);
+      const why = isProtected
+        ? (coreIds.has(m.id) ? '★ Core' : '🔒 Role')
+        : m.activity === 'inactive' ? 'Inactive'
+        : (pf > 0 && m.power > 0 && m.power < pf) ? `Below ${pf}M`
+        : m.rank === 'R1' ? 'R1 rank'
+        : m.rank === 'R2' ? 'R2 rank'
+        : 'Low power';
+      const effectivelyCut = isCut && !isProtected;
+      const nameStyle = effectivelyCut ? 'color:var(--red);text-decoration:line-through;' : '';
+      const actionLabel = effectivelyCut ? (m.side === 'b' ? 'Left behind' : 'Remove') : '';
+      return `<div class="cut-row">
+        <span class="cut-priority">${effectivelyCut ? '✕' : '·'}</span>
+        <span class="mr-rank ${rankClass(m.rank)}">${m.rank}</span>
+        <span class="mr-name" style="${nameStyle}">${esc(m.name)}${m.core?' ★':''}</span>
+        <span class="mr-power">${fmtPower(m.power)}</span>
+        <span class="mr-activity ${actClass(m.activity)}">${actLabel(m.activity)}</span>
+        <span class="cut-origin cut-origin-${m.side}">${m.side.toUpperCase()}</span>
+        <span class="cut-why">${effectivelyCut ? actionLabel + (why !== 'Low power' ? ' · ' + why : '') : why}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Scope-excluded B members (core-only mode: non-core B shown separately)
+  if (leftBehindIds.size > 0) {
+    const leftBehind = STATE.b.filter(m => leftBehindIds.has(m.id));
+    rows += `<div class="cut-row" style="background:var(--surface2);border-top:1px solid var(--border2)">
+      <span class="cut-priority" style="color:var(--text3)">…</span>
+      <span style="font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;flex:1">
+        ${leftBehind.length} non-core B member${leftBehind.length!==1?'s':''} left behind (not in scope):
+        ${leftBehind.map(m=>`<span style="color:var(--text2)">${esc(m.name)}</span>`).join(', ')}
+      </span>
+    </div>`;
+  }
+
+  // Departing members (leaving to another alliance — shown for awareness)
+  const allDeparting = [...STATE.a, ...STATE.b].filter(m => m.departing);
+  if (allDeparting.length > 0) {
+    rows += `<div class="cut-row" style="background:rgba(251,191,36,.06);border-top:1px solid rgba(251,191,36,.15)">
+      <span class="cut-priority" style="color:#fbbf24">✈</span>
+      <span style="font-size:.7rem;color:#fbbf24;font-family:'JetBrains Mono',monospace;flex:1">
+        ${allDeparting.length} member${allDeparting.length!==1?'s':''} departing to another alliance (excluded from merge):
+        ${allDeparting.map(m=>`<span style="color:var(--text2)">${esc(m.name)} (${m.side.toUpperCase()})</span>`).join(', ')}
+      </span>
+    </div>`;
+  }
+
+  list.innerHTML = rows || '<div class="cut-empty">Nothing to show.</div>';
+}
+
+function setPowerFloor(val) {
+  STATE.powerFloor = parseFloat(val) || 0;
+  renderCuts(); renderMoveSequence(); renderPlan(); saveState();
+}
+
+// ── Move sequence helpers ─────────────────────────────────────────────────────
+function phaseBlock(num, title, steps) {
+  return `<div class="move-phase">
+    <div class="move-phase-title"><span class="move-phase-num">${num}</span>${title}</div>
+    ${steps.join('')}
+  </div>`;
+}
+function stepItem(icon, body) {
+  return `<div class="move-step"><span class="move-step-icon">${icon}</span><div class="move-step-body">${body}</div></div>`;
+}
+
+// ── Move sequence ─────────────────────────────────────────────────────────────
+function renderMoveSequence() {
+  const el = document.getElementById('moveSeqBody');
+  if (!el) return;
+  const total = STATE.a.length + STATE.b.length;
+  if (total === 0) {
+    el.innerHTML = '<div class="move-empty">Add members and assign roles to generate the move sequence.</div>';
+    return;
+  }
+
+  const aName = document.getElementById('aName').value.trim() || 'Alliance A';
+  const bName = document.getElementById('bName').value.trim() || 'Alliance B';
+  const allById = {};
+  [...STATE.a,...STATE.b].forEach(m => allById[m.id] = m);
+
+  const { scored, cutIds, bPool, leftBehindIds, departingIds } = computeCuts();
+  const aCuts = STATE.a.filter(m => cutIds.has(m.id));
+  const bCuts = bPool.filter(m => cutIds.has(m.id));
+  const bScopeLeft = STATE.b.filter(m => leftBehindIds.has(m.id));
+  // Departing = leaving to ANOTHER alliance (not joining A, not staying in B for the merge)
+  const bDeparting = STATE.b.filter(m => m.departing);
+  const aDeparting = STATE.a.filter(m => m.departing);
+
+  // B members who will actually move to A (in pool, not cut, not departing)
+  const bMovers = bPool.filter(m => !cutIds.has(m.id));
+
+  // The acting B leader: the R5 if they're moving, else the highest-rank mover.
+  // If the B R5 is departing, a different member will act as leader through the handoff.
+  const bLeader = bMovers.find(m => m.rank === 'R5') ||
+    [...bMovers].sort((a,b) => RANK_ORDER[b.rank]-RANK_ORDER[a.rank])[0] || null;
+
+  // tempLeader = the person bLeader promotes right before leaving.
+  // They stay in B last so bLeader has someone to hand off to.
+  const tempLeader = bMovers
+    .filter(m => m.id !== bLeader?.id)
+    .sort((a,b) => RANK_ORDER[b.rank]-RANK_ORDER[a.rank])[0] || null;
+
+  // Remaining movers = everyone except bLeader and tempLeader (they move first)
+  const bOtherMovers = bMovers.filter(m => m.id !== bLeader?.id && m.id !== tempLeader?.id);
+  const bCoreOther   = bOtherMovers.filter(m => m.core);
+  const bRegOther    = bOtherMovers.filter(m => !m.core);
+
+  const newR5 = STATE.roles.r5 ? allById[STATE.roles.r5] : null;
+  const r4Meta = [
+    {key:'warlord',label:'Warlord',icon:'⚔️'},
+    {key:'recruiter',label:'Recruiter',icon:'📣'},
+    {key:'butler',label:'Butler',icon:'🛡️'},
+    {key:'muse',label:'Muse',icon:'🌟'},
+  ];
+
+  let html = ''; let ph = 1;
+
+  // Phase 1: Cleanup
+  const p1 = [];
+  if (aCuts.length > 0) p1.push(stepItem('🔴',
+    `<strong>[${aName} R5]</strong> Remove ${aCuts.length} member${aCuts.length!==1?'s':''} from ${aName} before opening slots:`+
+    `<div class="names">${aCuts.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`));
+  if (bCuts.length > 0) p1.push(stepItem('⚠️',
+    `<strong>${bCuts.length} member${bCuts.length!==1?'s':''} will be left behind in ${bName}</strong> — over cap, not joining ${aName}. `+
+    `Notify them in advance:`+
+    `<div class="names">${bCuts.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`));
+  if (bScopeLeft.length > 0) p1.push(stepItem('⚠️',
+    `<strong>${bScopeLeft.length} non-core member${bScopeLeft.length!==1?'s':''} staying in ${bName}</strong> — not part of this move (core-only scope). `+
+    `Notify them they are not moving with the core group:`+
+    `<div class="names">${bScopeLeft.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`));
+  if (!p1.length) p1.push(stepItem('✅', 'No cuts needed — all in-scope members fit under the 100-member cap.'));
+  html += phaseBlock(ph++, 'Pre-Merge Cleanup', p1);
+
+  // Phase: Departing members (leaving to another alliance entirely)
+  const pDepart = [];
+  if (bDeparting.length > 0) {
+    const bDepartR5 = bDeparting.find(m => m.rank === 'R5');
+    if (bDepartR5) {
+      // B R5 is departing — they must promote the acting merge leader (bLeader) before leaving
+      pDepart.push(stepItem('👑',
+        `<strong>[${bDepartR5.name}]</strong> is departing to another alliance before the merge. `+
+        `Before leaving ${bName}, they must promote `+
+        (bLeader ? `<strong>${bLeader.name}</strong>` : 'a trusted officer')+
+        ` to R5 so the remaining members have a leader to conduct the merge. `+
+        `<em>An R5 cannot leave without first transferring leadership.</em>`));
+    }
+    pDepart.push(stepItem('✈️',
+      `<strong>${bDeparting.length} ${bName} member${bDeparting.length!==1?'s':''} depart to another alliance before the merge begins:</strong>`+
+      `<div class="names">${bDeparting.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`));
+  }
+  if (aDeparting.length > 0) {
+    pDepart.push(stepItem('✈️',
+      `<strong>${aDeparting.length} ${aName} member${aDeparting.length!==1?'s':''} depart to another alliance:</strong>`+
+      `<div class="names">${aDeparting.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`));
+  }
+  if (pDepart.length) html += phaseBlock(ph++, 'Pre-Merge Departures', pDepart);
+
+  // Phase: Core movers (everyone except bLeader and tempLeader, core first)
+  if (bCoreOther.length > 0) {
+    html += phaseBlock(ph++, `Priority — Core ${bName} Members Move First`, [
+      stepItem('⭐', `<strong>[${aName} R5]</strong> Pre-invite core members or have them apply.`),
+      stepItem('🚶', `Core members leave ${bName} and join ${aName}:`+
+        `<div class="names">${bCoreOther.map(m=>'★ '+m.name+' ('+m.rank+(m.notes?' — '+esc(m.notes):'')+')').join(' · ')}</div>`),
+    ]);
+  }
+
+  // Phase: Regular movers
+  if (bRegOther.length > 0) {
+    html += phaseBlock(ph++, `Remaining ${bName} Members Move`, [
+      stepItem('🚶', `${bRegOther.length} member${bRegOther.length!==1?'s':''} leave ${bName} and join ${aName}:`+
+        `<div class="names">${bRegOther.map(m=>m.name+' ('+m.rank+')').join(' · ')}</div>`),
+    ]);
+  }
+
+  // Phase: Leader handoff + departure (bLeader leaves second-to-last, tempLeader leaves last)
+  if (bLeader && bMovers.length > 0) {
+    const isNewR5 = newR5 && newR5.id === bLeader.id;
+    const leaderSteps = [];
+    if (tempLeader) {
+      // tempLeader stayed behind — bLeader promotes them, then bLeader leaves
+      leaderSteps.push(stepItem('👑',
+        `<strong>[${bLeader.name}]</strong> promotes <strong>${tempLeader.name}</strong> to temporary R5 in ${bName}. `+
+        `<em>The R5 cannot leave without first promoting someone — this happens right before they depart, not at the start.</em>`));
+      leaderSteps.push(stepItem('🚶',
+        `<strong>${bLeader.name}</strong> leaves ${bName} and joins ${aName}.`+
+        (isNewR5 ? ' <em>This player will become the new R5 of the merged alliance.</em>' : '')));
+      leaderSteps.push(stepItem('🚶',
+        `<strong>${tempLeader.name}</strong> leaves ${bName} last and joins ${aName}. `+
+        `(${bName} is now empty and will dissolve.)`));
+    } else {
+      // bLeader is the only mover — no one to promote; they simply leave last
+      leaderSteps.push(stepItem('🚶',
+        `<strong>${bLeader.name}</strong> is the last member of ${bName}. `+
+        `They leave and join ${aName}. ${bName} dissolves automatically.`+
+        (isNewR5 ? ' <em>This player will become the new R5 of the merged alliance.</em>' : '')));
+    }
+    if (isNewR5) {
+      leaderSteps.push(stepItem('👑',
+        `<strong>[Current ${aName} R5]</strong> Promote <strong>${bLeader.name}</strong> to R5 immediately after they join.`));
+    }
+    html += phaseBlock(ph++, `${bName} — Final Departure`, leaderSteps);
+  }
+
+  // Phase 6: Post-merge roles
+  const roleSteps = [];
+  if (newR5 && (!bLeader || newR5.id !== bLeader.id)) {
+    roleSteps.push(stepItem('👑', `<strong>[New A R5]</strong> Promote <strong>${newR5.name}</strong> to R5 in the merged alliance.`));
+  }
+  for (const r of r4Meta) {
+    const m = STATE.roles[r.key] ? allById[STATE.roles[r.key]] : null;
+    if (m) roleSteps.push(stepItem(r.icon, `Assign <strong>${r.label}</strong> → <strong>${m.name}</strong>`));
+  }
+  if (roleSteps.length) {
+    roleSteps.unshift(stepItem('⚙️', `<strong>[New R5]</strong> Open the member panel and assign roles:`));
+    html += phaseBlock(ph++, 'Post-Merge — Role Assignment', roleSteps);
+  }
+
+  el.innerHTML = html;
+}
+
+// ── Merge day checklist ───────────────────────────────────────────────────────
+const BASE_CHECKLIST = [
+  {id:'cl-agree',   s:'Before Merge Day', t:'Agree on merge date and time with both R5s', w:'Both R5s'},
+  {id:'cl-share',   s:'Before Merge Day', t:'Share the full member list — who is joining, who is staying behind, who is departing elsewhere — at least 24 hours in advance', w:'Both R5s'},
+  {id:'cl-notify',  s:'Before Merge Day', t:"Notify every member individually about their status — don't blindside anyone", w:'Both R5s'},
+  {id:'cl-depart',  s:'Before Merge Day', t:'Coordinate with any departing members (going to a third alliance) so they leave before merge day', w:'B R5'},
+  {id:'cl-kick-a',  s:'Before Merge Day', t:'Alliance A removes members on the cut list to free up slots before B members arrive', w:'A R5'},
+  {id:'cl-confirm-b',s:'Before Merge Day', t:'Confirm which B members are not joining and ensure they understand they will remain in B', w:'B R5'},
+  {id:'cl-ready',   s:'Before Merge Day', t:'Confirm core B members are online and ready for move day', w:'B R5'},
+  {id:'cl-flags',   s:'Merge Day', t:'Check for active rally or flag timers in A before accepting new members — accepting mid-rally can cancel it', w:'A R5'},
+  {id:'cl-core',    s:'Merge Day', t:'Core B members join A first — A R5 sends invites or approves applications', w:'A R5'},
+  {id:'cl-rest',    s:'Merge Day', t:'Remaining B members (non-core, non-leader) join A in order', w:'A R5'},
+  {id:'cl-xfer',    s:'Merge Day', t:'B leader promotes a successor to temporary R5 in B — this must happen immediately before the B leader departs, not at the start of merge day', w:'B R5'},
+  {id:'cl-b-r5',    s:'Merge Day', t:'B leader leaves B and joins A. Their successor is now the last person in B and leaves after.', w:'B R5'},
+  {id:'cl-b-temp',  s:'Merge Day', t:'B R5 successor (temp leader) leaves B last — B alliance dissolves automatically when empty', w:'Temp R5'},
+  {id:'cl-roles',   s:'Merge Day', t:'New R5 assigns the four R4 officer roles in-game: Warlord, Recruiter, Butler, Muse', w:'New R5'},
+  {id:'cl-welc',    s:'After Merge', t:'Post a welcome message in alliance chat addressing both former alliances by name', w:'New R5'},
+  {id:'cl-desc',    s:'After Merge', t:'Update alliance description, name, tag, and join message to reflect the merged identity', w:'New R5'},
+  {id:'cl-req',     s:'After Merge', t:'Review join requirements (open / invite-only / minimum power)', w:'New R5'},
+  {id:'cl-tech',    s:'After Merge', t:'Review alliance technology donation priorities — new members may have different research needs', w:'New R5'},
+  {id:'cl-conf',    s:'After Merge', t:'Confirm all four officer roles (Warlord, Recruiter, Butler, Muse) are assigned in-game', w:'New R5'},
+  {id:'cl-gift',    s:'After Merge', t:'Check Alliance Gift Level — if one alliance had a higher level, ensure it carries over or plan how to reach it again', w:'New R5'},
+];
+
+function renderChecklist() {
+  const el = document.getElementById('checklistBody');
+  if (!el) return;
+  const sections = {};
+  for (const item of BASE_CHECKLIST) {
+    (sections[item.s] = sections[item.s] || []).push(item);
+  }
+  let html = '';
+  for (const [section, items] of Object.entries(sections)) {
+    html += `<div class="checklist-section"><div class="checklist-section-title">${section}</div>`;
+    for (const item of items) {
+      const done = !!CL_CHECKED[item.id];
+      html += `<div class="checklist-item${done?' done':''}" onclick="toggleCheck('${item.id}')">
+        <div class="cl-check">${done?'✓':''}</div>
+        <div>
+          <div class="cl-text">${esc(item.t)}</div>
+          ${item.w ? `<div class="cl-who">${esc(item.w)}</div>` : ''}
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function toggleCheck(id) {
+  CL_CHECKED[id] = !CL_CHECKED[id];
+  try { localStorage.setItem(CL_KEY, JSON.stringify(CL_CHECKED)); } catch(e) {}
+  renderChecklist();
+}
+
+function resetChecklist() {
+  CL_CHECKED = {};
+  try { localStorage.removeItem(CL_KEY); } catch(e) {}
+  renderChecklist();
+}
+
+// ── Merge plan ────────────────────────────────────────────────────────────────
+function renderPlan() {
+  const body = document.getElementById('planBody');
+  const aName = document.getElementById('aName').value.trim() || 'Alliance A';
+  const bName = document.getElementById('bName').value.trim() || 'Alliance B';
+  const aTag  = document.getElementById('aTag').value.trim();
+  const bTag  = document.getElementById('bTag').value.trim();
+  const total = STATE.a.length + STATE.b.length;
+
+  if (total === 0) {
+    body.innerHTML = '<p style="color:var(--text3);font-size:.84rem;font-family:\'JetBrains Mono\',monospace">Add members and assign roles to generate the merge plan.</p>';
+    return;
+  }
+
+  const allById = {};
+  [...STATE.a, ...STATE.b].forEach(m => allById[m.id] = m);
+
+  function roleMember(key) {
+    const id = STATE.roles[key];
+    if (!id) return null;
+    return allById[id] || null;
+  }
+
+  const { scored, cutIds, over, bPool: rpBPool, aPool: rpAPool } = computeCuts();
+
+  // Surviving = non-departing members who are not cut (the actual merged alliance)
+  const surviving = [...rpAPool, ...rpBPool].filter(m => !cutIds.has(m.id));
+
+  // Build rank breakdown
+  const byRank = { R5:[], R4:[], R3:[], R2:[], R1:[] };
+  for (const m of surviving) {
+    (byRank[m.rank] || byRank.R1).push(m);
+  }
+
+  // Post-merge power — only surviving (non-cut, non-departing, in-scope) members
+  const planPwA = sumPower(surviving.filter(m => m.side === 'a'));
+  const planPwB = sumPower(surviving.filter(m => m.side === 'b'));
+  const planPwT = planPwA + planPwB;
+
+  // B remaining after merge = left-behind (scope exclusions) + cut B pool members
+  const { leftBehindIds: planLeftBehindIds } = computeCuts();
+  const planBLeftBehind = STATE.b.filter(m => planLeftBehindIds.has(m.id));
+  const planBCut        = rpBPool.filter(m => cutIds.has(m.id));
+  const planBRemaining  = [...planBLeftBehind, ...planBCut];
+  const planPwBRemaining = sumPower(planBRemaining);
+  const planBDissolves  = planBRemaining.length === 0;
+
+  // Render
+  let html = '';
+
+  // Header
+  html += `<div class="plan-block">
+    <div class="plan-block-title">Merge Overview</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">New Alliance</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:600">${esc(aTag||'[TAG]')} ${esc(aName)}</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Members After Merge</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:${surviving.length<=100?'var(--green)':'var(--red)'}">${surviving.length} / 100</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-top:2px solid var(--r5);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(aName)} — Power After Merge</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;color:var(--r5)">${planPwT ? fmtPowerCompact(planPwT) : '—'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:2px">${planPwT ? fmtPowerFull(planPwT) : 'enter member powers above'}</div>
+      </div>
+      <div style="background:rgba(100,100,120,.07);border:1px solid rgba(150,150,170,.18);border-top:2px solid ${planBDissolves?'rgba(150,150,170,.3)':'var(--merge-b)'};border-radius:8px;padding:.55rem .8rem;opacity:.8">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(bName)} — After Merge</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;color:${planBDissolves?'var(--text3)':'var(--merge-b)'}">
+          ${planBDissolves ? 'Dissolved' : (planPwBRemaining ? fmtPowerCompact(planPwBRemaining) : `${planBRemaining.length} member${planBRemaining.length!==1?'s':''}`)}
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:2px">
+          ${planBDissolves
+            ? '0 members remaining · alliance ceases to exist'
+            : `${planBRemaining.length} member${planBRemaining.length!==1?'s':''} remaining${planPwBRemaining?' · '+fmtPowerFull(planPwBRemaining):''}`}
+        </div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-top:2px solid var(--merge-a);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(aName)} contribution</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;color:var(--merge-a)">${planPwA ? fmtPowerCompact(planPwA) : '—'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:2px">${planPwT>0?(planPwA/planPwT*100).toFixed(1)+'% of merged total':''}</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-top:2px solid var(--merge-b);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(bName)} contribution</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;color:var(--merge-b)">${planPwB ? fmtPowerCompact(planPwB) : '—'}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:2px">${planPwT>0?(planPwB/planPwT*100).toFixed(1)+'% of merged total':''}</div>
+      </div>
+      ${over > 0 ? `<div style="background:var(--red-bg);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:.55rem .8rem">
+        <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Not Joining</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:var(--red)">${over}</div>
+      </div>` : ''}
+    </div>
+  </div>`;
+
+  // Leadership
+  html += `<div class="plan-block"><div class="plan-block-title">Leadership Assignments</div>`;
+  const roleLabels = [
+    { key:'r5', icon:'👑', label:'R5 Leader'  },
+    { key:'warlord',   icon:'⚔️', label:'Warlord'   },
+    { key:'recruiter', icon:'📣', label:'Recruiter'  },
+    { key:'butler',    icon:'🛡️', label:'Butler'     },
+    { key:'muse',      icon:'🌟', label:'Muse'       },
+  ];
+  for (const r of roleLabels) {
+    const m = roleMember(r.key);
+    html += `<div class="plan-role-row">
+      <span style="font-size:1rem;flex-shrink:0">${r.icon}</span>
+      <span class="plan-role-label">${r.label}</span>
+      ${m
+        ? `<span class="plan-role-name">${esc(m.name)}</span>
+           <span class="mr-rank ${rankClass(m.rank)}" style="font-size:.65rem;margin-left:4px">${m.rank}</span>
+           <span class="plan-role-origin">
+             <span class="cut-origin cut-origin-${m.side}">${m.side === 'a' ? esc(aName) : esc(bName)}</span>
+           </span>`
+        : `<span style="color:var(--text3);font-size:.82rem;font-style:italic">Unassigned</span>`
+      }
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Roster by rank
+  html += `<div class="plan-block"><div class="plan-block-title">Final Roster by Rank</div>`;
+  for (const rank of ['R5','R4','R3','R2','R1']) {
+    const members = byRank[rank];
+    if (!members.length) continue;
+    html += `<div style="margin-bottom:.6rem">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem">
+        <span class="mr-rank ${rankClass(rank)}" style="font-size:.72rem">${rank}</span>
+        <span style="font-size:.75rem;color:var(--text3)">${members.length} member${members.length!==1?'s':''}</span>
+      </div>
+      <div class="plan-members-grid">
+        ${members.sort((a,b) => b.power - a.power).map(m => `
+          <div class="plan-member">
+            ${m.core ? '<span style="color:var(--r5);font-size:.7rem;flex-shrink:0">★</span>' : ''}
+            <span class="mr-name" title="${m.notes ? esc(m.notes) : ''}">${esc(m.name)}</span>
+            <span style="font-size:.65rem;margin-left:auto;flex-shrink:0" class="cut-origin cut-origin-${m.side}">${m.side.toUpperCase()}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Cut list if any
+  if (over > 0) {
+    html += `<div class="plan-block"><div class="plan-block-title" style="color:var(--red)">Members to Remove Before Merge (${over})</div>`;
+    scored.slice(0, over).forEach(m => {
+      html += `<div class="plan-role-row">
+        <span class="mr-rank ${rankClass(m.rank)}" style="font-size:.65rem">${m.rank}</span>
+        <span class="plan-role-name" style="color:var(--red)">${esc(m.name)}</span>
+        <span style="font-size:.7rem;color:var(--text3);margin-left:auto">${m.activity === 'inactive' ? 'Inactive' : fmtPower(m.power)+' power'}</span>
+        <span class="cut-origin cut-origin-${m.side}" style="margin-left:.4rem">${m.side.toUpperCase()}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Rankings block in the plan
+  if (STATE.rankings.length > 0) {
+    const mergedLabel = (aTag ? aTag+' ' : '') + aName;
+    const entries = [
+      ...STATE.rankings.map(r => ({ name:r.name, power:r.power, isMerged:false })),
+      { name:mergedLabel, power:planPwT, isMerged:true },
+    ].sort((a,b) => b.power - a.power);
+    const mergedPos = entries.findIndex(e => e.isMerged) + 1;
+    html += `<div class="plan-block"><div class="plan-block-title">Server Power Rankings — Estimated Position: #${mergedPos}</div>`;
+    entries.forEach((e, i) => {
+      const pos = i + 1;
+      const posLabel = pos <= 3 ? ['🥇','🥈','🥉'][pos-1] : `#${pos}`;
+      const rowStyle = e.isMerged
+        ? 'background:rgba(240,192,64,.07);border-left:3px solid var(--r5);'
+        : '';
+      html += `<div class="plan-role-row" style="${rowStyle}">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;width:32px;flex-shrink:0">${posLabel}</span>
+        <span class="plan-role-name">${esc(e.name)}</span>
+        ${e.isMerged ? '<span class="rank-merged-badge" style="margin-left:4px">After Merge</span>' : ''}
+        <span style="font-family:\'JetBrains Mono\',monospace;font-size:.72rem;color:var(--text2);margin-left:auto;flex-shrink:0">${e.power ? fmtPowerCompact(e.power) : '—'}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  body.innerHTML = html;
+
+  // Build plain text version for clipboard
+  buildPlainText(aName, aTag, bName, bTag, roleLabels, roleMember, surviving, scored, over, allById);
+}
+
+function buildPlainText(aName, aTag, bName, bTag, roleLabels, roleMember, surviving, scored, over, allById) {
+  // Post-cut, scope-aware, departing-excluded power
+  const { cutIds, bPool, aPool } = computeCuts();
+  const survA = aPool.filter(m => !cutIds.has(m.id));
+  const survB = bPool.filter(m => !cutIds.has(m.id));
+  const pwA = sumPower(survA);
+  const pwB = sumPower(survB);
+  const pwT = pwA + pwB;
+  const scopeNote = STATE.mergeScope === 'core' ? ' (core B members only)' : '';
+  let t = '';
+  t += `=== ALLIANCE MERGE PLAN ===\n`;
+  t += `${aTag ? aTag+' ' : ''}${aName} absorbs ${bTag ? bTag+' ' : ''}${bName}${scopeNote}\n`;
+  t += `Members joining the merge: ${surviving.length}/100\n`;
+  if (over > 0) t += `Over cap by: ${over} (see who's not joining)\n`;
+  t += `\n--- POWER AFTER MERGE ---\n`;
+  t += `${aName} (${survA.length} joining): ${fmtPowerFull(pwA)} (${fmtPowerCompact(pwA)})\n`;
+  t += `${bName} (${survB.length} joining): ${fmtPowerFull(pwB)} (${fmtPowerCompact(pwB)})\n`;
+  t += `Total after merge: ${fmtPowerFull(pwT)} (${fmtPowerCompact(pwT)})\n`;
+  if (pwT > 0) {
+    t += `Contribution — ${aName}: ${(pwA/pwT*100).toFixed(1)}%  |  ${bName}: ${(pwB/pwT*100).toFixed(1)}%\n`;
+  }
+  t += '\n--- LEADERSHIP ---\n';
+  for (const r of roleLabels) {
+    const m = roleMember(r.key);
+    t += `${r.label}: ${m ? m.name + ' ('+m.rank+', '+(m.side==='a'?aName:bName)+')' : 'Unassigned'}\n`;
+  }
+  if (over > 0) {
+    t += '\n--- REMOVE BEFORE MERGE ---\n';
+    scored.slice(0, over).forEach(m => {
+      t += `- ${m.name} [${m.rank}] from ${m.side==='a'?aName:bName} (${m.activity})\n`;
+    });
+  }
+  t += '\n--- FINAL ROSTER ---\n';
+  for (const rank of ['R5','R4','R3','R2','R1']) {
+    const members = surviving.filter(m => m.rank === rank);
+    if (!members.length) continue;
+    t += `${rank} (${members.length}): ${members.map(m=>(m.core?'★':'')+m.name+(m.notes?' ['+m.notes+']':'')).join(', ')}\n`;
+  }
+  // Move sequence summary
+  const { cutIds: ci2, bPool: bp2, aPool: ap2, departingIds: di2 } = computeCuts();
+  const bMovers2 = bp2.filter(m => !ci2.has(m.id));
+  const bLeader2 = bMovers2.find(m=>m.rank==='R5') ||
+    [...bMovers2].sort((a,b)=>RANK_ORDER[b.rank]-RANK_ORDER[a.rank])[0] || null;
+  const tempLeader2 = bMovers2.filter(m=>m.id!==bLeader2?.id)
+    .sort((a,b)=>RANK_ORDER[b.rank]-RANK_ORDER[a.rank])[0] || null;
+  const bOther2 = bMovers2.filter(m=>m.id!==bLeader2?.id && m.id!==tempLeader2?.id);
+  const bCore2  = bOther2.filter(m=>m.core);
+  const bReg2   = bOther2.filter(m=>!m.core);
+  const aC2  = ap2.filter(m=>ci2.has(m.id));
+  const bC2  = bp2.filter(m=>ci2.has(m.id));
+  const bDep2 = STATE.b.filter(m=>di2.has(m.id));
+  const aDep2 = STATE.a.filter(m=>m.departing);
+  t += '\n--- MOVE SEQUENCE ---\n';
+  if (aC2.length)    t += `1. ${aName} R5 removes: ${aC2.map(m=>m.name).join(', ')}\n`;
+  if (bC2.length)    t += `${aC2.length?'2':'1'}. Left behind in ${bName} (not joining): ${bC2.map(m=>m.name).join(', ')}\n`;
+  if (bDep2.length)  t += `Departing from ${bName} to another alliance: ${bDep2.map(m=>m.name).join(', ')}\n`;
+  if (aDep2.length)  t += `Departing from ${aName} to another alliance: ${aDep2.map(m=>m.name).join(', ')}\n`;
+  if (bCore2.length) t += `Core ${bName} members move first: ${bCore2.map(m=>m.name).join(', ')}\n`;
+  if (bReg2.length)  t += `Remaining ${bName} members: ${bReg2.map(m=>m.name).join(', ')}\n`;
+  if (bLeader2 && tempLeader2) {
+    t += `${bLeader2.name} promotes ${tempLeader2.name} to temp R5, then ${bLeader2.name} joins ${aName}\n`;
+    t += `${tempLeader2.name} joins ${aName} last (${bName} dissolves)\n`;
+  } else if (bLeader2) {
+    t += `${bLeader2.name} is last to leave ${bName} — ${bName} dissolves\n`;
+  }
+  // Server rankings
+  if (STATE.rankings.length > 0 && pwT > 0) {
+    const mergedLabel = (aTag ? aTag+' ' : '') + aName;
+    const allEntries = [
+      ...STATE.rankings.map(r => ({ name:r.name, power:r.power, isMerged:false })),
+      { name:mergedLabel+' (after merge)', power:pwT, isMerged:true },
+    ].sort((a,b) => b.power - a.power);
+    t += '\n--- SERVER RANKINGS (estimated) ---\n';
+    allEntries.forEach((e,i) => {
+      const marker = e.isMerged ? ' ◄ YOU' : '';
+      t += `#${i+1}  ${e.name}  —  ${fmtPowerFull(e.power)} (${fmtPowerCompact(e.power)})${marker}\n`;
+    });
+  }
+  document.getElementById('planText').value = t;
+}
+
+function exportPlan() {
+  const text = document.getElementById('planText').value;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    fb.style.opacity = '1';
+    setTimeout(() => fb.style.opacity = '0', 2000);
+  });
+}
+
+// ── Export / Import ───────────────────────────────────────────────────────────
+function exportConfig() {
+  const payload = {
+    _version: 2,
+    _tool: 'lw-merge-planner',
+    a: STATE.a, b: STATE.b,
+    roles: STATE.roles,
+    powerFloor: STATE.powerFloor,
+    mergeScope: STATE.mergeScope,
+    rankings: STATE.rankings,
+    nextId,
+    aName:  document.getElementById('aName').value,
+    aTag:   document.getElementById('aTag').value,
+    aLevel: document.getElementById('aLevel').value,
+    aPower: document.getElementById('aPower').value,
+    bName:  document.getElementById('bName').value,
+    bTag:   document.getElementById('bTag').value,
+    bLevel: document.getElementById('bLevel').value,
+    bPower: document.getElementById('bPower').value,
+  };
+  const aTag  = payload.aTag  || 'A';
+  const bTag  = payload.bTag  || 'B';
+  const aName = payload.aName || 'AllianceA';
+  const bName = payload.bName || 'AllianceB';
+  const safeName = str => str.replace(/[^a-zA-Z0-9_\-]/g,'_');
+  const filename = `merge_${safeName(aTag||aName)}_${safeName(bTag||bName)}.json`;
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importConfig(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.a || !data.b) throw new Error('Not a valid merge planner config');
+      // Apply same migration logic as loadState
+      STATE.a = (data.a||[]).map(m => ({core:false, notes:'', departing:false, ...m, side:'a'}));
+      STATE.b = (data.b||[]).map(m => ({core:false, notes:'', departing:false, ...m, side:'b'}));
+      STATE.roles      = data.roles      || {r5:null,warlord:null,recruiter:null,butler:null,muse:null};
+      STATE.powerFloor = data.powerFloor || 0;
+      STATE.mergeScope = data.mergeScope || 'full';
+      STATE.rankings   = data.rankings   || [];
+      nextId = data.nextId || Math.max(...[...STATE.a,...STATE.b].map(m=>m.id), 0) + 1;
+      if (data.aName)  document.getElementById('aName').value  = data.aName;
+      if (data.aTag)   document.getElementById('aTag').value   = data.aTag;
+      if (data.aLevel) document.getElementById('aLevel').value = data.aLevel;
+      if (data.aPower) document.getElementById('aPower').value = data.aPower;
+      if (data.bName)  document.getElementById('bName').value  = data.bName;
+      if (data.bTag)   document.getElementById('bTag').value   = data.bTag;
+      if (data.bLevel) document.getElementById('bLevel').value = data.bLevel;
+      if (data.bPower) document.getElementById('bPower').value = data.bPower;
+      if (STATE.powerFloor) document.getElementById('pfInput').value = STATE.powerFloor;
+      document.getElementById('scopeBtnFull').classList.toggle('active', STATE.mergeScope !== 'core');
+      document.getElementById('scopeBtnCore').classList.toggle('active', STATE.mergeScope === 'core');
+      renderAll();
+      saveState();
+      // Show toast
+      const toast = document.getElementById('importToast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    } catch(err) {
+      alert('Import failed: ' + err.message + '\n\nMake sure you are loading a .json file exported from this tool.');
+    }
+    input.value = ''; // reset so the same file can be re-imported if needed
+  };
+  reader.readAsText(file);
+}
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      a:STATE.a, b:STATE.b, roles:STATE.roles, powerFloor:STATE.powerFloor, mergeScope:STATE.mergeScope,
+      rankings:STATE.rankings, nextId,
+      aName:document.getElementById('aName').value,
+      aTag: document.getElementById('aTag').value,
+      aLevel:document.getElementById('aLevel').value,
+      aPower:document.getElementById('aPower').value,
+      bName:document.getElementById('bName').value,
+      bTag: document.getElementById('bTag').value,
+      bLevel:document.getElementById('bLevel').value,
+      bPower:document.getElementById('bPower').value,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const cl = localStorage.getItem(CL_KEY);
+    if (cl) CL_CHECKED = JSON.parse(cl);
+  } catch(e) {}
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('lw_merge_planner_v1');
+    if (!raw) { renderChecklist(); return; }
+    const data = JSON.parse(raw);
+    // Migrate: add core/notes if missing from old saves
+    STATE.a = (data.a||[]).map(m => ({core:false, notes:'', departing:false, ...m, side:'a'}));
+    STATE.b = (data.b||[]).map(m => ({core:false, notes:'', departing:false, ...m, side:'b'}));
+    STATE.roles      = data.roles      || {r5:null,warlord:null,recruiter:null,butler:null,muse:null};
+    STATE.powerFloor = data.powerFloor || 0;
+    STATE.mergeScope = data.mergeScope || 'full';
+    STATE.rankings   = data.rankings   || [];
+    nextId = data.nextId || Math.max(...[...STATE.a,...STATE.b].map(m=>m.id), 0) + 1;
+    if (data.aName)  document.getElementById('aName').value  = data.aName;
+    if (data.aTag)   document.getElementById('aTag').value   = data.aTag;
+    if (data.aLevel) document.getElementById('aLevel').value = data.aLevel;
+    if (data.aPower) document.getElementById('aPower').value = data.aPower;
+    if (data.bName)  document.getElementById('bName').value  = data.bName;
+    if (data.bTag)   document.getElementById('bTag').value   = data.bTag;
+    if (data.bLevel) document.getElementById('bLevel').value = data.bLevel;
+    if (data.bPower) document.getElementById('bPower').value = data.bPower;
+    if (STATE.powerFloor) document.getElementById('pfInput').value = STATE.powerFloor;
+    document.getElementById('scopeBtnFull').classList.toggle('active', STATE.mergeScope !== 'core');
+    document.getElementById('scopeBtnCore').classList.toggle('active', STATE.mergeScope === 'core');
+    renderAll();
+  } catch(e) { renderChecklist(); }
+}
+
+document.addEventListener('DOMContentLoaded', loadState);
+</script>
+</body>
+</html>

@@ -5,6 +5,9 @@ const NAV_LINKS = [
     {label:'Desert Storm Planner', href:'desert-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
     {label:'Canyon Storm Planner', href:'canyon-storm-planner.html', icon:'images/allianceduel/vs_combat.png'},
   ]},
+  {label:'Alliance', children:[
+    {label:'Alliance Merge Planner', href:'alliance-merge-planner.html', icon:'images/ui/alliancecity_level.png'},
+  ]},
   {label:'Guides', children:[
     {label:'Alliance Duel Planner', href:'alliance-duel-planner.html', icon:'images/allianceduel/vs_logo.png'},
     {label:'Stamina & Resource ROI', href:'stamina-roi-guide.html', icon:'images/resources/res_stamina.png'},
@@ -31,6 +34,7 @@ const NAV_LINKS = [
 // Search index — title, url, keywords
 const SEARCH_INDEX = [
   { title:'Home', url:'index.html', tags:'home overview' },
+  { title:'Alliance Merge Planner', url:'alliance-merge-planner.html', tags:'alliance merge planner roster 100 cap R5 R4 R3 R2 R1 warlord recruiter butler muse leadership roles cut list' },
   { title:'Capital War Planner', url:'capital-war-planner.html', tags:'capital war planner cannon assault rally burn squad garrison president occupation' },
   { title:'Pre-Season Map Planner', url:'preseason-map-planner.html', tags:'preseason map planner territory zone alliance village chemical plant power town metropolis military base capitol' },
   { title:'Desert Storm Planner', url:'desert-storm-planner.html', tags:'desert storm planner tactical map drag drop phase plan auto assign' },
@@ -44,7 +48,6 @@ const SEARCH_INDEX = [
   { title:'VIP & Diamonds', url:'vip-diamond-guide.html', tags:'vip diamonds gems guide spending' },
   { title:'Gear Upgrade', url:'gear-upgrade-guide.html', tags:'gear upgrade equipment dps tank mythic guide' },
   { title:'Drone Priority', url:'drone-upgrade-guide.html', tags:'drone upgrade priority guide' },
-  { title:'Daily Checklist', url:'daily-checklist.html', tags:'daily checklist tasks missions todo reset' },
   { title:'Hero EXP Calculator', url:'hero-exp-calculator.html', tags:'hero exp experience calculator level upgrade' },
   { title:'Speedup Calculator', url:'speedup-calculator.html', tags:'speedup calculator time build research hours days' },
   { title:'Server Tracker', url:'server-tracker.html', tags:'server tracker day count state timeline events' },

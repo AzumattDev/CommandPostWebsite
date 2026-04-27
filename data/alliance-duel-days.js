@@ -46,7 +46,6 @@ const days = [
       { t: "Save ALL building speedups for Tuesday", d: "Do not touch a single building speedup today. Every one you save now is Tuesday points." },
       { t: "Save ALL tech speedups for Wednesday", d: "Don't start any research completions. Tech speedups and Valor Badges are Wednesday's fuel." },
       { t: "Save ALL hero resources for Thursday", d: "Don't level heroes, use shards, or spend skill medals. Thursday is hero day — everything is worth more then." },
-      { t: "Re-send gatherers", d: "After collecting, send squads back out to resource tiles. Set the timer to return Monday morning next week." },
     ],
     tips: [
       { t: "Hero XP: Monday scores it, Thursday maximizes it", d: "Hero XP is a valid Monday scoring item but earns more points per item on Thursday. Save it for Thursday unless you're very close to a chest threshold." },
