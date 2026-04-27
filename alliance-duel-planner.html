@@ -111,6 +111,32 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .at-soon{color:var(--amber)!important}
 .at-later{color:#38bdf8!important}
 .at-section-label{background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.15)}
+
+/* Quick priority list */
+.ql-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:1.25rem}
+.ql-head{font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:6px}
+.ql-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.ql-item:last-child{border-bottom:none;padding-bottom:0}
+.ql-item:first-child{padding-top:0}
+.ql-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:var(--accent);width:16px;flex-shrink:0;margin-top:2px;text-align:right}
+.ql-text{font-size:.86rem;color:var(--text2);line-height:1.45}
+
+/* Alliance announcement */
+.ann-wrap{margin-bottom:1.25rem;border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden}
+.ann-wrap[open]{border-color:rgba(167,139,250,.25)}
+.ann-summary{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:.84rem;font-weight:500;color:var(--text2);background:var(--surface);list-style:none;user-select:none;transition:background .12s}
+.ann-summary:hover{background:var(--surface2)}
+.ann-summary::-webkit-details-marker{display:none}
+.ann-chevron{margin-left:auto;font-size:.55rem;color:var(--text3);transition:transform .15s}
+.ann-wrap[open] .ann-chevron{transform:rotate(180deg)}
+.ann-body{padding:12px 14px;background:var(--surface);border-top:1px solid var(--border)}
+.ann-text{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:.84rem;line-height:1.6;resize:vertical;min-height:72px;box-sizing:border-box;cursor:text}
+.ann-text:focus{outline:none;border-color:var(--border2)}
+.ann-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ann-hint{font-size:.7rem;color:var(--text3)}
+.btn-copy{padding:6px 14px;border-radius:6px;border:1px solid var(--green-border);background:rgba(52,211,153,.08);color:var(--green);font-family:'Chakra Petch',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-copy:hover{background:rgba(52,211,153,.15)}
+.btn-copy.copied{border-color:rgba(96,165,250,.2);background:rgba(96,165,250,.08);color:var(--blue)}
 </style>
 </head>
 <body>
@@ -189,6 +215,21 @@ function render() {
       const daysAhead = (i - srvDay + 7) % 7;
       const bannerLabel = daysAhead > 0 ? 'Opens in' : 'Opens again in';
       html += `<div class="day-banner banner-future"><div class="db-icon">⏰</div><div class="db-body"><div class="db-label">${bannerLabel}</div><div class="db-time" id="db-time-${i}">--:--:--</div></div></div>`;
+    }
+
+    // Quick priority list
+    if (d.quicklist && d.quicklist.length) {
+      html += `<div class="ql-wrap"><div class="ql-head">At a glance — do these in order</div>`;
+      d.quicklist.forEach((item, qi) => {
+        html += `<div class="ql-item"><span class="ql-num">${qi + 1}</span><span class="ql-text">${item}</span></div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Alliance announcement
+    if (d.announce) {
+      const charCount = d.announce.length;
+      html += `<details class="ann-wrap"><summary class="ann-summary"><span>📣</span><span>Alliance Announcement</span><span class="ann-chevron">▼</span></summary><div class="ann-body"><textarea class="ann-text" id="ann-text-${i}" readonly rows="4">${d.announce}</textarea><div class="ann-footer"><span class="ann-hint">Copy and paste into game chat or Discord · ${charCount} chars</span><button class="btn-copy" id="ann-copy-${i}" onclick="cpCopyAnn(${i})">Copy</button></div></div></details>`;
     }
 
     if (d.icons && d.icons.length) {
@@ -369,6 +410,18 @@ function tickDuelTimers() {
   });
 }
 setInterval(tickDuelTimers, 1000);
+
+window.cpCopyAnn = function(i) {
+  const el = document.getElementById(`ann-text-${i}`);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = document.getElementById(`ann-copy-${i}`);
+    if (!btn) return;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => { el.select(); document.execCommand('copy'); });
+};
 
 if (location.hash) {
   applyHash();
