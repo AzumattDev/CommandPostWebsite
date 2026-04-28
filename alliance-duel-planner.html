@@ -7,15 +7,15 @@
 <link rel="stylesheet" href="style.css">
 <script src="nav.js"></script>
 <style>
-h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--accent), #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--amber), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .subtitle { color: var(--text2); font-size: 0.95rem; margin-bottom: 1.5rem; }
 
 .score-bar { display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap; }
-.score-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; text-align: center; flex: 1; min-width: 80px; }
+.score-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; text-align: center; flex: 1; min-width: 80px; display: flex; flex-direction: column; align-items: center; }
 .score-chip .day { font-size: 0.75rem; color: var(--text3); font-weight: 500; }
 .score-chip .chip-theme { font-size: 0.58rem; color: var(--text3); margin-top: 1px; line-height: 1.2; opacity: 0.7; }
-.score-chip .pts { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin-top: 3px; }
-.pts-1 { color: var(--blue); }
+.score-chip .pts { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin-top: auto; padding-top: 4px; }
+.pts-1 { color: var(--amber); }
 .pts-2 { color: var(--accent); }
 .pts-4 { color: var(--red); }
 .pts-0 { color: var(--text3); }
@@ -31,8 +31,8 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .day-name { font-size: 1.3rem; font-weight: 600; }
 .day-theme { font-size: 0.9rem; color: var(--text3); }
 .day-value { font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; }
-.val-1 { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
-.val-2 { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(167,139,250,0.25); }
+.val-1 { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.val-2 { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(249,115,22,0.25); }
 .val-4 { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
 .rule { border: none; border-top: 1px solid var(--border); margin: 1rem 0 1.25rem; }
 
@@ -40,7 +40,7 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .section-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; padding: 3px 10px; border-radius: 5px; display: inline-block; }
 .label-today { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
 .label-prep { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
-.label-tip { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(167,139,250,0.25); }
+.label-tip { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(249,115,22,0.25); }
 .label-pts { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
 
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 8px; }
@@ -51,7 +51,7 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .points-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.5rem; }
 .point-chip { font-size: 0.78rem; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text3); background: var(--surface2); font-family: 'JetBrains Mono', monospace; }
 
-.golden-rules { background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(167,139,250,0.05)); border: 1px solid var(--amber-border); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 2rem; }
+.golden-rules { background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(249,115,22,0.05)); border: 1px solid var(--amber-border); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 2rem; }
 .golden-rules h2 { font-size: 0.95rem; font-weight: 600; color: var(--amber); margin-bottom: 0.6rem; }
 .gr-item { display: flex; gap: 10px; margin-bottom: 8px; }
 .gr-num { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--amber); font-weight: 600; flex-shrink: 0; margin-top: 2px; }
@@ -92,13 +92,13 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 /* Day timer banner */
 .day-banner{display:flex;align-items:center;gap:12px;border-radius:var(--radius-lg);padding:10px 14px;margin-bottom:1.25rem}
 .day-banner.db-active{background:rgba(251,191,36,.05);border:1px solid var(--amber-border)}
-.day-banner.banner-future{background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.15)}
+.day-banner.banner-future{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.18)}
 .db-icon{font-size:1.2rem;flex-shrink:0}
 .db-body{flex:1;min-width:0}
 .db-label{font-size:.73rem;color:var(--text3);font-weight:500;margin-bottom:2px}
 .db-time{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700}
 .db-active .db-time{color:var(--amber)}
-.banner-future .db-time{color:#38bdf8}
+.banner-future .db-time{color:var(--amber)}
 
 /* Action timers */
 .at-list{display:flex;flex-direction:column;gap:4px;margin-top:8px}
@@ -109,8 +109,8 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 .at-cd{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:700;flex-shrink:0;white-space:nowrap}
 .at-urgent{color:var(--red)!important}
 .at-soon{color:var(--amber)!important}
-.at-later{color:#38bdf8!important}
-.at-section-label{background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.15)}
+.at-later{color:var(--blue)!important}
+.at-section-label{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(249,115,22,.2)}
 
 /* Quick priority list */
 .ql-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:1.25rem}
@@ -123,7 +123,7 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 
 /* Alliance announcement */
 .ann-wrap{margin-bottom:1.25rem;border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden}
-.ann-wrap[open]{border-color:rgba(167,139,250,.25)}
+.ann-wrap[open]{border-color:rgba(249,115,22,.25)}
 .ann-summary{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:.84rem;font-weight:500;color:var(--text2);background:var(--surface);list-style:none;user-select:none;transition:background .12s}
 .ann-summary:hover{background:var(--surface2)}
 .ann-summary::-webkit-details-marker{display:none}
@@ -229,7 +229,7 @@ function render() {
     // Alliance announcement
     if (d.announce) {
       const charCount = d.announce.length;
-      html += `<details class="ann-wrap"><summary class="ann-summary"><span>📣</span><span>Alliance Announcement</span><span class="ann-chevron">▼</span></summary><div class="ann-body"><textarea class="ann-text" id="ann-text-${i}" readonly rows="4">${d.announce}</textarea><div class="ann-footer"><span class="ann-hint">Copy and paste into game chat or Discord · ${charCount} chars</span><button class="btn-copy" id="ann-copy-${i}" onclick="cpCopyAnn(${i})">Copy</button></div></div></details>`;
+      html += `<details class="ann-wrap"><summary class="ann-summary"><span>&#128226;</span><span>Alliance Announcement</span><span class="ann-chevron">&#9660;</span></summary><div class="ann-body"><textarea class="ann-text" id="ann-text-${i}" readonly rows="6">${d.announce}</textarea><div class="ann-footer"><span class="ann-hint">Paste into game chat &middot; ${charCount} / 500 chars</span><button class="btn-copy" id="ann-copy-${i}" onclick="cpCopyAnn(${i})">Copy</button></div></div></details>`;
     }
 
     if (d.icons && d.icons.length) {

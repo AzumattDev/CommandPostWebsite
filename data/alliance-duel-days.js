@@ -13,7 +13,7 @@ const days = [
       "Start a 1–2 day research — you will finish it with speedups on Wednesday",
       "Save everything — nothing scores on Sunday, no spending today",
     ],
-    announce: "📋 PREP DAY: Stack radar (NO claiming — aim 30+). Send ALL squads to gold tiles, returns AFTER midnight reset. Queue longest buildings + start 2-day research. SAVE THIS WEEK: Mon=Drone/Stamina | Tue=Build speedups | Wed=Tech+Valor Badges | Thu=Hero XP/Shards | Fri=Train speedups | Sat=Healing speedups",
+    announce: "[PREP DAY - No scoring]\n- Stack radar tasks, DO NOT claim any\n- Send ALL squads to gold tiles (return after reset)\n- Queue longest buildings + start 2-day research\n- SAVE THIS WEEK:\nMon=Drone/Stamina | Tue=Build speedups\nWed=Tech+Valor Badges | Thu=Hero XP/Shards\nFri=Train speedups | Sat=Healing speedups",
     today: [
       { t: "Stack radar tasks (DO NOT claim)", d: "Complete radar missions but leave all rewards unclaimed. Aim for 30–35 stacked before Monday reset. This is your Monday point burst." },
       { t: "Send ALL squads to gather", d: "Send every squad to resource tiles NOW — gold tiles give the most points. Watch the <strong>Action Timer</strong> above (Monday reset countdown): squads must land AFTER that reset to count as Monday gathering points. Aim for gather times that bring them home 30–60 minutes after reset — not before." },
@@ -49,7 +49,7 @@ const days = [
       "Collect returning gatherers → send ALL squads back out to resource tiles immediately",
       "Open all Drone Chip Chests (Day 85+ only)",
     ],
-    announce: "📡 MONDAY — Radar Training (1 pt): CLAIM all stacked radar first. Dump ALL Drone Parts + Drone Data. Use ALL Stamina. Collect gatherers → resend. Open Chip Chests (Day 85+). DO NOT spend tech speedups, hero resources, or training speedups — they score more on their day. Keep stacking radar without claiming.",
+    announce: "[MONDAY - Radar Training | 1pt]\n- CLAIM all stacked radar tasks first\n- Dump ALL Drone Parts + Drone Data\n- Use ALL Stamina on radar/attacks/rallies\n- Collect gatherers, resend immediately\n- Open Drone Chip Chests (Day 85+)\nSAVE: Tech speedups (Wed), Hero resources (Thu), Training speedups (Fri)\nStack radar again - DO NOT claim",
     today: [
       { t: "Claim all stacked radar rewards", pts: "~25k pts/task", d: "First action after reset — collect every pending radar task saved from Sunday. This is your biggest single point burst of the day." },
       { t: "Spend ALL stamina", pts: "~300 pts/stamina", d: "Use every stamina point on radar missions, attacks, and rallies. Overlaps with Arms Race: Drone Upgrade for double rewards." },
@@ -86,7 +86,7 @@ const days = [
       "Unpack any gift-boxed buildings for extra Building Power points",
       "Use Survivor Recruitment tickets",
     ],
-    announce: "🏗️ TUESDAY — Base Expansion (2 pts): Use ALL building speedups + generics. Send ONLY UR (orange) trucks. Finish starred Legend Tasks. Unpack gift boxes. STILL SAVE: tech speedups + Valor Badges for Wed, all hero resources for Thu, training speedups for Fri. Queue a research tonight if not already running.",
+    announce: "[TUESDAY - Base Expansion | 2pts]\n- Use ALL building speedups + generics\n- Send ONLY UR (orange) Trade Contract trucks\n- Complete starred Legend Tasks (Secret CP)\n- Unpack any gift-boxed buildings\nSAVE: Tech speedups + Valor Badges (Wed), Hero resources (Thu), Training speedups (Fri)\nQueue a research tonight if not already running",
     today: [
       { t: "Blast through buildings with speedups", pts: "~120 pts/speedup", d: "Use building speedups to complete all queued constructions. Generic (universal) speedups count toward Building Speed here too — dump any non-specific speedups today. Aim for 10–14 days' worth across 2–3 major buildings." },
       { t: "Unpack any gift-boxed buildings", pts: "~21 pts/power increase", d: "Open buildings left in gift state. Each one increases Building Power for extra points." },
@@ -125,7 +125,7 @@ const days = [
       "Open ALL Drone Component Chests (Lv.1–7) — these ONLY score on Wednesday, never another day",
       "Queue troop training in all barracks tonight for Friday's promotion burst",
     ],
-    announce: "🔬 WEDNESDAY — Age of Science (2 pts): Claim stacked radar. Use ALL tech speedups + generics. Spend ALL Valor Badges (Duel research tree first). Open ALL Drone Component Chests (only score today). STILL SAVE: Hero XP/Shards for Thu, training speedups for Fri. Queue troop training in barracks tonight — Friday needs troops mid-queue.",
+    announce: "[WEDNESDAY - Age of Science | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL tech speedups + generics to finish research\n- Spend ALL Valor Badges (Duel tree first)\n- Open ALL Drone Component Chests (only score today)\nSAVE: Hero XP/Shards (Thu), Training speedups (Fri)\nQueue troop training in barracks tonight",
     today: [
       { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Monday. Instant point injection to start the day strong." },
       { t: "Finish ALL research with speedups", pts: "~120 pts/speedup · ~21 pts/research", d: "Spend every tech speedup to complete research. Generic (universal) speedups count toward Tech Speed too — use them all. Don't leave completed research sitting — it blocks your Tech Center." },
@@ -163,7 +163,7 @@ const days = [
       "Use ALL Recruit Tickets — Legendary, New Era, and Hero's Return",
       "Use ALL Exclusive Weapon Shards (Season 1+ only)",
     ],
-    announce: "⚔️ THURSDAY — Train Heroes (2 pts): Use ALL Hero XP, ALL Hero Shards, ALL Skill Medals, ALL Recruit Tickets. Weapon Shards if S1+. Hold nothing back. Queue troop training in all barracks now — Friday speedups will promote them for max points. Save training speedups (Fri) and healing speedups (Sat).",
+    announce: "[THURSDAY - Train Heroes | 2pts]\n- Use ALL Hero XP books\n- Use ALL Hero Shards (Universal + Overlord)\n- Use ALL Skill Medals\n- Use ALL Recruit Tickets (Legendary, New Era)\n- Use ALL Weapon Shards (Season 1+)\nQueue troops in all barracks now for Friday\nSAVE: Training speedups (Fri), Healing speedups (Sat)",
     today: [
       { t: "Use ALL Hero XP", pts: "~6 pts/660 XP", d: "Level up every hero with the full week's stock of XP books. Overlaps with Arms Race: Hero Upgrade for double credit." },
       { t: "Use ALL Hero Shards", pts: "~20k (gold) · ~7k (purple) · ~2k (blue)", d: "Promote hero stars using every saved Universal Shard, Hero-specific Shard, and Overlord Universal Shard." },
@@ -208,7 +208,7 @@ const days = [
       "Shield: be online at Saturday reset and shield within 5 minutes. If sleeping through reset, apply 24h shield NOW",
       "Recall ALL squads off resource tiles before Saturday reset — open squads are free kills",
     ],
-    announce: "🚀 FRIDAY — Total Mobilization (2 pts): Claim radar. Use ALL training speedups — promote troops for max points. Finish leftover buildings + research. SHIELD: Be online at midnight reset, shield within 5 min. If sleeping through reset, apply 24h shield NOW. Recall ALL squads before reset. Save healing speedups for tomorrow.",
+    announce: "[FRIDAY - Total Mobilization | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL training speedups - promote troops (higher tier = more pts)\n- Finish leftover buildings + research with spare speedups\n- Recall ALL squads before midnight reset\nSHIELD: Be online at reset, shield within 5 min.\nIf sleeping through reset: apply 24h shield NOW\nSave healing speedups for Saturday",
     today: [
       { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Thursday. Do this immediately after reset." },
       { t: "Train troops (main focus)", pts: "~122 pts/speedup · points scale with tier", d: "Use all training speedups and generic/universal speedups to train and promote troops. Your #1 point source today. Promoting existing troops to higher tiers earns far more than training fresh — see tier table below." },
@@ -249,7 +249,7 @@ const days = [
       "Dump EVERY remaining speedup — building, tech, train, healing, and generic all score as separate categories",
       "Kill VS opponent troops for 5× points — read alliance chat and coordinate before attacking anyone",
     ],
-    announce: "💥 SATURDAY — Enemy Buster (4 pts): CHECK SHIELD FIRST. Send UR trucks. Complete all Legend Tasks. Dump EVERY remaining speedup. Kill VS opponent troops (5x points — coordinate in chat). Empty defense lineup before combat. Spend EVERYTHING — nothing carries over after tonight's reset.",
+    announce: "[SATURDAY - Enemy Buster | 4pts]\nCHECK SHIELD FIRST - reapply if needed\n- Send UR (orange) trucks immediately\n- Complete ALL saved Legend Tasks\n- Dump EVERY remaining speedup (all types score)\n- Kill VS opponent troops (5x points - coordinate!)\nEmpty defense lineup before combat\nSpend EVERYTHING - nothing carries over",
     today: [
       { t: "Shield check — first thing at reset", d: "If you are online at Saturday reset: apply your shield within the first 5 minutes so it covers the full combat window. If you shielded before sleep (backup method): verify it is still active and check the expiry time. Re-apply immediately if it dropped or will expire before Duel ends. A lapsed shield Saturday morning means your base gets zeroed before you can respond." },
       { t: "Send UR Trucks", pts: "~200k pts/truck", d: "Guaranteed points with zero combat risk. Use Trade Contracts to refresh for UR (orange) trucks. Only send orange — lower rarity isn't worth it." },

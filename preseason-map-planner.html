@@ -8,9 +8,9 @@
     <script src="nav.js"></script>
     <style>
         :root {
-            --ps: #a78bfa;
-            --ps-bg: rgba(167, 139, 250, .08);
-            --ps-bdr: rgba(167, 139, 250, .25)
+            --ps: #f97316;
+            --ps-bg: rgba(249, 115, 22, .08);
+            --ps-bdr: rgba(249, 115, 22, .25)
         }
 
         .ps-hero {
@@ -1181,7 +1181,7 @@
     <div class="new-profile-form" id="newProfileForm">
         <div class="npf-field">
             <label>Your Alliance</label>
-            <input type="text" id="npfAlliance" placeholder="LHZN" maxlength="8"
+            <input type="text" id="npfAlliance" placeholder="ASHM" maxlength="8"
                    style="width:90px;text-transform:uppercase">
         </div>
         <div class="npf-field">
@@ -1217,7 +1217,7 @@
                     <input type="text" id="inTag" placeholder="TAG" maxlength="5"
                            onkeydown="if(event.key==='Enter')addAlliance()">
                     <input type="text" id="inName" placeholder="Name" onkeydown="if(event.key==='Enter')addAlliance()">
-                    <input type="color" id="inColor" value="#a78bfa" title="Color">
+                    <input type="color" id="inColor" value="#f97316" title="Color">
                     <button onclick="addAlliance()">+</button>
                 </div>
                 <div class="a-list" id="aList"></div>
@@ -2821,7 +2821,7 @@
                     const tag = (a.tag || '').toUpperCase();
                     if (!tag) return;
                     if (!cloudByTag[tag]) {
-                        cloudByTag[tag] = {tag, name: a.name || tag, color: a.color || '#a78bfa', nap: !!a.nap};
+                        cloudByTag[tag] = {tag, name: a.name || tag, color: a.color || '#f97316', nap: !!a.nap};
                     } else {
                         // NAP=true wins; keep longest name; keep existing color
                         if (a.nap) cloudByTag[tag].nap = true;
