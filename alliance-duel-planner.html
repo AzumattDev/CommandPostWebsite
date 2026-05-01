@@ -163,11 +163,13 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
       <div class="tc-field">
         <label class="tc-lbl">Server time (UTC−2)</label>
         <input type="time" id="tcSrv" class="tc-inp" oninput="tcFromSrv()">
+        <div class="tc-dual" id="tcDualSrv"></div>
       </div>
       <span class="tc-arrow">⇄</span>
       <div class="tc-field">
         <label class="tc-lbl">Your local time</label>
         <input type="time" id="tcLoc" class="tc-inp" oninput="tcFromLoc()">
+        <div class="tc-dual" id="tcDualLoc"></div>
       </div>
     </div>
     <div class="tc-hint" id="tcHint"></div>
@@ -328,7 +330,7 @@ function fmtMs(ms) {
   const m = Math.floor((s % 3600) / 60);
   const sec = s % 60;
   const p2 = n => String(n).padStart(2, '0');
-  if (d > 0) return `${d}d ${p2(h)}h ${p2(m)}m`;
+  if (d > 0) return `${d}d ${p2(h)}h ${p2(m)}m ${p2(sec)}s`;
   return `${p2(h)}:${p2(m)}:${p2(sec)}`;
 }
 function cdCls(ms, force) {
@@ -340,45 +342,45 @@ function cdCls(ms, force) {
 const DAY_TIMERS = [
   // 0 Sunday
   [
-    { label:'Gather window — squads must be OUT before this', note:'Send every squad NOW and time returns to land AFTER this reset. Gathering only scores on Monday if squads return after reset. Also: claim all stacked radar tasks at this moment.', targetDay:1 },
-    { label:'Buildings must be queued by — Tuesday', note:'Any build longer than this countdown must already be running. 1–2 day builds: start today. Under 12h: can wait until Monday.', targetDay:2 },
-    { label:'Research must be running by — Wednesday', note:'Queue a 1–2 day research now; finish it with speedups on Wednesday for Age of Science points', targetDay:3 },
+    { label:'Monday reset — send squads NOW so they return AFTER this', note:'Squads sent now must land 30–60 min after Monday reset to earn gathering points. Claim all stacked radar tasks the moment this hits zero.', targetDay:1 },
+    { label:'Tuesday building deadline — any long build must already be running', note:'Any build longer than this countdown must be queued now. 1–2 day builds: start today. Under 12h: can wait until Monday.', targetDay:2 },
+    { label:'Wednesday research deadline — research must be running before this', note:'Queue a 1–2 day research now so you can finish it with speedups on Wednesday for Age of Science points.', targetDay:3 },
   ],
   // 1 Monday
   [
-    { label:'Radar stack window — claim on Wednesday', note:'Keep completing radar missions without claiming; build the stack all the way to Wednesday morning', targetDay:3 },
-    { label:'Tech speedup lock-in — Wednesday', note:'Save every tech speedup and Valor Badge; do not spend any before Wednesday', targetDay:3 },
-    { label:'Hero resource lock-in — Thursday', note:'Save all Hero XP, Shards, and Skill Medals; Thursday earns the most points per item', targetDay:4 },
+    { label:'Hold radar stack until Wednesday — do NOT claim before this', note:'Keep completing radar missions without claiming. Claim the whole stack the moment Wednesday resets.', targetDay:3 },
+    { label:'Hold all tech speedups until Wednesday — do NOT spend before this', note:'Save every tech speedup and Valor Badge. Spending them before Wednesday loses Duel points.', targetDay:3 },
+    { label:'Hold all hero resources until Thursday — do NOT spend before this', note:'Save all Hero XP, Shards, Skill Medals, and Recruit Tickets. Thursday scores the most points per item.', targetDay:4 },
   ],
   // 2 Tuesday
   [
-    { label:'Research must be queued — Wednesday', note:'A research needs to be running now so you can finish it with speedups on Wednesday', targetDay:3 },
-    { label:'Hero resource lock-in — Thursday', note:'Hold all Hero XP, Shards, Medals, and Recruit Tickets; do not spend before Thursday', targetDay:4 },
-    { label:'Queue troop training by — Thursday', note:'Fill barracks Thursday so troops are mid-queue and ready to promote with speedups Friday', targetDay:4 },
+    { label:'Wednesday research deadline — research must be running before this', note:'A research must already be in progress now. You will finish it with speedups on Wednesday for Age of Science points.', targetDay:3 },
+    { label:'Hold all hero resources until Thursday — do NOT spend before this', note:'Hold all Hero XP, Shards, Medals, and Recruit Tickets. Do not spend before Thursday.', targetDay:4 },
+    { label:'Fill barracks on Thursday — queue troops for Friday bulk promotions', note:'On Thursday, fill barracks with cheap low-tier troops so Friday speedups can promote them all in bulk for maximum points.', targetDay:4 },
   ],
   // 3 Wednesday
   [
-    { label:'Hero resource lock-in — Thursday', note:'Do not level heroes or spend shards today; Thursday scores more points per item', targetDay:4 },
-    { label:'Training speedup lock-in — Friday', note:'Save all training and generic speedups for Friday\'s troop promotion burst', targetDay:5 },
-    { label:'Shield prep — Saturday reset', note:'Ideal: be online at Saturday reset to shield immediately. If you need a Friday-night backup shield, it must be 24h — shorter durations may expire mid-Saturday.', targetDay:6 },
+    { label:'Hold all hero resources until Thursday — do NOT spend before this', note:'Do not level heroes or spend shards today. Thursday scores more points per item used.', targetDay:4 },
+    { label:'Hold all training speedups until Friday — do NOT spend before this', note:'Save all training and generic speedups for Friday\'s troop promotion burst.', targetDay:5 },
+    { label:'Enemy Buster starts Saturday — stock up on shields before this', note:'Buy shields from the Alliance Store if you are short. Plan to be online at Saturday reset to shield immediately, or have a 24h shield ready as backup.', targetDay:6 },
   ],
   // 4 Thursday
   [
-    { label:'Training speedup lock-in — Friday', note:'Final deadline: save every training and generic speedup for tomorrow', targetDay:5 },
-    { label:'Fill barracks now — for Friday promoting', note:'Queue cheap low-tier troops tonight so Friday speedups can promote them all in bulk', targetDay:5 },
-    { label:'Saturday reset — shield up within 5 min of this', note:'Primary: be online at reset and shield immediately for full coverage. Backup only: if you cannot be there, apply 24h shield before Friday sleep.', targetDay:6, urgent:true },
+    { label:'Hold all training speedups until Friday — do NOT spend before this', note:'Final deadline: save every training and generic speedup for tomorrow\'s promotion burst.', targetDay:5 },
+    { label:'Fill barracks now — queue cheap troops for Friday bulk promotions', note:'Queue low-tier troops tonight so Friday speedups can promote them all in bulk for maximum points.', targetDay:5 },
+    { label:'Enemy Buster starts — shield within 5 min of this reset', note:'Primary: be online at Saturday reset and shield immediately. Backup only: if you cannot be there, apply a 24h shield before Friday sleep.', targetDay:6, urgent:true },
   ],
   // 5 Friday
   [
-    { label:'Saturday reset — shield up within 5 min', note:'Primary method: be online at this reset and apply shield immediately. If you shielded before sleep as backup, verify it is still active and will not expire before Duel ends.', targetDay:6, urgent:true },
-    { label:'Recall ALL squads before Saturday', note:'Any march still on a tile at Saturday reset is a free kill for the enemy', targetDay:6, urgent:true },
-    { label:'Save healing speedups until Saturday', note:'Do not heal tonight; Saturday combat injuries need fast healing for bonus points', targetDay:6 },
+    { label:'Enemy Buster starts — shield within 5 min of this reset', note:'Be online at this reset and apply your shield immediately. If you shielded before sleep as a backup, verify it is still active and will not expire mid-Saturday.', targetDay:6, urgent:true },
+    { label:'Recall ALL squads before this reset — any march out is a free kill', note:'Pull every squad off resource tiles now. Troops still marching when Saturday resets can be attacked and zeroed.', targetDay:6, urgent:true },
+    { label:'Hold healing speedups until Saturday — do NOT spend before this', note:'Do not heal tonight. Saturday combat injures troops — fast healing with speedups earns Healing Speed points.', targetDay:6 },
   ],
   // 6 Saturday
   [
-    { label:'Duel resets — start stacking radar', note:'Immediately after reset: complete radar tasks without claiming, send gatherers, queue buildings and research', targetDay:0 },
-    { label:'Buildings should be queued for — Tuesday', note:'Queue longest buildings Sunday night; they need ~2 days running before Tuesday\'s speedup dump', targetDay:2 },
-    { label:'Research should be running for — Wednesday', note:'Start a 1–2 day research Sunday night to complete on Wednesday for Age of Science points', targetDay:3 },
+    { label:'New week starts at this countdown — immediately stack radar', note:'The moment the Duel resets: complete radar tasks without claiming, send gatherers to gold tiles, and queue buildings and research overnight.', targetDay:0 },
+    { label:'Tuesday building deadline — long builds must be running before this', note:'Queue your longest buildings Sunday night. They need roughly 2 days running before Tuesday\'s speedup dump.', targetDay:2 },
+    { label:'Wednesday research deadline — research must be running before this', note:'Start a 1–2 day research Sunday night. You will complete it with speedups on Wednesday for Age of Science points.', targetDay:3 },
   ],
 ];
 
@@ -432,6 +434,17 @@ if (location.hash) {
 render();
 scrollToSection();
 
+function tcFmt12(h,m){const ap=h>=12?'PM':'AM';return`${h%12||12}:${String(m).padStart(2,'0')} ${ap}`;}
+function tcDuals(){
+  ['Srv','Loc'].forEach(k=>{
+    const v=document.getElementById('tc'+k).value;
+    const el=document.getElementById('tcDual'+k);
+    if(!el) return;
+    if(!v){el.innerHTML='';return;}
+    const [h,m]=v.split(':').map(Number);
+    el.innerHTML=`<span class="tc-chip"><span class="tc-tag">24H</span><span class="tc-d24">${v}</span></span><span class="tc-chip"><span class="tc-tag">12H</span><span class="tc-d12">${tcFmt12(h,m)}</span></span>`;
+  });
+}
 function tcInit(){
   const sn=new Date(Date.now()-2*60*60*1000);
   const p2=n=>String(n).padStart(2,'0');
@@ -446,7 +459,7 @@ function tcFromSrv(){
   const lm=((h*60+m)+120-tzOff+2880)%1440;
   const p2=n=>String(n).padStart(2,'0');
   document.getElementById('tcLoc').value=`${p2(Math.floor(lm/60))}:${p2(lm%60)}`;
-  tcHint();
+  tcHint(); tcDuals();
 }
 function tcFromLoc(){
   const val=document.getElementById('tcLoc').value;
@@ -456,7 +469,7 @@ function tcFromLoc(){
   const sm=((h*60+m)-120+tzOff+2880)%1440;
   const p2=n=>String(n).padStart(2,'0');
   document.getElementById('tcSrv').value=`${p2(Math.floor(sm/60))}:${p2(sm%60)}`;
-  tcHint();
+  tcHint(); tcDuals();
 }
 function tcHint(){
   const off=-new Date().getTimezoneOffset()/60;

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Trees — Ash Masters Command Post</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Research Trees ────────────────────────────────────────────── */
+h1.rt-title{font-family:'Chakra Petch',sans-serif;font-size:1.55rem;font-weight:700;background:linear-gradient(135deg,var(--amber),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.25rem}
+
+/* summary chips */
+.rt-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem}
+.rt-chip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem 1rem;flex:1;min-width:130px}
+.rt-chip-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.rt-chip-val{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700;color:var(--accent)}
+.rt-chip-sub{font-size:.68rem;color:var(--text2)}
+
+/* tree selector tabs */
+.tree-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:1.25rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.tree-tab{flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.65rem .75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;width:90px;transition:border-color .15s,background .15s;user-select:none}
+.tree-tab:hover{border-color:var(--border2)}
+.tree-tab.active{border-color:var(--accent);background:var(--accent-bg)}
+.tt-ring{position:relative;width:42px;height:42px}
+.tt-ring svg{width:42px;height:42px;transform:rotate(-90deg)}
+.tt-ring .rb{fill:none;stroke:var(--border2);stroke-width:3}
+.tt-ring .rf{fill:none;stroke-width:3.5;stroke-linecap:round;stroke-dasharray:107}
+.tt-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700}
+.tt-name{font-size:.64rem;font-weight:600;color:var(--text);text-align:center;line-height:1.25;white-space:pre-line}
+
+/* tree canvas */
+.tree-canvas-wrap{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto;overflow-y:visible;margin-bottom:1.25rem;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:30px 30px}
+.tree-svg{position:absolute;top:0;left:0;pointer-events:none}
+.tree-grid{position:relative;display:grid}
+
+/* node hover */
+.tree-node:not(.locked):hover .hex-scale{transform:scale(1.09)}
+.tree-node.sel .hex-scale{transform:scale(1.09)}
+.hex-scale{transition:transform .12s}
+
+/* node detail panel */
+.node-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.15rem;margin-top:.25rem}
+.nd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:1rem}
+.nd-title{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;color:var(--text);white-space:pre-line;line-height:1.3}
+.nd-stat-lbl{font-size:.75rem;color:var(--text2);margin-top:3px}
+.nd-close{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;padding:0;line-height:1;flex-shrink:0;transition:color .1s}
+.nd-close:hover{color:var(--text)}
+
+.nd-lv-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem 1rem;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.nd-lv-label{font-size:.8rem;color:var(--text2);font-weight:600}
+.nd-lv-ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nd-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:6px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:border-color .1s,color .1s;font-size:.9rem;width:28px;height:28px}
+.nd-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.nd-btn:disabled{opacity:.3;cursor:default}
+.nd-btn.sm{width:auto;padding:0 7px;font-size:.65rem;height:26px}
+.nd-btn.gold{color:var(--amber)}
+.nd-lv-num{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text);min-width:20px;text-align:center}
+.nd-lv-sep,.nd-lv-max{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text3)}
+
+.nd-sec{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.45rem}
+.nd-scroll{overflow-x:auto}
+.nd-table{width:100%;border-collapse:collapse;font-size:.77rem;margin-bottom:1rem}
+.nd-table th{text-align:left;padding:5px 8px;color:var(--text3);font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+.nd-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.028);font-family:'JetBrains Mono',monospace;font-size:.74rem;white-space:nowrap}
+.nd-table tr.past td{opacity:.38}
+.nd-table tr.cur td{background:var(--accent-bg)}
+.nd-table tr.cur td:first-child{border-left:2px solid var(--accent)}
+.nd-table tr.done td{color:var(--amber)}
+.nd-table .lv-col{color:var(--text3)}
+.nd-table .food-col{color:#4ade80}
+.nd-table .iron-col{color:#94a3b8}
+.nd-table .gold-col{color:var(--amber)}
+.nd-table .time-col{color:var(--cyan)}
+.nd-table .bon-col{color:var(--accent);font-weight:700}
+
+.nd-totals{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem}
+.nd-tot-title{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:600;margin-bottom:.55rem}
+.nd-tot-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.nd-tot-item{display:flex;flex-direction:column;gap:1px}
+.nd-tot-lbl{font-size:.6rem;color:var(--text3)}
+.nd-tot-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600}
+.nd-maxed-banner{text-align:center;color:var(--amber);font-weight:700;font-size:.9rem;padding:.5rem}
+
+/* placeholder notice */
+.ph-notice{background:var(--amber-bg);border:1px solid var(--amber-border);border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem 1rem;font-size:.78rem;color:var(--amber);margin-bottom:1.25rem}
+
+@media(max-width:600px){
+  .rt-chip{min-width:100px}
+  .nd-table{font-size:.7rem}
+  .nd-table td,.nd-table th{padding:4px 5px}
+  .tree-tab{width:78px}
+  .tt-name{font-size:.6rem}
+}
+</style>
+</head>
+<body>
+<script src="nav.js"></script>
+<div class="container">
+
+  <h1 class="rt-title">Research Trees</h1>
+  <p class="subtitle">Track your Tech Center progress across all research trees. Tap a node to view costs and set your current level.</p>
+
+  <div class="ph-notice">⚠ Costs and bonuses are placeholders — update <code>data/research-trees.js</code> with real in-game values once confirmed.</div>
+
+  <div class="rt-chips" id="rtChips"></div>
+  <div class="tree-tabs" id="treeTabs"></div>
+
+  <div class="tree-canvas-wrap" id="treeWrap">
+    <svg class="tree-svg" id="treeSvg"></svg>
+    <div class="tree-grid" id="treeGrid"></div>
+  </div>
+
+  <div class="node-detail hidden" id="nodeDetail"></div>
+
+</div>
+<script src="data/research-trees.js"></script>
+<script>
+// ── Constants ──────────────────────────────────────────────────
+const CW = 118, CH = 128, PAD = 22, HO = 88, HI = 78;
+const HEX = 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)';
+// Node state colors [outerBg, innerBg, lvColor]
+const STATE_COLORS = {
+  locked:    ['#1e1f27','#14151b','#3a3b4e'],
+  available: ['#31334a','#1e1f27','#7a7896'],
+  progress:  ['#f97316','#1c0e00','#fbbf24'],
+  maxed:     ['#fbbf24','#1a1300','#f97316'],
+};
+// SVG line colors per child-node state
+const LINE_COLORS = { locked:'#1e1f27', available:'#2a2b36', progress:'#f97316', maxed:'#fbbf24' };
+
+// ── State ──────────────────────────────────────────────────────
+let prog   = JSON.parse(localStorage.getItem('rt_prog') || '{}');
+let activeTree = null;
+let activeNode = null;
+
+function save() { localStorage.setItem('rt_prog', JSON.stringify(prog)); }
+function getLv(id)         { return prog[id] || 0; }
+function setLv(id, v, max) { prog[id] = Math.max(0, Math.min(max, v)); save(); renderAll(); if (activeNode) renderDetail(); }
+
+// ── Node helpers ───────────────────────────────────────────────
+function findNode(id) {
+  for (const t of TREES) for (const n of t.nodes) if (n.id === id) return n;
+  return null;
+}
+function nodeState(node) {
+  const lv = getLv(node.id);
+  if (lv >= node.maxLevel) return 'maxed';
+  if (lv > 0)              return 'progress';
+  const ok = node.prereqs.every(p => getLv(p) >= 1);
+  return ok ? 'available' : 'locked';
+}
+function treeProg(tree) {
+  const max = tree.nodes.reduce((s,n) => s + n.maxLevel, 0);
+  const cur = tree.nodes.reduce((s,n) => s + Math.min(getLv(n.id), n.maxLevel), 0);
+  return { cur, max, pct: max ? Math.round(cur/max*100) : 0 };
+}
+
+// ── Summary chips ──────────────────────────────────────────────
+function renderChips() {
+  const all  = TREES.flatMap(t => t.nodes);
+  const tMax = all.reduce((s,n) => s + n.maxLevel, 0);
+  const tCur = all.reduce((s,n) => s + Math.min(getLv(n.id), n.maxLevel), 0);
+  const maxed = all.filter(n => getLv(n.id) >= n.maxLevel).length;
+  const done  = TREES.filter(t => { const p=treeProg(t); return p.max && p.cur>=p.max; }).length;
+  const pct   = tMax ? Math.round(tCur/tMax*100) : 0;
+  document.getElementById('rtChips').innerHTML = `
+    <div class="rt-chip"><div class="rt-chip-lbl">Overall Progress</div><div class="rt-chip-val">${pct}%</div><div class="rt-chip-sub">${tCur} / ${tMax} levels</div></div>
+    <div class="rt-chip"><div class="rt-chip-lbl">Nodes Maxed</div><div class="rt-chip-val">${maxed}</div><div class="rt-chip-sub">of ${all.length} nodes</div></div>
+    <div class="rt-chip"><div class="rt-chip-lbl">Trees Complete</div><div class="rt-chip-val">${done}</div><div class="rt-chip-sub">of ${TREES.length} trees</div></div>
+  `;
+}
+
+// ── Tree tabs ──────────────────────────────────────────────────
+function renderTabs() {
+  const r = 17; // ring radius
+  const circ = +(2 * Math.PI * r).toFixed(1); // ~106.8
+  document.getElementById('treeTabs').innerHTML = TREES.map(t => {
+    const p = treeProg(t);
+    const offset = +(circ - p.pct/100*circ).toFixed(1);
+    const col = p.pct===100 ? 'var(--amber)' : p.pct>0 ? 'var(--accent)' : 'var(--border2)';
+    return `<div class="tree-tab${activeTree===t.id?' active':''}" onclick="selectTree('${t.id}')">
+      <div class="tt-ring">
+        <svg viewBox="0 0 42 42"><circle class="rb" cx="21" cy="21" r="${r}"/><circle class="rf" cx="21" cy="21" r="${r}" stroke="${col}" style="stroke-dashoffset:${offset}"/></svg>
+        <div class="tt-pct" style="color:${col}">${p.pct}%</div>
+      </div>
+      <div class="tt-name">${t.name}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Select tree ────────────────────────────────────────────────
+function selectTree(id) {
+  activeTree = id;
+  activeNode = null;
+  document.getElementById('nodeDetail').classList.add('hidden');
+  renderTree();
+  renderTabs();
+}
+
+// ── Render tree ────────────────────────────────────────────────
+function renderTree() {
+  const tree = TREES.find(t => t.id === activeTree);
+  if (!tree) return;
+  const grid = document.getElementById('treeGrid');
+  const svg  = document.getElementById('treeSvg');
+  const cols = tree.cols;
+  const rows = Math.max(...tree.nodes.map(n => n.row)) + 1;
+  const W = PAD*2 + cols*CW;
+  const H = PAD*2 + rows*CH;
+
+  grid.style.cssText = `display:grid;position:relative;grid-template-columns:repeat(${cols},${CW}px);grid-template-rows:repeat(${rows},${CH}px);padding:${PAD}px;width:${W}px;height:${H}px`;
+  svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+
+  // SVG connector lines (drawn BEFORE nodes so nodes render on top)
+  svg.innerHTML = '';
+  tree.nodes.forEach(node => {
+    const tx = PAD + node.col*CW + CW/2;
+    const ty = PAD + node.row*CH + CH/2;
+    const st = nodeState(node);
+    const lc = LINE_COLORS[st];
+    node.prereqs.forEach(pid => {
+      const pn = findNode(pid);
+      if (!pn) return;
+      const px = PAD + pn.col*CW + CW/2;
+      const py = PAD + pn.row*CH + CH/2;
+      const midY = py + (ty - py) * 0.5;
+      // Route: vertical from parent to midpoint, horizontal to child column, vertical to child
+      const d = px===tx
+        ? `M${px},${py} L${tx},${ty}`
+        : `M${px},${py} L${px},${midY} L${tx},${midY} L${tx},${ty}`;
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', lc);
+      path.setAttribute('stroke-width', '2.5');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(path);
+    });
+  });
+
+  // Render nodes
+  grid.innerHTML = '';
+  tree.nodes.forEach(node => {
+    const lv  = getLv(node.id);
+    const st  = nodeState(node);
+    const sel = activeNode === node.id;
+    const [oc, ic, lc] = STATE_COLORS[st];
+    const lvTxt = st==='maxed' ? 'MAX' : `${lv}/${node.maxLevel}`;
+
+    const el = document.createElement('div');
+    el.className = `tree-node${st==='locked'?' locked':''}${sel?' sel':''}`;
+    el.style.cssText = `grid-row:${node.row+1};grid-column:${node.col+1};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:${st==='locked'?'default':'pointer'};opacity:${st==='locked'?.4:1}`;
+    el.innerHTML = `
+      <div class="hex-scale" style="display:flex;align-items:center;justify-content:center;width:${HO}px;height:${HO}px;clip-path:${HEX};background:${sel&&st!=='maxed'?'#ea580c':oc}">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:${HI}px;height:${HI}px;clip-path:${HEX};background:${ic}">
+          <span style="font-size:1.35rem;line-height:1">${node.icon||'🔬'}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.52rem;font-weight:700;color:${lc}">${lvTxt}</span>
+        </div>
+      </div>
+      <span style="font-size:.62rem;font-weight:600;color:var(--text);text-align:center;line-height:1.25;max-width:${CW-4}px;white-space:pre-line">${node.name}</span>`;
+
+    if (st !== 'locked') {
+      el.addEventListener('click', () => openDetail(node.id));
+    }
+    grid.appendChild(el);
+  });
+}
+
+// ── Node detail ────────────────────────────────────────────────
+function openDetail(nodeId) {
+  activeNode = nodeId;
+  renderTree();
+  renderDetail();
+}
+
+function renderDetail() {
+  const node = findNode(activeNode);
+  if (!node) return;
+  const lv  = getLv(node.id);
+  const el  = document.getElementById('nodeDetail');
+  el.classList.remove('hidden');
+
+  const rows = node.levels.map((lvl, i) => {
+    const cls = i < lv ? 'past' : i === lv ? 'cur' : i === node.maxLevel-1 ? 'done' : '';
+    return `<tr class="${cls}">
+      <td class="lv-col">${i+1}</td>
+      <td class="food-col">${fmtN(lvl.food)}</td>
+      <td class="iron-col">${fmtN(lvl.iron)}</td>
+      <td class="gold-col">${lvl.gold ? fmtN(lvl.gold) : '—'}</td>
+      <td class="time-col">${fmtT(lvl.time)}</td>
+      <td class="bon-col">${lvl.bonus}</td>
+    </tr>`;
+  }).join('');
+
+  const rem = node.levels.slice(lv);
+  const totF = rem.reduce((s,l) => s+(l.food||0), 0);
+  const totI = rem.reduce((s,l) => s+(l.iron||0), 0);
+  const totG = rem.reduce((s,l) => s+(l.gold||0), 0);
+  const totT = rem.reduce((s,l) => s+(l.time||0), 0);
+  const left = node.maxLevel - lv;
+
+  el.innerHTML = `
+    <div class="nd-head">
+      <div>
+        <div class="nd-title">${node.name}</div>
+        <div class="nd-stat-lbl">${node.stat}</div>
+      </div>
+      <button class="nd-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="nd-lv-row">
+      <span class="nd-lv-label">Your Level</span>
+      <div class="nd-lv-ctrl">
+        <button class="nd-btn" onclick="window._adj(-1)" ${lv<=0?'disabled':''}>−</button>
+        <span class="nd-lv-num">${lv}</span>
+        <span class="nd-lv-sep">/</span>
+        <span class="nd-lv-max">${node.maxLevel}</span>
+        <button class="nd-btn" onclick="window._adj(1)" ${lv>=node.maxLevel?'disabled':''}>+</button>
+        <button class="nd-btn sm" onclick="window._set(0)" title="Reset to 0">0</button>
+        <button class="nd-btn sm gold" onclick="window._set(${node.maxLevel})" title="Set to max">MAX</button>
+      </div>
+    </div>
+    <div class="nd-sec">Cost per Level</div>
+    <div class="nd-scroll">
+      <table class="nd-table">
+        <thead><tr>
+          <th>Lv</th>
+          <th style="color:#4ade80">Food</th>
+          <th style="color:#94a3b8">Iron</th>
+          <th style="color:var(--amber)">Gold</th>
+          <th style="color:var(--cyan)">Time</th>
+          <th>Bonus</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${left > 0 ? `
+    <div class="nd-totals">
+      <div class="nd-tot-title">To Max — ${left} level${left!==1?'s':''} remaining</div>
+      <div class="nd-tot-grid">
+        <div class="nd-tot-item"><div class="nd-tot-lbl">Food</div><div class="nd-tot-val" style="color:#4ade80">${fmtN(totF)}</div></div>
+        <div class="nd-tot-item"><div class="nd-tot-lbl">Iron</div><div class="nd-tot-val" style="color:#94a3b8">${fmtN(totI)}</div></div>
+        <div class="nd-tot-item"><div class="nd-tot-lbl">Gold</div><div class="nd-tot-val" style="color:var(--amber)">${totG?fmtN(totG):'—'}</div></div>
+        <div class="nd-tot-item"><div class="nd-tot-lbl">Time</div><div class="nd-tot-val" style="color:var(--cyan)">${fmtT(totT)}</div></div>
+      </div>
+    </div>` : `<div class="nd-maxed-banner">✓ Maxed</div>`}`;
+}
+
+window._adj = function(d) {
+  const n = findNode(activeNode); if (!n) return;
+  setLv(n.id, getLv(n.id)+d, n.maxLevel);
+};
+window._set = function(v) {
+  const n = findNode(activeNode); if (!n) return;
+  setLv(n.id, v, n.maxLevel);
+};
+window.closeDetail = function() {
+  activeNode = null;
+  document.getElementById('nodeDetail').classList.add('hidden');
+  renderTree();
+};
+
+// ── Formatters ─────────────────────────────────────────────────
+function fmtN(n) {
+  if (!n) return '0';
+  if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return Math.round(n/1e3)+'K';
+  return String(n);
+}
+function fmtT(s) {
+  if (!s) return '—';
+  const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60);
+  if (d>0) return `${d}d ${h}h`;
+  if (h>0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+// ── Render all ─────────────────────────────────────────────────
+function renderAll() {
+  renderChips();
+  renderTabs();
+  if (activeTree) renderTree();
+}
+
+// ── Init ───────────────────────────────────────────────────────
+renderAll();
+selectTree(TREES[0].id);
+</script>
+</body>
+</html>

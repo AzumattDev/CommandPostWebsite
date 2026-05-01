@@ -15,7 +15,7 @@ const days = [
     ],
     announce: "[PREP DAY - No scoring]\n- Stack radar tasks, DO NOT claim any\n- Send ALL squads to gold tiles (return after reset)\n- Queue longest buildings + start 2-day research\n- SAVE THIS WEEK:\nMon=Drone/Stamina | Tue=Build speedups\nWed=Tech+Valor Badges | Thu=Hero XP/Shards\nFri=Train speedups | Sat=Healing speedups",
     today: [
-      { t: "Stack radar tasks (DO NOT claim)", d: "Complete radar missions but leave all rewards unclaimed. Aim for 30–35 stacked before Monday reset. This is your Monday point burst." },
+      { t: "Stack radar tasks (DO NOT claim)", d: "Complete radar missions but leave all rewards unclaimed. Aim for 30–35 stacked before Monday reset. This is your Monday point burst.<br><br><strong>Taylor users:</strong> Collect only the minimum number of tasks required to get all your daily chests — then stop claiming." },
       { t: "Send ALL squads to gather", d: "Send every squad to resource tiles NOW — gold tiles give the most points. Watch the <strong>Action Timer</strong> above (Monday reset countdown): squads must land AFTER that reset to count as Monday gathering points. Aim for gather times that bring them home 30–60 minutes after reset — not before." },
       { t: "Start your longest buildings NOW", d: "Queue HQ, Barracks, Tech Center — the longest ones first. You'll use speedups to finish them on Tuesday (Base Expansion). The build only needs to be <em>in progress</em>, not done — but it must be running before Tuesday reset.<br><br><strong>When to start based on build duration:</strong><table class='pts-table'><thead><tr><th>Build duration</th><th>Start by</th></tr></thead><tbody><tr><td>Under 12 hours</td><td class='pts-val'>Monday — any time</td></tr><tr><td>12 h – 1 day</td><td class='pts-val'>Monday morning</td></tr><tr><td>1 – 2 days</td><td class='pts-vs'>Sunday (today) ←</td></tr><tr><td>2 – 4 days</td><td class='pts-other'>Friday – Saturday</td></tr><tr><td>4 – 7 days</td><td class='pts-lost'>Last Wed–Thu — already behind</td></tr><tr><td>7 – 10 days</td><td class='pts-lost'>Last Sunday — must already be running</td></tr><tr><td>10+ days</td><td class='pts-lost'>Long-term planning; use a speedup to get it started now</td></tr></tbody></table>The <strong>Action Timer</strong> above shows exact time until Tuesday. Any build longer than that countdown must already be in your queue." },
       { t: "Queue a long research", d: "Start a research that takes 1–2 days. You'll finish it with speedups on Wednesday to score Tech Power + Tech Speed." },
@@ -26,6 +26,7 @@ const days = [
     tips: [
       { t: "5-minute reset gap", d: "After daily server reset, there's a 5–7 minute window where points don't register. Wait it out before spending any resources." },
       { t: "Win condition reminder", d: "7 points wins the week. Win Mon–Thu and you clinch it before Saturday's risky combat day. Saturday's 4 pts is your fallback if it's close." },
+      { t: "Arms Race overlaps — Sunday is a great day to earn chests", d: "Sunday activities overlap directly with Arms Race phases. Use the minimum needed to unlock all three chests in each:<br><br><strong>Unit Progression:</strong> Train Troops and use Training Speed-ups to start refilling your drill grounds.<br><strong>Tech Research:</strong> Use Research Speed-Ups and complete Tech Research to earn points.<br><strong>Drone Boost:</strong> Use Stamina to hit all three chests — but avoid using actual Drone Battle Data; save that for Monday.<br><strong>Hero Advancement:</strong> Use 30 Elite Recruitment Tickets or use a little Hero EXP to level up a hero and earn all three chests.<br><strong>City Building:</strong> Open a couple of building \"presents\" to complete their construction, or use the minimum number of Construction Speed-Ups to open all three chests." },
     ],
     points: []
   },
@@ -62,10 +63,14 @@ const days = [
       { t: "Save ALL building speedups for Tuesday", d: "Do not touch a single building speedup today. Every one you save now is Tuesday points." },
       { t: "Save ALL tech speedups for Wednesday", d: "Don't start any research completions. Tech speedups and Valor Badges are Wednesday's fuel." },
       { t: "Save ALL hero resources for Thursday", d: "Don't level heroes, use shards, or spend skill medals. Thursday is hero day — everything is worth more then." },
+      { t: "Leave upgraded buildings as gift boxes for Tuesday", d: "When a building upgrade finishes today, leave it wrapped as a present instead of opening it. Tuesday scores Building Power for unwrapping — so gift-boxing now means free Tuesday points later." },
+      { t: "Save Survivor Recruitment Cards for Tuesday", d: "Hold all Survivor Tickets for Tuesday. They score Survivor Recruit points, one of Tuesday's point categories." },
+      { t: "Prepare trucks and tasks for Tuesday", d: "On Tuesday, you want ONLY gold (UR) trucks and ONLY Legendary (gold) secret tasks. Get into the habit of refreshing both now so you're ready when Tuesday opens." },
     ],
     tips: [
       { t: "Hero XP: Monday scores it, Thursday maximizes it", d: "Hero XP is a valid Monday scoring item but earns more points per item on Thursday. Save it for Thursday unless you're very close to a chest threshold." },
       { t: "Ration Drone resources if opponent is weak", d: "Spend just enough to hit all 9 individual chests. Bank the rest for next week." },
+      { t: "Arms Race overlap — here's what to do for each phase", d: "Use the minimum needed to unlock all three chests per phase:<br><br><strong>Drone Boost:</strong> Do ALL drone upgrades right now — but leave Drone Components alone until Tuesday. Level up your drone and start lots of rallies to earn points for Stamina.<br><strong>Hero Advancement:</strong> Recommend using some Hero EXP to get your three chests — it earns points in VS too.<br><strong>City Building:</strong> Unbox the minimum number of building presents in your base or use the minimum number of speed-ups required to get all three chests open.<br><strong>Unit Progression:</strong> Train and speed-up your troops until you unlock all three chests.<br><strong>Tech Research:</strong> Just do the minimum number of speed-ups here — save the bulk of tech speed-ups for Wednesday. Around 50 hours of speed-ups is typically needed to open all three chests." },
     ],
     points: ["Radar tasks", "Stamina", "Hero XP", "Drone Data", "Drone Parts", "Gather Gold/Iron/Food", "Chip Chests"]
   },
@@ -86,7 +91,7 @@ const days = [
       "Unpack any gift-boxed buildings for extra Building Power points",
       "Use Survivor Recruitment tickets",
     ],
-    announce: "[TUESDAY - Base Expansion | 2pts]\n- Use ALL building speedups + generics\n- Send ONLY UR (orange) Trade Contract trucks\n- Complete starred Legend Tasks (Secret CP)\n- Unpack any gift-boxed buildings\nSAVE: Tech speedups + Valor Badges (Wed), Hero resources (Thu), Training speedups (Fri)\nQueue a research tonight if not already running",
+    announce: "[TUESDAY - Base Expansion | 2pts]\n- Use ALL building speedups + generics\n- Send ONLY UR (orange) Trade Contract trucks\n- Complete starred Legend Tasks (Secret CP)\n- Unpack any gift-boxed buildings\n- Use Survivor Recruitment Tickets\nSAVE: Tech speedups + Valor Badges (Wed), Hero resources (Thu), Training speedups (Fri)\nQueue a research tonight if not already running",
     today: [
       { t: "Blast through buildings with speedups", pts: "~120 pts/speedup", d: "Use building speedups to complete all queued constructions. Generic (universal) speedups count toward Building Speed here too — dump any non-specific speedups today. Aim for 10–14 days' worth across 2–3 major buildings." },
       { t: "Unpack any gift-boxed buildings", pts: "~21 pts/power increase", d: "Open buildings left in gift state. Each one increases Building Power for extra points." },
@@ -96,14 +101,15 @@ const days = [
       { t: "Use Armament Materials (S4+)", d: "Season 4+ only: invest Armament Materials and Cores for T11 troop upgrades." },
     ],
     prep: [
-      { t: "Keep stacking radar — do NOT claim", d: "Continue completing radar missions without claiming rewards. Stack all the way through to Wednesday morning." },
+      { t: "Keep stacking radar — do NOT claim", d: "Continue completing radar missions without claiming rewards. Stack all the way through to Wednesday morning.<br><br><strong>Taylor users:</strong> Only collect the minimum amount needed to get your daily chests — then stop claiming." },
+      { t: "Start a mid-length research if none is running", d: "If you don't already have a long research in progress, start a medium-length one tonight. It needs to be running so you can finish it with speedups on Wednesday for Age of Science points." },
       { t: "Save ALL tech speedups for tomorrow", d: "Don't complete a single research today. Wednesday is tech day — every research speedup you hold now is Wednesday points." },
       { t: "Save ALL Valor Badges for tomorrow", d: "Don't spend any badges today. Wednesday is their day — they'll be used on Alliance Duel research for up to 150% point multiplier." },
       { t: "Save Drone Component Chests for tomorrow", d: "Hold all Lv.1–7 Drone Component Chests. They only score on Wednesday." },
       { t: "Save hero resources for Thursday", d: "Keep holding all Hero XP, Hero Shards, Skill Medals, and Recruit Tickets. Thursday is hero day." },
     ],
     tips: [
-      { t: "Arms Race overlap", d: "Building speedups and power overlap with Arms Race: City Building. Run both simultaneously for double credit." },
+      { t: "Arms Race overlap — City Building is the star today", d: "Tuesday is the best Arms Race day for City Building. Open those presents! Speed up those builds! Generally go to town upgrading your base — and don't forget about your new season-specific buildings, they earn lots of points.<br><br>For other Arms Race phases, do the minimum:<br><strong>Drone Boost:</strong> Burn some stamina.<br><strong>Hero Advancement:</strong> Spend 30 hero recruit cards or use a little Hero EXP.<br><strong>Unit Progression:</strong> Train, promote, and use Training Speed-ups until all 3 chests open.<br><strong>Tech Research:</strong> No need to go crazy — the minimum speed-ups to open all three chests. Feel free to hold onto them for Wednesday if you prefer." },
       { t: "Starred secret tasks are Saturday's ammo", d: "Leave star-marked legend tasks pending all week. Saturday is when they score best." },
     ],
     points: ["Building Power", "Building Speed", "Generic speedups", "UR Trucks", "Legend Tasks", "Survivor Recruits"]
@@ -125,12 +131,12 @@ const days = [
       "Open ALL Drone Component Chests (Lv.1–7) — these ONLY score on Wednesday, never another day",
       "Queue troop training in all barracks tonight for Friday's promotion burst",
     ],
-    announce: "[WEDNESDAY - Age of Science | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL tech speedups + generics to finish research\n- Spend ALL Valor Badges (Duel tree first)\n- Open ALL Drone Component Chests (only score today)\nSAVE: Hero XP/Shards (Thu), Training speedups (Fri)\nQueue troop training in barracks tonight",
+    announce: "[WEDNESDAY - Age of Science | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL tech speedups + generics to finish research\n- Spend ALL Valor Badges (Duel tree first)\n- Open ALL Drone Component Chests (only score today)\nSAVE: Hero XP/Shards/Medals/Tickets (Thu), Training speedups (Fri)\nQueue troop training in barracks tonight",
     today: [
       { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Monday. Instant point injection to start the day strong." },
       { t: "Finish ALL research with speedups", pts: "~120 pts/speedup · ~21 pts/research", d: "Spend every tech speedup to complete research. Generic (universal) speedups count toward Tech Speed too — use them all. Don't leave completed research sitting — it blocks your Tech Center." },
-      { t: "Spend ALL Valor Badges", pts: "~600 pts/badge", d: "This is the only day to spend badges efficiently. Priority order: Alliance Duel research tree first (unlocks point multipliers), then Trucks and Special Forces branches." },
-      { t: "Open all Drone Component Chests", d: "Open every saved Lv.1–7 component chest now. These only score on Wednesday — don't hold them past today." },
+      { t: "Spend ALL Valor Badges", pts: "~600 pts/badge", d: "This is the only day to spend badges efficiently. Priority order: Alliance Duel research tree first (unlocks point multipliers), then Trucks and Special Forces branches. If you don't already have T-10s, Special Forces is the recommended focus after unlocking Duel multiplier nodes." },
+      { t: "Open all Drone Component Chests", d: "Open every saved Lv.1–7 component chest now. These only score on Wednesday — don't hold them past today. If you're close to a point threshold at the end of the day, consider holding a few chests until just before reset for a final push." },
     ],
     prep: [
       { t: "Save ALL Hero XP for tomorrow", d: "Don't level any heroes today. Every XP book is worth more points on Thursday." },
@@ -143,7 +149,7 @@ const days = [
     ],
     tips: [
       { t: "Alliance Duel research is a force multiplier", d: "Upgrading the Duel research tree increases your points per action by up to 150%. 'Advanced Reward' and 'Super Reward' nodes unlock better chests — prioritize these above all other badge spending." },
-      { t: "Arms Race overlap", d: "Overlaps with Arms Race: Tech Research. Run both together for double credit." },
+      { t: "Arms Race overlap — Tech Research is the big one today", d: "Wednesday is where you can maximize Arms Race points too. Use any Research Speed-ups during this window for huge points in both VS and Arms Race — go through as many researches as you can, and focus on research that uses Valor Badges.<br><br>For other Arms Race phases, do the minimum:<br><strong>Drone Boost:</strong> Use stamina for radar tasks or rallies. Whatever you do — save your actual drone upgrades for Monday of next week. Don't use them today.<br><strong>Hero Advancement:</strong> Just burn 30 recruit cards or level up one hero to open all three chests. Save as much as you can for after reset.<br><strong>City Building:</strong> Minimum building presents or speed-ups to open all three chests.<br><strong>Unit Progression:</strong> Train troops until all three chests open." },
     ],
     points: ["Radar tasks", "Tech Power", "Tech Speed", "Generic speedups", "Valor Badges", "Drone Component Chests"]
   },
@@ -166,10 +172,10 @@ const days = [
     announce: "[THURSDAY - Train Heroes | 2pts]\n- Use ALL Hero XP books\n- Use ALL Hero Shards (Universal + Overlord)\n- Use ALL Skill Medals\n- Use ALL Recruit Tickets (Legendary, New Era)\n- Use ALL Weapon Shards (Season 1+)\nQueue troops in all barracks now for Friday\nSAVE: Training speedups (Fri), Healing speedups (Sat)",
     today: [
       { t: "Use ALL Hero XP", pts: "~6 pts/660 XP", d: "Level up every hero with the full week's stock of XP books. Overlaps with Arms Race: Hero Upgrade for double credit." },
-      { t: "Use ALL Hero Shards", pts: "~20k (gold) · ~7k (purple) · ~2k (blue)", d: "Promote hero stars using every saved Universal Shard, Hero-specific Shard, and Overlord Universal Shard." },
+      { t: "Use ALL Hero Shards — pop choice chests too", pts: "~20k (gold) · ~7k (purple) · ~2k (blue)", d: "Pop any saved hero choice chests and use all shards you've saved this week — Universal Shards, Hero-specific Shards, and Overlord Universal Shards. Not sure which hero to build? Ask in alliance chat — your leadership is there to help all day." },
       { t: "Use ALL Skill Medals", pts: "~20 pts/medal", d: "Upgrade hero skills with every saved medal. Increases combat power and earns Duel points." },
-      { t: "Elite Recruitment", pts: "~3.75k pts/recruit", d: "Use every saved Legendary, New Era, and Hero's Return ticket in the Tavern. Don't hold any back." },
-      { t: "Use ALL Weapon Shards (S1+)", pts: "~20k pts/shard", d: "Season 1+ only: use every Exclusive Weapon Shard to upgrade hero weapons. Each shard scores separately." },
+      { t: "Elite Recruitment", pts: "~3.75k pts/recruit", d: "Use every saved Legendary and New Era ticket in the Tavern. Hero's Return Tickets also count in this category — however, it's generally recommended to hold onto Hero's Return Tickets until Season 2 unless you really need them." },
+      { t: "Use ALL Weapon Shards (S1+)", pts: "~20k pts/shard", d: "Season 1+ only: use every Exclusive Weapon Shard to upgrade hero weapons. Each shard scores separately. Priority targets: Kim's or DVA's ultimate weapon if you haven't already maxed them." },
     ],
     prep: [
       { t: "Stack radar — do NOT claim", d: "Complete radar missions without claiming rewards. Stack as many as possible for Friday morning's burst." },
@@ -177,10 +183,13 @@ const days = [
       { t: "Save ALL training speedups for tomorrow", d: "Don't touch a single training speedup today. Friday's troop training is your main Friday scoring engine." },
       { t: "Save healing speedups for Saturday", d: "Keep holding healing speedups. Saturday combat will injure your troops — quick healing = extra Saturday points." },
       { t: "Save UR Truck contracts for Friday + Saturday", d: "Keep Trade Contracts in reserve. You'll dispatch trucks again on Friday and need more for Saturday morning." },
+      { t: "Leave upgraded buildings as gift boxes for Friday", d: "Any buildings that finish upgrading tonight — leave them wrapped as presents. Friday scores Building Power for unwrapping, so save them for then." },
+      { t: "Have tech research ready to finish after Friday reset", d: "Queue a research to complete on Friday with minimal speedups. Tech Power and Tech Speed both score on Friday, so finishing a research then earns extra points." },
     ],
     tips: [
       { t: "Most straightforward day of the week", d: "Thursday is simple — just dump every hero resource you've been saving. No complex decisions." },
       { t: "Don't buy pulls", d: "Only use tickets you've been saving all week. Don't spend diamonds on pulls just for Duel points unless you're very close to a chest threshold." },
+      { t: "Arms Race overlap — Hero Advancement is the star today", d: "Thursday is where Hero Advancement goes wild in Arms Race. Use ALL your Legendary Recruitment Tickets and level up your heroes using Hero EXP for a massive amount of Arms Race points.<br><br>For other phases, do the minimum to open all three chests:<br><strong>City Building:</strong> Minimum building presents or Construction Speed-ups.<br><strong>Unit Progression:</strong> Train troops until all three chests open.<br><strong>Tech Research:</strong> Minimum Research Speed-ups to open all three chests.<br><strong>Drone Boost:</strong> Burn just enough stamina to open all three chests." },
     ],
     points: ["Hero Recruit", "Hero XP", "Hero Shards", "Skill Medals", "Weapon Shards (S1+)"]
   },
@@ -208,7 +217,7 @@ const days = [
       "Shield: be online at Saturday reset and shield within 5 minutes. If sleeping through reset, apply 24h shield NOW",
       "Recall ALL squads off resource tiles before Saturday reset — open squads are free kills",
     ],
-    announce: "[FRIDAY - Total Mobilization | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL training speedups - promote troops (higher tier = more pts)\n- Finish leftover buildings + research with spare speedups\n- Recall ALL squads before midnight reset\nSHIELD: Be online at reset, shield within 5 min.\nIf sleeping through reset: apply 24h shield NOW\nSave healing speedups for Saturday",
+    announce: "[FRIDAY - Total Mobilization | 2pts]\n- Claim ALL stacked radar tasks first\n- Use ALL training speedups - promote troops (higher tier = more pts)\n- Finish leftover buildings + research with spare speedups\n- Recall ALL squads before midnight reset\nSHIELD: Enemy Buster = full 24h event.\nPassive day = 24h shield. Fighting = drop, attack, re-shield.\nCan't make reset: 24h shield NOW (shorter ones expire mid-day)\nSave healing speedups for Saturday",
     today: [
       { t: "Claim stacked radar rewards", pts: "~23k pts/task", d: "First action — collect all radar tasks stacked since Thursday. Do this immediately after reset." },
       { t: "Train troops (main focus)", pts: "~122 pts/speedup · points scale with tier", d: "Use all training speedups and generic/universal speedups to train and promote troops. Your #1 point source today. Promoting existing troops to higher tiers earns far more than training fresh — see tier table below." },
@@ -218,15 +227,18 @@ const days = [
       { t: "Overlord upgrades (S2+)", d: "Season 2+ only: use Overlord Shards, Guidebooks, Certificates, Bronze Badges, and Star Badges. All five item types score as separate categories — use every one you have." },
     ],
     prep: [
-      { t: "Shield timing — know the difference", d: "<strong>Primary (best):</strong> Be online at Saturday reset (server midnight — see Action Timer above) and apply your shield within the first 5 minutes. An 8h, 12h, or 24h shield applied <em>at</em> reset covers the entire Saturday combat window.<br><br><strong>Backup only — if you cannot be online at reset:</strong> Apply a 24h shield before sleeping Friday night. A shorter shield (8h/12h) applied Friday night may expire mid-Saturday and leave you exposed. Only do this if you genuinely cannot be there for reset.<br><br>Either way — do NOT go into Saturday morning without a shield active.", warn: true },
+      { t: "Stock up on shields NOW — available in the Alliance Store", d: "Enemy Buster runs the full 24 hours of Saturday server time. Plan your shield around how active you'll be.<br><br>If you don't already have shields in stock, buy them from the Alliance Store before Saturday.<br><br><strong>Primary (best — be at reset):</strong> Be online at Saturday reset (server midnight — see Action Timer above) and apply your shield within the first 5 minutes.<br>— <strong>Passive day</strong> (trucks, tasks, speedups only — no combat): use a <strong>24h shield</strong> for full-day coverage.<br>— <strong>Participating in combat</strong>: shield up at reset, then drop it during your active window to attack. Re-shield immediately when you're done. Choose a duration that covers your remaining offline hours.<br><br><strong>Backup only — if you cannot be at reset:</strong> Apply a 24h shield before sleeping Friday night. Shorter shields (8h/12h) will expire mid-Saturday and leave you exposed — Enemy Buster does not end until the next daily reset.<br><br>Either way — do NOT go into Saturday morning without a shield active.", warn: true },
       { t: "Save healing speedups for tomorrow", d: "Don't use any healing speedups tonight. You'll need them Saturday after combat to score Healing Speed points." },
       { t: "Save Legend Tasks for tomorrow", d: "Don't finish any starred Secret Command Post tasks tonight. Legend Tasks are a clean Saturday point source." },
       { t: "Save remaining UR Truck contracts for tomorrow", d: "Hold any leftover Trade Contracts for Saturday morning truck dispatches." },
+      { t: "Stock up on all speedup types for Saturday", d: "Saturday scores points for <em>using</em> speedups — building, tech, train, healing, and generic all count as separate categories. Collecting finished products won't boost your points on Saturday the way it does on other days. Save every speedup type you have." },
+      { t: "Be ready to turn ALL trucks and tasks gold for Saturday", d: "Refresh Trade Contracts until you have UR (orange) trucks queued. Refresh Secret Command Post tasks until they're Legendary (gold). These are the easiest points for members who don't want to do combat." },
       { t: "Recall all squads", d: "Pull every squad off of resource tiles before you sleep. Any troops out Saturday morning are free kills for the enemy." },
     ],
     tips: [
       { t: "Arms Race overlap", d: "Troop training overlaps with Arms Race: Unit Progression. Run both at the same time for double rewards." },
       { t: "Waterfall method for max train points", d: "Train cheap low-tier troops all week, then promote them through each barracks tier on Friday. Each promotion step scores separately for far more points than direct high-tier training." },
+      { t: "Save valor for Wednesday — don't blow it all today", d: "Friday scores Tech Research points, but Valor Badges are far more valuable on Wednesday (2× efficiency with Duel multipliers). Only spend Valor Badges on Friday if you are close to unlocking T-10 tier research — otherwise hold every badge for next Wednesday." },
     ],
     points: ["Radar tasks", "Train Unit", "Train Speed", "Building Power/Speed", "Tech Power/Speed", "Generic speedups", "Overlord items (S2+)"]
   },
@@ -249,13 +261,13 @@ const days = [
       "Dump EVERY remaining speedup — building, tech, train, healing, and generic all score as separate categories",
       "Kill VS opponent troops for 5× points — read alliance chat and coordinate before attacking anyone",
     ],
-    announce: "[SATURDAY - Enemy Buster | 4pts]\nCHECK SHIELD FIRST - reapply if needed\n- Send UR (orange) trucks immediately\n- Complete ALL saved Legend Tasks\n- Dump EVERY remaining speedup (all types score)\n- Kill VS opponent troops (5x points - coordinate!)\nEmpty defense lineup before combat\nSpend EVERYTHING - nothing carries over",
+    announce: "[SATURDAY - Enemy Buster | 4pts]\nCHECK SHIELD FIRST - reapply if needed\n- Send UR (orange) trucks immediately\n- Complete ALL saved Legend Tasks\n- Dump EVERY remaining speedup (all types score)\n- Kill VS opponent troops (5x points - coordinate!)\n- Heal troops after combat (Healing Speed points)\nEmpty defense lineup before combat\nSpend EVERYTHING - nothing carries over",
     today: [
       { t: "Shield check — first thing at reset", d: "If you are online at Saturday reset: apply your shield within the first 5 minutes so it covers the full combat window. If you shielded before sleep (backup method): verify it is still active and check the expiry time. Re-apply immediately if it dropped or will expire before Duel ends. A lapsed shield Saturday morning means your base gets zeroed before you can respond." },
       { t: "Send UR Trucks", pts: "~200k pts/truck", d: "Guaranteed points with zero combat risk. Use Trade Contracts to refresh for UR (orange) trucks. Only send orange — lower rarity isn't worth it." },
       { t: "Complete all saved Legend Tasks", pts: "~150k pts/task", d: "Finish every starred legendary task you've been holding from the Secret Command Post. These were saved specifically for today." },
-      { t: "Dump ALL remaining speedups", pts: "~120 pts/speedup", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories. Use absolutely every speedup you have left — nothing carries over usefully." },
-      { t: "Kill enemy units", d: "Unit kills score directly. Killing your VS opponent's units gives 5× more points than killing anyone else. Follow alliance coordination for attack targets and timing." },
+      { t: "Dump ALL remaining speedups", pts: "~120 pts/speedup", d: "Building Speed, Tech Speed, Train Speed, Healing Speed, and Generic (universal) speedups each score as separate categories. Use absolutely every speedup you have left — nothing carries over usefully.<br><br><strong>Important:</strong> You earn points for <em>using</em> speedups — not for collecting the finished products. A building or research completing from a speedup scores; the product arriving in your inventory does not give bonus Saturday points." },
+      { t: "Kill enemy units", d: "Unit kills score directly. Killing your VS opponent's units gives 5× more points than killing anyone else. Follow alliance coordination for attack targets and timing.<br><br><em>Did you know:</em> Killing your own troops also gives some points — though it's not recommended. Only consider it as a last resort if you're close to a point threshold with nothing else left to spend." },
       { t: "Unit kill & loss point values by tier", d: "<table class='pts-table'><thead><tr><th>Tier</th><th class='pts-vs'>VS opponent kill</th><th class='pts-val'>Any kill</th><th>Lost (yours)</th></tr></thead><tbody><tr><td>T1</td><td class='pts-vs'>25</td><td class='pts-val'>5</td><td>6</td></tr><tr><td>T2</td><td class='pts-vs'>38</td><td class='pts-val'>8</td><td>8</td></tr><tr><td>T3</td><td class='pts-vs'>50</td><td class='pts-val'>10</td><td>10</td></tr><tr><td>T4</td><td class='pts-vs'>63</td><td class='pts-val'>13</td><td>13</td></tr><tr><td>T5</td><td class='pts-vs'>75</td><td class='pts-val'>15</td><td>15</td></tr><tr><td>T6</td><td class='pts-vs'>88</td><td class='pts-val'>18</td><td>18</td></tr><tr><td>T7</td><td class='pts-vs'>100</td><td class='pts-val'>20</td><td>20</td></tr><tr><td>T8</td><td class='pts-vs'>113</td><td class='pts-val'>23</td><td>20</td></tr><tr><td>T9</td><td class='pts-vs'>125</td><td class='pts-val'>25</td><td class='pts-lost'>—</td></tr><tr><td>T10</td><td class='pts-vs'>138</td><td class='pts-val'>28</td><td class='pts-lost'>—</td></tr></tbody></table>VS opponent kills are worth 5× more — always prioritize their troops over anyone else's." },
     ],
     prep: [
@@ -268,6 +280,7 @@ const days = [
       { t: "If the opponent is too strong — stay shielded", d: "Score your safe points (trucks, legend tasks, speedups) and don't feed them kills. A shielded loss still beats a zeroed base." },
       { t: "Last-minute dump tactic", d: "Against a strong opponent, hold all remaining resources until the final minutes before reset. One coordinated mass dump prevents them from adjusting their score in response." },
       { t: "Never gather on Saturday", d: "Any squad on a resource tile Saturday is a free kill for the enemy. Recall everyone before combat starts." },
+      { t: "Arms Race overlap — use research to boost combat power", d: "If you didn't burn all your Construction Speed-ups yesterday, use them now for City Building points.<br><br>For Tech Research, use Research Speed-ups to get through research that boosts your combat skills. The <strong>Units</strong> and <strong>Hero Trees</strong> are great choices — they give combat boosts without requiring any Valor Badges. Working on your <strong>Garage</strong> research can also be surprisingly helpful.<br><br>For Unit Progression, use Training Speed-ups to your heart's desire.<br><br>Drone Boost: burn some stamina. There are countless ways to do that on combat day." },
     ],
     points: ["UR Trucks", "Legend Tasks", "Building Speed", "Tech Speed", "Train Speed", "Healing Speed", "Generic speedups", "Unit Kills (5x vs VS)"]
   }

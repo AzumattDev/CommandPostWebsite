@@ -168,11 +168,13 @@ h2{font-size:1.1rem;font-weight:600;margin-bottom:.75rem}
     <div class="tc-field">
       <label class="tc-lbl">Server time (UTC−2)</label>
       <input type="time" id="tcSrv" class="tc-inp" oninput="tcFromSrv()">
+      <div class="tc-dual" id="tcDualSrv"></div>
     </div>
     <span class="tc-arrow">⇄</span>
     <div class="tc-field">
       <label class="tc-lbl">Your local time</label>
       <input type="time" id="tcLoc" class="tc-inp" oninput="tcFromLoc()">
+      <div class="tc-dual" id="tcDualLoc"></div>
     </div>
   </div>
   <div class="tc-hint" id="tcHint"></div>
@@ -534,6 +536,17 @@ async function submitFlag(){
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFlagModal(); });
 
+function tcFmt12(h,m){const ap=h>=12?'PM':'AM';return`${h%12||12}:${String(m).padStart(2,'0')} ${ap}`;}
+function tcDuals(){
+  ['Srv','Loc'].forEach(k=>{
+    const v=document.getElementById('tc'+k).value;
+    const el=document.getElementById('tcDual'+k);
+    if(!el) return;
+    if(!v){el.innerHTML='';return;}
+    const [h,m]=v.split(':').map(Number);
+    el.innerHTML=`<span class="tc-chip"><span class="tc-tag">24H</span><span class="tc-d24">${v}</span></span><span class="tc-chip"><span class="tc-tag">12H</span><span class="tc-d12">${tcFmt12(h,m)}</span></span>`;
+  });
+}
 function tcInit(){
   const sn=new Date(Date.now()-2*60*60*1000);
   const p2=n=>String(n).padStart(2,'0');
@@ -548,7 +561,7 @@ function tcFromSrv(){
   const lm=((h*60+m)+120-tzOff+2880)%1440;
   const p2=n=>String(n).padStart(2,'0');
   document.getElementById('tcLoc').value=`${p2(Math.floor(lm/60))}:${p2(lm%60)}`;
-  tcHint();
+  tcHint(); tcDuals();
 }
 function tcFromLoc(){
   const val=document.getElementById('tcLoc').value;
@@ -558,7 +571,7 @@ function tcFromLoc(){
   const sm=((h*60+m)-120+tzOff+2880)%1440;
   const p2=n=>String(n).padStart(2,'0');
   document.getElementById('tcSrv').value=`${p2(Math.floor(sm/60))}:${p2(sm%60)}`;
-  tcHint();
+  tcHint(); tcDuals();
 }
 function tcHint(){
   const off=-new Date().getTimezoneOffset()/60;
