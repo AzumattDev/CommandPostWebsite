@@ -344,8 +344,9 @@ h2.toggle:hover .cbtn{color:var(--text)}
 <div class="panel">
   <div id="schedRows"></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap">
-    <label style="font-size:.83rem;color:var(--text2)">⏰ Boarding:</label>
-    <input type="time" id="tcTime" value="10:00" oninput="tcSaveSched();tcPreview()">
+    <label style="font-size:.83rem;color:var(--text2)">⏰ Boarding (UTC):</label>
+    <input type="time" id="tcTime" value="10:00" oninput="tcSaveSched();tcPreview();tcUpdateBoardingLocal()">
+    <span id="tcTimeLocal" style="font-size:.78rem;color:var(--text3);font-family:'JetBrains Mono',monospace"></span>
     <label class="chk-label" style="margin-left:8px">
       <input type="checkbox" id="tcVip" onchange="tcToggleVip()"> Show VIP slot
     </label>
@@ -543,6 +544,21 @@ function fmtDate(ds){
   return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 }
 function tcToggle(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
+function tcUpdateBoardingLocal(){
+  const t=document.getElementById('tcTime')?.value||'10:00';
+  const [h,m]=(t+':00').split(':').map(Number);
+  const now=new Date();
+  const d=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),h,m||0,0));
+  const local=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+  const el=document.getElementById('tcTimeLocal');
+  if(el) el.textContent=`= ${local} your time`;
+  // Keep alliance boarding hour in sync
+  const sel=document.getElementById('allyBoardingHour');
+  if(sel&&String(sel.value)!==String(h)){
+    sel.value=h;
+    if(allyId&&allyToken) tcAllySettingsChanged();
+  }
+}
 function ruleLabel(rule){
   if(rule.label) return rule.label;
   return RULE_TYPES.find(r=>r.v===rule.type)?.l||'Manual';
@@ -974,7 +990,7 @@ function tcPreview(){
   });
 
   ctx.textAlign='center';ctx.fillStyle='rgba(255,215,102,0.5)';ctx.font='12px "Exo 2",Arial';
-  ctx.fillText('commandpost.guide',W/2,H-12);
+  ctx.fillText('ashmasters.org',W/2,H-12);
 }
 function cvRect(ctx,x,y,w,h,r,fill){
   ctx.fillStyle=fill;ctx.beginPath();
@@ -1070,7 +1086,8 @@ async function tcPostDaily(){
   const dow=gameDow(0);
   const conductor=S.sched.conductors[dow]||'';
   if(!conductor){alert('No conductor set for today. Fill in the schedule first.');btn.innerHTML=orig;btn.disabled=false;return;}
-  const ok=await tcDiscordProxy({action:'daily-manual',conductor,date:gameDate(0),upcomingWeek:Array.from({length:7},(_,i)=>({day:DAYS[(dow+i)%7],conductor:S.sched.conductors[(dow+i)%7]||'?',offset:i}))});
+  const time=document.getElementById('tcTime')?.value||'';
+  const ok=await tcDiscordProxy({action:'daily-manual',conductor,date:gameDate(0),boardingTime:time,upcomingWeek:Array.from({length:7},(_,i)=>({day:DAYS[(dow+i)%7],conductor:S.sched.conductors[(dow+i)%7]||'?',offset:i}))});
   if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
   else{btn.innerHTML=orig;btn.disabled=false;}
 }
@@ -1139,6 +1156,7 @@ function tcInit(){
   renderFairness();
   renderBlocked();
   tcPreview();
+  tcUpdateBoardingLocal();
   // Show quick start for first-timers (no players added yet, not dismissed)
   if(!S.players.length && !localStorage.getItem('tc-qs-dismissed')){
     document.getElementById('quickStart').style.display='';
@@ -1300,6 +1318,9 @@ function tcAllyApplyServerState(data){
   if(alliance?.boardingHour!=null){
     const sel=document.getElementById('allyBoardingHour');
     if(sel) sel.value=alliance.boardingHour;
+    const tc=document.getElementById('tcTime');
+    if(tc) tc.value=`${String(alliance.boardingHour).padStart(2,'0')}:00`;
+    tcUpdateBoardingLocal();
   }
   if(alliance?.postDaily!=null){
     const cb=document.getElementById('allyPostDaily');

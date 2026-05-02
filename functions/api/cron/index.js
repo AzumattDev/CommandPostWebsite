@@ -122,7 +122,7 @@ async function handleCron(env) {
         { name: '​', value: '**— Upcoming conductors —**', inline: false },
         ...weekFields,
       ],
-      footer:    { text: `${ally.name} · commandpost.guide · automated reminder` },
+      footer:    { text: `${ally.name} · ashmasters.org · automated reminder` },
       timestamp: new Date().toISOString(),
     };
 

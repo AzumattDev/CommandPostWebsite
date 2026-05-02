@@ -139,7 +139,7 @@ export async function onRequestPost({ request, env }) {
         { name: '​', value: '**— Upcoming conductors —**', inline: false },
         ...weekFields,
       ],
-      footer: { text: 'commandpost.guide · automated reminder' },
+      footer: { text: 'ashmasters.org · automated reminder' },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(env.DISCORD_WEBHOOK_URL, { embeds: [embed] }); }
@@ -169,7 +169,7 @@ export async function onRequestPost({ request, env }) {
         { name: 'Date', value: date ? formatDisplayDate(date) : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }), inline: false },
         ...(weekFields.length ? [{ name: '​', value: '**— Upcoming —**', inline: false }, ...weekFields] : []),
       ],
-      footer: { text: 'commandpost.guide · train scheduler' },
+      footer: { text: 'ashmasters.org · train scheduler' },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(webhookUrl, { embeds: [embed] }); }
@@ -185,7 +185,7 @@ export async function onRequestPost({ request, env }) {
 
   // Test ping
   if (_test) {
-    try { await postToDiscord(webhookUrl, { content: '🚂 Webhook test from Train Conductor Scheduler — commandpost.guide' }); }
+    try { await postToDiscord(webhookUrl, { content: '🚂 Webhook test from Train Conductor Scheduler — ashmasters.org' }); }
     catch (e) { return new Response(e.message, { status: 502, headers: CORS }); }
     return Response.json({ ok: true }, { headers: CORS });
   }
@@ -205,7 +205,7 @@ export async function onRequestPost({ request, env }) {
     title,
     color: 0xe8720c,
     fields,
-    footer: { text: `⏰ Boarding: ${boardingTime || '??:??'} · commandpost.guide` },
+    footer: { text: `⏰ Boarding: ${boardingTime || '??:??'} · ashmasters.org` },
     timestamp: new Date().toISOString(),
   };
 

@@ -311,7 +311,7 @@ export async function onRequestPost({ request, env }) {
     }
     const { schedule, boardingTime, weekLabel, weekStartDate, _test } = body;
     if (_test) {
-      try { await postToDiscord(ally.discord_webhook, { content: '🚂 Webhook test — commandpost.guide · Train Conductor Scheduler' }); }
+      try { await postToDiscord(ally.discord_webhook, { content: '🚂 Webhook test — ashmasters.org · Train Conductor Scheduler' }); }
       catch (e) { return new Response(e.message, { status: 502, headers: CORS }); }
       return Response.json({ ok: true }, { headers: CORS });
     }
@@ -323,7 +323,8 @@ export async function onRequestPost({ request, env }) {
     const monday      = weekStartDate || currentUtcMonday();
     const todayStr    = utcDate();
     const todayOffset = daysBetween(monday, todayStr);
-    const boardingTs  = boardingUnixTs(monday, ally.boarding_hour_utc ?? 2);
+    const bHour       = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
+    const boardingTs  = boardingUnixTs(monday, bHour);
     const resetTs     = resetUnixTs(monday);
 
     const title = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
@@ -345,7 +346,7 @@ export async function onRequestPost({ request, env }) {
 
     const embed = {
       title, description, color: 0xe8720c, fields,
-      footer:    { text: `${ally.name} · commandpost.guide` },
+      footer:    { text: `${ally.name} · ashmasters.org` },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(ally.discord_webhook, { embeds: [embed] }); }
@@ -358,11 +359,12 @@ export async function onRequestPost({ request, env }) {
     if (!ally.discord_webhook) {
       return new Response('No Discord webhook configured for this alliance.', { status: 503, headers: CORS });
     }
-    const { conductor, date, upcomingWeek } = body;
+    const { conductor, date, upcomingWeek, boardingTime } = body;
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
-    const todayStr   = date || utcDate();
-    const boardingTs = boardingUnixTs(todayStr, ally.boarding_hour_utc ?? 2);
+    const todayStr = date || utcDate();
+    const bHour    = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
+    const boardingTs = boardingUnixTs(todayStr, bHour);
     const resetTs    = resetUnixTs(todayStr);
 
     const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => ({
@@ -379,7 +381,7 @@ export async function onRequestPost({ request, env }) {
         { name: 'Date', value: formatDisplayDate(todayStr), inline: false },
         ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
       ],
-      footer:    { text: `${ally.name} · commandpost.guide · train scheduler` },
+      footer:    { text: `${ally.name} · ashmasters.org · train scheduler` },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(ally.discord_webhook, { embeds: [embed] }); }
