@@ -373,12 +373,10 @@ export async function onRequestPost({ request, env }) {
 
     const embed = {
       title:       '🚂 Today\'s Train Conductor',
-      description: `**${conductor}** is conducting the train today.\n\nAll aboard! 🚂`,
+      description: `**${conductor}** is conducting the train today.\n\nAll aboard — boarding at <t:${boardingTs}:t> · Reset at <t:${resetTs}:t>`,
       color:  0xe8720c,
       fields: [
-        { name: 'Date',          value: formatDisplayDate(todayStr),  inline: true },
-        { name: '⏰ Boarding',   value: `<t:${boardingTs}:t>`,        inline: true },
-        { name: '🔄 Game Reset', value: `<t:${resetTs}:t>`,           inline: true },
+        { name: 'Date', value: formatDisplayDate(todayStr), inline: false },
         ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
       ],
       footer:    { text: `${ally.name} · commandpost.guide · train scheduler` },
