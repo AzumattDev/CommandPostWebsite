@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Train Conductor Scheduler — The Command Post</title>
+<link rel="stylesheet" href="style.css">
+<script src="nav.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--tr-orange:#e8720c;--tr-gold:#ffd700}
+h1{font-family:'Chakra Petch',sans-serif;font-size:clamp(1.3rem,4vw,1.75rem);font-weight:700;margin-bottom:.4rem;color:var(--tr-orange)}
+h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:.85rem;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* Conductor card */
+.cond-card{background:var(--surface);border:1px solid var(--amber-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap}
+.cond-icon{font-size:2.2rem;line-height:1;flex-shrink:0}
+.cond-lbl{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.cond-name{font-family:'Chakra Petch',sans-serif;font-size:1.5rem;font-weight:700;color:var(--amber);line-height:1.15}
+.cond-sub{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text3);margin-top:3px}
+
+/* Upcoming grid */
+.upcoming-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:1.75rem}
+.uday{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .85rem}
+.uday.today{border-color:var(--amber-border);background:rgba(251,191,36,.05)}
+.uday-lbl{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text3);margin-bottom:2px}
+.uday-name{font-size:.88rem;font-weight:600;color:var(--text)}
+.uday-rule{font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uday.today .uday-name{color:var(--amber)}
+
+/* Generic panel */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1rem}
+
+/* Role badges */
+.rbadge{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.03em;display:inline-block;flex-shrink:0}
+.rb-r5{background:rgba(240,192,64,.12);color:#f0c040;border:1px solid rgba(240,192,64,.25)}
+.rb-r4{background:rgba(192,132,255,.1);color:#c084ff;border:1px solid rgba(192,132,255,.2)}
+.rb-r3{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid var(--blue-border)}
+.rb-r2{background:rgba(52,211,153,.08);color:var(--green);border:1px solid var(--green-border)}
+.rb-r1{background:rgba(157,155,175,.08);color:var(--text2);border:1px solid var(--border)}
+
+/* Player rows */
+.player-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.player-row:last-child{border-bottom:none}
+.pname{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.9rem;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.pname:hover{color:var(--tr-orange)}
+.pavail{display:flex;gap:3px}
+.adot{width:16px;height:16px;border-radius:50%;font-size:.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;border:1px solid var(--border);color:var(--text3);background:var(--surface2);transition:all .12s;flex-shrink:0}
+.adot.on{background:rgba(52,211,153,.15);border-color:var(--green-border);color:var(--green)}
+.ppts{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3);display:flex;flex-direction:column;align-items:flex-end;gap:1px;white-space:nowrap}
+.act-toggle{width:28px;height:16px;border-radius:99px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;position:relative;transition:all .15s;flex-shrink:0}
+.act-toggle.on{background:rgba(52,211,153,.2);border-color:var(--green-border)}
+.act-toggle::after{content:'';position:absolute;width:10px;height:10px;border-radius:50%;background:var(--text3);top:2px;left:2px;transition:all .15s}
+.act-toggle.on::after{background:var(--green);left:14px}
+
+/* Add player form */
+.add-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ff{display:flex;flex-direction:column;gap:4px}
+.ff label{font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+
+/* Day rule rows */
+.rule-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rule-row:last-child{border-bottom:none}
+.rday{font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:600;color:var(--tr-orange);width:2.8rem;flex-shrink:0}
+
+/* Schedule rows */
+.srow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.sday{font-family:'Chakra Petch',sans-serif;font-size:.88rem;font-weight:600;color:var(--tr-orange);width:2.8rem;flex-shrink:0}
+.stag{font-size:.64rem;font-family:'JetBrains Mono',monospace;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;white-space:nowrap;flex-shrink:0;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.vip-input{display:none}
+.show-vip .vip-input{display:block}
+
+/* Shared controls */
+.tc-in{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:.88rem;transition:border-color .15s}
+.tc-in:focus{outline:none;border-color:var(--tr-orange)}
+.tc-sel{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.84rem}
+.tc-sel:focus{outline:none;border-color:var(--tr-orange)}
+input[type=time]{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88rem}
+input[type=time]:focus{outline:none;border-color:var(--tr-orange)}
+.tc-num{width:72px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem}
+.tc-ta{width:100%;min-height:68px;resize:vertical;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;box-sizing:border-box}
+.tc-ta:focus{outline:none;border-color:var(--accent)}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:8px;border:1px solid transparent;font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--tr-orange);color:#fff;border-color:var(--tr-orange)}
+.btn-primary:hover{filter:brightness(1.12)}
+.btn-green{background:rgba(52,211,153,.1);color:var(--green);border-color:var(--green-border)}
+.btn-green:hover{background:rgba(52,211,153,.17)}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-gold{background:rgba(255,215,0,.08);color:var(--tr-gold);border-color:rgba(255,215,0,.25)}
+.btn-gold:hover{background:rgba(255,215,0,.14)}
+.btn-danger{background:transparent;color:var(--red);border-color:rgba(248,113,113,.2)}
+.btn-danger:hover{background:rgba(248,113,113,.06)}
+.btn-disc{background:rgba(88,101,242,.1);color:#7289da;border-color:rgba(88,101,242,.3)}
+.btn-disc:hover{background:rgba(88,101,242,.18)}
+.btn-disc:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm{padding:5px 11px;font-size:.76rem}
+
+/* Actions */
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+
+/* Pager */
+.pager{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.pager-info{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);min-width:90px;text-align:center}
+.pager button:disabled{opacity:.35;cursor:not-allowed}
+
+/* Canvas */
+.cvwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:10px}
+#tcCanvas{max-width:100%;border-radius:8px;display:block}
+.cvhint{font-size:.72rem;color:var(--text3);text-align:center}
+
+/* Fairness */
+.fair-bars{display:flex;flex-direction:column;gap:7px}
+.frow{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.fname{min-width:100px;max-width:140px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ftrack{flex:1;height:9px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.ffill{height:100%;background:linear-gradient(90deg,var(--tr-orange),var(--tr-gold));border-radius:99px;transition:width .3s}
+.fnum{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);min-width:2.5rem;text-align:right}
+.blocked-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.bchip{font-size:.72rem;padding:3px 10px;border-radius:99px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);color:var(--red);font-family:'JetBrains Mono',monospace}
+
+/* Info box */
+.info-box{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.16);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.65rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:.75rem}
+
+/* Collapsible h2 headers */
+h2.toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+h2.toggle:hover{color:var(--accent)}
+.cbtn{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px;margin-left:auto;border-radius:4px;pointer-events:none}
+h2.toggle:hover .cbtn{color:var(--text)}
+
+/* Settings inputs */
+.set-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.set-row label{font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.set-row input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88rem}
+.set-row input:focus{outline:none;border-color:var(--blue)}
+.chk-label{display:flex;align-items:center;gap:7px;font-size:.88rem;color:var(--text2);cursor:pointer;user-select:none}
+.chk-label input[type=checkbox]{accent-color:var(--tr-orange);width:15px;height:15px;cursor:pointer}
+
+/* Edit modal */
+.modal-bg{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;width:min(480px,95vw)}
+.modal-title{font-family:'Chakra Petch',sans-serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:1.25rem}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.mf{display:flex;flex-direction:column;gap:4px}
+.mf label{font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+.mf input,.mf select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem}
+.mf input:focus,.mf select:focus{outline:none;border-color:var(--tr-orange)}
+.mavail{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.mavail-day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace;cursor:pointer}
+.mavail-day input[type=checkbox]{width:14px;height:14px;accent-color:var(--tr-orange)}
+.mbtns{display:flex;gap:8px;justify-content:flex-end}
+
+/* Alliance account section */
+.ally-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1rem}
+.ally-tab{flex:1;padding:7px 0;border:none;background:var(--surface2);color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .15s}
+.ally-tab.active{background:var(--surface3);color:var(--text)}
+.ally-tab+.ally-tab{border-left:1px solid var(--border)}
+.ally-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.1);border:1px solid var(--green-border);color:var(--green);border-radius:6px;padding:4px 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.85rem}
+.ally-id-chip{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;user-select:all}
+.ally-id-chip:hover{border-color:var(--border2);color:var(--text2)}
+
+@media(max-width:600px){.pavail{display:none}.mgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div style="margin-bottom:1.5rem">
+  <h1>🚂 Train Conductor Scheduler</h1>
+  <p style="font-size:.88rem;color:var(--text2);max-width:660px;line-height:1.6">Plan your weekly train conductor schedule with per-day rules — R4/R3 rotation, MVP, BG MVP, Top Tech Contributor, Casino, and more. Export as an image or post directly to Discord.</p>
+</div>
+
+<!-- Today's conductor -->
+<div class="cond-card" id="condCard">
+  <div class="cond-icon">🚂</div>
+  <div>
+    <div class="cond-lbl">Today's Conductor</div>
+    <div class="cond-name" id="condName">—</div>
+    <div class="cond-sub" id="condSub"></div>
+  </div>
+  <div id="condVipWrap" style="margin-left:auto;text-align:right;display:none">
+    <div class="cond-lbl">VIP</div>
+    <div id="condVip" style="font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700;color:var(--tr-gold)">—</div>
+  </div>
+</div>
+
+<!-- Next 7 Days -->
+<h2>Next 7 Days</h2>
+<div class="upcoming-grid" id="upcomingGrid"></div>
+
+<hr style="border:none;border-top:1px solid var(--border);margin:1.5rem 0">
+
+<!-- Alliance Account -->
+<h2 class="toggle" onclick="tcToggle('allyBody')">🏰 Alliance Account <button class="cbtn">▼</button></h2>
+<div id="allyBody" class="panel" style="display:none">
+
+  <!-- Not logged in -->
+  <div id="allyLoginSection">
+    <div class="info-box" style="margin-bottom:1rem">Register a free alliance account to store your roster, schedule, and rules in the cloud. Anyone in your alliance can log in with the shared password. Enable <strong>Auto-Post</strong> to have the daily conductor announcement sent to your Discord automatically every day.</div>
+    <div class="ally-tabs">
+      <button id="allyTabReg" class="ally-tab active" onclick="tcAllyTab('reg')">Register New Alliance</button>
+      <button id="allyTabLogin" class="ally-tab" onclick="tcAllyTab('login')">Login to Existing Alliance</button>
+    </div>
+
+    <!-- Register -->
+    <div id="allyRegForm">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="set-row"><label>Alliance Name</label><input type="text" id="allyRegName" placeholder="Dragon Fist…" maxlength="48"></div>
+        <div class="set-row"><label>Game Server # (optional)</label><input type="text" id="allyRegServer" placeholder="e.g. S42" maxlength="16"></div>
+      </div>
+      <div class="set-row" style="margin-bottom:12px"><label>Password (6+ characters — shared with your alliance)</label><input type="password" id="allyRegPass" placeholder="Choose a password…" onkeydown="if(event.key==='Enter')tcAllyRegister()"></div>
+      <button class="btn btn-green" onclick="tcAllyRegister()">✦ Create Alliance Account</button>
+    </div>
+
+    <!-- Login -->
+    <div id="allyLoginForm" style="display:none">
+      <div class="set-row"><label>Alliance ID</label><input type="text" id="allyLoginId" placeholder="a1b2c3d4e5f6…" style="font-family:'JetBrains Mono',monospace"></div>
+      <div class="set-row" style="margin-bottom:12px"><label>Password</label><input type="password" id="allyLoginPass" placeholder="Alliance password…" onkeydown="if(event.key==='Enter')tcAllyLogin()"></div>
+      <button class="btn btn-primary" onclick="tcAllyLogin()">→ Login</button>
+    </div>
+  </div>
+
+  <!-- Logged in -->
+  <div id="allyConnectedSection" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:1rem">
+      <span class="ally-badge">✓ Connected</span>
+      <span id="allyConnName" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text)"></span>
+      <span id="allyConnId" class="ally-id-chip" title="Click to copy ID" onclick="tcAllyShowId()"></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div class="set-row">
+        <label>Discord Webhook URL</label>
+        <input type="password" id="allyWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcAllySettingsChanged()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="set-row">
+          <label>Auto-Post Hour (UTC)</label>
+          <select id="allyBoardingHour" class="tc-sel" onchange="tcAllySettingsChanged()"></select>
+        </div>
+        <label class="chk-label" style="margin-top:2px">
+          <input type="checkbox" id="allyPostDaily" onchange="tcAllySettingsChanged()"> Enable daily auto-post
+        </label>
+      </div>
+    </div>
+    <div class="info-box" style="margin-bottom:10px;font-size:.82rem">When enabled, the site will automatically post today's conductor to your Discord channel at the selected UTC hour every day.</div>
+    <div id="allySyncMsg" style="font-size:.78rem;margin-bottom:8px;display:none"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-green btn-sm" onclick="tcAllyPull()">↓ Pull from Server</button>
+      <button class="btn btn-primary btn-sm" onclick="tcAllyPush()">↑ Push All to Server</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcAllyShowId()">📋 Copy Alliance ID</button>
+      <button class="btn btn-danger btn-sm" onclick="tcAllyLogout()">Disconnect</button>
+    </div>
+  </div>
+
+  <div id="allyMsg" style="font-size:.8rem;margin-top:10px;display:none"></div>
+</div>
+
+<!-- Settings -->
+<h2 class="toggle" onclick="tcToggle('settingsBody')">⚙️ Settings <button class="cbtn">▼</button></h2>
+<div id="settingsBody" class="panel" style="display:none">
+  <div id="tcLegacySettings">
+    <div class="info-box">Connect an <strong>Alliance Account</strong> above to store your webhook securely on the server. These fields are only needed if you are the site administrator managing this without an alliance account.</div>
+    <div class="set-row">
+      <label>Discord Webhook URL</label>
+      <input type="password" id="tcWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcSaveSettings()">
+    </div>
+    <div class="set-row">
+      <label>Access Token</label>
+      <input type="password" id="tcToken" placeholder="Token provided by the site admin…" oninput="tcSaveSettings()">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+      <button class="btn btn-ghost btn-sm" onclick="tcTestWebhook()">🔔 Test Webhook</button>
+      <button class="btn btn-disc btn-sm" id="tcDailyBtn" onclick="tcPostDaily()">📢 Post Today's Conductor</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcSyncRoster()">↻ Sync Roster from Server</button>
+    </div>
+    <div id="syncMsg" style="font-size:.78rem;margin-bottom:8px;display:none"></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-ghost btn-sm" onclick="tcExport()">📤 Export State</button>
+    <button class="btn btn-ghost btn-sm" onclick="tcImport()">📥 Import State</button>
+    <button class="btn btn-danger btn-sm" onclick="tcResetAll()">⚠ Reset Everything</button>
+  </div>
+</div>
+
+<!-- Player Pool -->
+<h2>Player Pool</h2>
+<div class="panel">
+  <div id="playerList"></div>
+  <div class="add-form">
+    <div class="ff" style="flex:1;min-width:110px">
+      <label>Name</label>
+      <input type="text" id="apName" class="tc-in" placeholder="Player name…" maxlength="32"
+             onkeydown="if(event.key==='Enter')tcAddPlayer()" style="width:100%">
+    </div>
+    <div class="ff">
+      <label>Role</label>
+      <select id="apRole" class="tc-sel">
+        <option value="r5">R5</option>
+        <option value="r4" selected>R4</option>
+        <option value="r3">R3</option>
+        <option value="r2">R2</option>
+        <option value="r1">R1</option>
+      </select>
+    </div>
+    <div class="ff"><label>VS Pts</label><input type="number" id="apVs" class="tc-num" value="0" min="0"></div>
+    <div class="ff"><label>Tech Pts</label><input type="number" id="apTech" class="tc-num" value="0" min="0"></div>
+    <div class="ff" style="justify-content:flex-end">
+      <label>&nbsp;</label>
+      <button class="btn btn-green" onclick="tcAddPlayer()">＋ Add</button>
+    </div>
+  </div>
+  <div style="font-size:.72rem;color:var(--text3);margin-top:.5rem">Toggle active (left switch) · Click availability dots to block a day · Click name to edit</div>
+</div>
+
+<!-- Day Rules -->
+<h2 class="toggle" onclick="tcToggle('rulesBody')">Day Rules <button class="cbtn">▼</button></h2>
+<div id="rulesBody" class="panel">
+  <div class="info-box">Set a scheduling strategy per day. <strong>Rotation</strong> rules step alphabetically through that rank. <strong>Top</strong> rules auto-pick highest scorer. <strong>Manual / MVP / BG MVP</strong> leave the field blank for you to fill in after applying.</div>
+  <div id="ruleRows"></div>
+</div>
+
+<!-- Weekly Schedule -->
+<h2>Weekly Schedule</h2>
+<div class="panel">
+  <div id="schedRows"></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap">
+    <label style="font-size:.83rem;color:var(--text2)">⏰ Boarding:</label>
+    <input type="time" id="tcTime" value="10:00" oninput="tcSaveSched();tcPreview()">
+    <label class="chk-label" style="margin-left:8px">
+      <input type="checkbox" id="tcVip" onchange="tcToggleVip()"> Show VIP slot
+    </label>
+    <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase">Weeks</label><input type="number" id="tcWeeks" value="1" min="1" max="8" class="tc-num" style="width:65px"></div>
+      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase">Penalty Days</label><input type="number" id="tcPenalty" value="7" min="0" max="30" class="tc-num" style="width:65px" oninput="tcSaveSettings()"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Pool override (collapsed) -->
+<h2 class="toggle" onclick="tcToggle('poolBody')">Randomizer Pool & Options <button class="cbtn">▼</button></h2>
+<div id="poolBody" class="panel" style="display:none">
+  <div class="ff" style="margin-bottom:12px">
+    <label style="font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em">Custom Pool <span style="font-weight:400">(comma or newline — blank = use Player Pool)</span></label>
+    <textarea id="tcPoolTxt" class="tc-ta" placeholder="Alice, Bob, Charlie&#10;Or one per line…" oninput="tcSaveSettings()"></textarea>
+  </div>
+  <label class="chk-label">
+    <input type="checkbox" id="tcAutoFair" checked> Auto-Fair weighting (favour under-assigned players)
+  </label>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn btn-green" onclick="tcApplyRules()">✓ Apply Rules</button>
+  <button class="btn btn-primary" onclick="tcRandomize()">🎲 Randomize</button>
+  <button class="btn btn-ghost" id="tcCopyBtn" onclick="tcCopyChat()">📋 Copy for Chat</button>
+  <button class="btn btn-gold" onclick="tcDownload()">📥 Download PNG</button>
+  <button class="btn btn-disc" id="tcDiscBtn" onclick="tcPostSchedule()">
+    <svg width="15" height="15" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.55 58.55 0 0 0 45.7.7a.22.22 0 0 0-.23.11 40.78 40.78 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.25 0A37.3 37.3 0 0 0 25.6.81a.22.22 0 0 0-.23-.11A58.36 58.36 0 0 0 10.97 4.9a.2.2 0 0 0-.09.08C1.62 18.73-1 32.2.31 45.5a.24.24 0 0 0 .09.16 58.84 58.84 0 0 0 17.72 8.96.22.22 0 0 0 .24-.08 42.04 42.04 0 0 0 3.63-5.9.22.22 0 0 0-.12-.3 38.73 38.73 0 0 1-5.53-2.63.22.22 0 0 1-.02-.37c.37-.28.74-.57 1.1-.86a.22.22 0 0 1 .22-.03c11.6 5.3 24.15 5.3 35.6 0a.22.22 0 0 1 .23.03c.36.29.73.58 1.1.86a.22.22 0 0 1-.02.37 36.36 36.36 0 0 1-5.54 2.63.22.22 0 0 0-.11.3 47.15 47.15 0 0 0 3.62 5.9.22.22 0 0 0 .24.08 58.7 58.7 0 0 0 17.74-8.96.22.22 0 0 0 .09-.16C73 30.08 69.89 16.7 60.18 4.98a.17.17 0 0 0-.08-.08ZM23.73 37.33c-3.5 0-6.39-3.21-6.39-7.16s2.83-7.16 6.39-7.16c3.59 0 6.44 3.24 6.39 7.16 0 3.95-2.84 7.16-6.39 7.16Zm23.62 0c-3.5 0-6.38-3.21-6.38-7.16s2.83-7.16 6.38-7.16c3.6 0 6.45 3.24 6.4 7.16 0 3.95-2.8 7.16-6.4 7.16Z"/></svg>
+    Post Schedule
+  </button>
+  <button class="btn btn-danger btn-sm" onclick="tcClearHistory()">Clear History</button>
+</div>
+
+<!-- Pager -->
+<div class="pager" id="tcPager" style="display:none">
+  <button class="btn btn-ghost btn-sm" id="tcPrev" onclick="tcNavWeek(-1)">◀ Prev</button>
+  <span class="pager-info" id="tcPagerInfo">Week 1 / 1</span>
+  <button class="btn btn-ghost btn-sm" id="tcNext" onclick="tcNavWeek(1)">Next ▶</button>
+</div>
+
+<!-- Canvas preview -->
+<div class="cvwrap">
+  <canvas id="tcCanvas" width="800" height="560"></canvas>
+  <div class="cvhint">Preview updates live as you type. Right-click → "Save image as…" if download fails.</div>
+</div>
+
+<!-- Fairness stats (collapsed) -->
+<h2 class="toggle" onclick="tcToggle('fairBody')">Fairness Stats <button class="cbtn">▼</button></h2>
+<div id="fairBody" class="panel" style="display:none">
+  <div id="fairBars" class="fair-bars"><p style="font-size:.84rem;color:var(--text3)">No history yet — apply rules or randomize to start tracking.</p></div>
+  <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Currently Blocked (penalty)</div>
+    <div id="blockedList" class="blocked-list"></div>
+  </div>
+</div>
+
+<!-- Edit player modal -->
+<div class="modal-bg" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">Edit Player</div>
+    <div class="mgrid">
+      <div class="mf" style="grid-column:1/-1"><label>Name</label><input type="text" id="emName" maxlength="32"></div>
+      <div class="mf"><label>Role</label><select id="emRole"><option value="r5">R5</option><option value="r4">R4</option><option value="r3">R3</option><option value="r2">R2</option><option value="r1">R1</option></select></div>
+      <div class="mf"><label>Active</label><select id="emActive"><option value="1">Yes</option><option value="0">No (skip in rules)</option></select></div>
+      <div class="mf"><label>VS Points (week)</label><input type="number" id="emVs" min="0" value="0"></div>
+      <div class="mf"><label>Tech Points (week)</label><input type="number" id="emTech" min="0" value="0"></div>
+    </div>
+    <div style="font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Availability (days they CAN drive)</div>
+    <div class="mavail" id="emAvail"></div>
+    <div class="mbtns">
+      <button class="btn btn-danger btn-sm" onclick="tcDeletePlayer()">Delete</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcCloseModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="tcSavePlayer()">Save</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- .container -->
+<script>
+'use strict';
+const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DLONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const RULE_TYPES = [
+  {v:'manual',       l:'Manual Entry'},
+  {v:'r5-rotation',  l:'R5 Rotation (alphabetical)'},
+  {v:'r4-rotation',  l:'R4 Rotation (alphabetical)'},
+  {v:'r3-rotation',  l:'R3 Rotation (alphabetical)'},
+  {v:'r2-rotation',  l:'R2 Rotation (alphabetical)'},
+  {v:'any-rotation', l:'Any Player Rotation'},
+  {v:'tech-top',     l:'Top Tech Contributor'},
+  {v:'vs-top',       l:'Top VS Scorer'},
+  {v:'mvp',          l:'Weekly MVP (manual)'},
+  {v:'bg-mvp',       l:'Battleground MVP (manual)'},
+  {v:'casino',       l:'Casino / Random Pick'},
+];
+const DEFAULT_RULES = [
+  {type:'r4-rotation', label:''},
+  {type:'r4-rotation', label:''},
+  {type:'r3-rotation', label:''},
+  {type:'bg-mvp',      label:'BG MVP'},
+  {type:'tech-top',    label:'Tech Top'},
+  {type:'casino',      label:'Casino Night'},
+  {type:'mvp',         label:'Weekly MVP'},
+];
+
+function mkState() {
+  return {
+    players:[],
+    dayRules:JSON.parse(JSON.stringify(DEFAULT_RULES)),
+    rotIdx:{r5:0,r4:0,r3:0,r2:0,r1:0,any:0},
+    sched:{time:'10:00',showVip:false,conductors:['','','','','','',''],vips:['','','','','','','']},
+    history:[],
+    penalty:7,
+    autoFair:true,
+    poolTxt:''
+  };
+}
+
+let S = mkState();
+let editId = null;
+let genWeeks = [], curWeek = 0;
+
+/* ── Persist ─────────────────────────────────────────────── */
+function save() { try{localStorage.setItem('tc-v1',JSON.stringify(S));}catch(e){} }
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('tc-v1')||'null');
+    if (!d) return;
+    S = Object.assign(mkState(), d);
+    if (!Array.isArray(S.sched.conductors)||S.sched.conductors.length!==7) S.sched.conductors=['','','','','','',''];
+    if (!Array.isArray(S.sched.vips)||S.sched.vips.length!==7) S.sched.vips=['','','','','','',''];
+    if (!Array.isArray(S.dayRules)||S.dayRules.length!==7) S.dayRules=JSON.parse(JSON.stringify(DEFAULT_RULES));
+    if (!S.rotIdx) S.rotIdx={r5:0,r4:0,r3:0,r2:0,r1:0,any:0};
+  } catch(e) {}
+}
+function tcSaveSettings() {
+  S.penalty = parseInt(document.getElementById('tcPenalty')?.value)||7;
+  S.autoFair = document.getElementById('tcAutoFair')?.checked??true;
+  S.poolTxt = document.getElementById('tcPoolTxt')?.value||'';
+  try{localStorage.setItem('tc-webhook', document.getElementById('tcWebhook')?.value||'');}catch(e){}
+  try{localStorage.setItem('tc-token',   document.getElementById('tcToken')?.value||'');}catch(e){}
+  save();
+  renderBlocked();
+}
+function loadSettings() {
+  document.getElementById('tcWebhook').value = localStorage.getItem('tc-webhook')||'';
+  document.getElementById('tcToken').value   = localStorage.getItem('tc-token')||'';
+  document.getElementById('tcPenalty').value = S.penalty;
+  document.getElementById('tcAutoFair').checked = S.autoFair;
+  document.getElementById('tcPoolTxt').value = S.poolTxt||'';
+}
+function tcSaveSched() {
+  S.sched.time = document.getElementById('tcTime')?.value||'10:00';
+  S.sched.showVip = document.getElementById('tcVip')?.checked||false;
+  S.sched.conductors = DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
+  S.sched.vips       = DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
+  save();
+}
+function loadSched() {
+  document.getElementById('tcTime').value = S.sched.time;
+  document.getElementById('tcVip').checked = S.sched.showVip;
+  if (S.sched.showVip) document.getElementById('schedRows').classList.add('show-vip');
+  DAYS.forEach((d,i)=>{
+    const c=document.getElementById('tcC'+d); if(c) c.value=S.sched.conductors[i]||'';
+    const v=document.getElementById('tcV'+d); if(v) v.value=S.sched.vips[i]||'';
+  });
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function gameDate(off=0){
+  const d=new Date(Date.now()-2*60*60*1000);
+  d.setUTCDate(d.getUTCDate()+off);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+function gameDow(off=0){
+  const d=new Date(Date.now()-2*60*60*1000);
+  d.setUTCDate(d.getUTCDate()+off);
+  return (d.getUTCDay()+6)%7; // 0=Mon..6=Sun
+}
+function fmtDate(ds){
+  const [y,m,d]=ds.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+}
+function tcToggle(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
+function ruleLabel(rule){
+  if(rule.label) return rule.label;
+  return RULE_TYPES.find(r=>r.v===rule.type)?.l||'Manual';
+}
+function roleBadge(role){return `<span class="rbadge rb-${role}">${role.toUpperCase()}</span>`;}
+
+/* ── Players ──────────────────────────────────────────────── */
+function tcAddPlayer(){
+  const nameEl=document.getElementById('apName');
+  const name=nameEl.value.trim();
+  if(!name){nameEl.focus();return;}
+  if(S.players.some(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Name already exists.');return;}
+  S.players.push({
+    id:uid(),name,
+    role:document.getElementById('apRole').value,
+    active:true,
+    avail:[true,true,true,true,true,true,true],
+    vsPoints:parseInt(document.getElementById('apVs').value)||0,
+    techPoints:parseInt(document.getElementById('apTech').value)||0
+  });
+  save();
+  nameEl.value='';
+  document.getElementById('apVs').value='0';
+  document.getElementById('apTech').value='0';
+  renderPlayers();
+  scheduleRosterSync();
+}
+function renderPlayers(){
+  const el=document.getElementById('playerList');
+  if(!S.players.length){
+    el.innerHTML='<div style="font-size:.85rem;color:var(--text3);padding:8px 0">No players yet — add some below.</div>';
+    return;
+  }
+  el.innerHTML=S.players.map(p=>{
+    const dots=DAYS.map((d,i)=>`<div class="adot${p.avail[i]?' on':''}" title="${DLONG[i]}" onclick="tcToggleAvail('${p.id}',${i})">${d[0]}</div>`).join('');
+    return `<div class="player-row">
+      <div class="act-toggle${p.active?' on':''}" title="${p.active?'Active':'Inactive'}" onclick="tcToggleActive('${p.id}')"></div>
+      <span class="pname" onclick="tcOpenModal('${p.id}')">${esc(p.name)}</span>
+      ${roleBadge(p.role)}
+      <div class="pavail">${dots}</div>
+      <div class="ppts"><span style="color:var(--amber)">⚔ ${p.vsPoints}</span><span>⚗ ${p.techPoints}</span></div>
+    </div>`;
+  }).join('');
+}
+function tcToggleActive(id){const p=S.players.find(p=>p.id===id);if(!p)return;p.active=!p.active;save();renderPlayers();}
+function tcToggleAvail(id,i){const p=S.players.find(p=>p.id===id);if(!p)return;p.avail[i]=!p.avail[i];save();renderPlayers();}
+
+/* ── Edit Modal ───────────────────────────────────────────── */
+function tcOpenModal(id){
+  const p=S.players.find(p=>p.id===id);
+  if(!p)return;
+  editId=id;
+  document.getElementById('emName').value=p.name;
+  document.getElementById('emRole').value=p.role;
+  document.getElementById('emActive').value=p.active?'1':'0';
+  document.getElementById('emVs').value=p.vsPoints;
+  document.getElementById('emTech').value=p.techPoints;
+  document.getElementById('emAvail').innerHTML=DAYS.map((d,i)=>`
+    <label class="mavail-day">
+      <input type="checkbox" data-day="${i}" ${p.avail[i]?'checked':''} style="accent-color:var(--tr-orange)">
+      ${d}
+    </label>`).join('');
+  document.getElementById('editModal').classList.add('open');
+}
+function tcCloseModal(){document.getElementById('editModal').classList.remove('open');editId=null;}
+function tcSavePlayer(){
+  if(!editId)return;
+  const p=S.players.find(p=>p.id===editId);if(!p)return;
+  const n=document.getElementById('emName').value.trim();
+  if(!n){document.getElementById('emName').focus();return;}
+  if(S.players.some(q=>q.id!==editId&&q.name.toLowerCase()===n.toLowerCase())){alert('Another player has that name.');return;}
+  p.name=n;
+  p.role=document.getElementById('emRole').value;
+  p.active=document.getElementById('emActive').value==='1';
+  p.vsPoints=parseInt(document.getElementById('emVs').value)||0;
+  p.techPoints=parseInt(document.getElementById('emTech').value)||0;
+  document.querySelectorAll('#emAvail input[type=checkbox]').forEach(cb=>{p.avail[+cb.dataset.day]=cb.checked;});
+  save();tcCloseModal();renderPlayers();tcPreview();
+  scheduleRosterSync();
+}
+function tcDeletePlayer(){
+  if(!editId||!confirm('Remove this player?'))return;
+  S.players=S.players.filter(p=>p.id!==editId);
+  save();tcCloseModal();renderPlayers();
+  scheduleRosterSync();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('editModal').addEventListener('click',e=>{if(e.target===document.getElementById('editModal'))tcCloseModal();});
+});
+
+/* ── Day Rules ────────────────────────────────────────────── */
+function buildRuleRows(){
+  const opts=RULE_TYPES.map(r=>`<option value="${r.v}">${r.l}</option>`).join('');
+  document.getElementById('ruleRows').innerHTML=DAYS.map((d,i)=>{
+    const rule=S.dayRules[i]||{type:'manual',label:''};
+    return `<div class="rule-row">
+      <span class="rday">${d}</span>
+      <select class="tc-sel" id="rt${i}" onchange="saveRule(${i})" style="font-size:.82rem;padding:6px 8px">
+        ${RULE_TYPES.map(r=>`<option value="${r.v}"${rule.type===r.v?' selected':''}>${r.l}</option>`).join('')}
+      </select>
+      <input type="text" id="rl${i}" class="tc-in" placeholder="Label (optional)" value="${esc(rule.label||'')}"
+             oninput="saveRule(${i})" style="flex:1;min-width:90px;font-size:.82rem;padding:6px 8px">
+    </div>`;
+  }).join('');
+}
+function saveRule(i){
+  S.dayRules[i]={type:document.getElementById('rt'+i)?.value||'manual',label:document.getElementById('rl'+i)?.value||''};
+  save();
+  updateTags();
+}
+function updateTags(){
+  DAYS.forEach((_,i)=>{const el=document.getElementById('stag'+i);if(el)el.textContent=ruleLabel(S.dayRules[i]);});
+  refreshCondCard();
+  renderUpcoming();
+}
+
+/* ── Schedule rows ────────────────────────────────────────── */
+function buildSchedRows(){
+  document.getElementById('schedRows').innerHTML=DAYS.map((d,i)=>`
+    <div class="srow">
+      <span class="sday">${d}</span>
+      <span class="stag" id="stag${i}">${ruleLabel(S.dayRules[i])}</span>
+      <input type="text" id="tcC${d}" class="tc-in" placeholder="${DLONG[i]} conductor…"
+             oninput="tcSaveSched();tcPreview()" style="flex:1;font-size:.85rem;padding:6px 8px">
+      <input type="text" id="tcV${d}" class="tc-in vip-input" placeholder="VIP…"
+             oninput="tcSaveSched();tcPreview()" style="flex:1;font-size:.85rem;padding:6px 8px">
+    </div>`).join('');
+}
+function tcToggleVip(){
+  document.getElementById('schedRows').classList.toggle('show-vip',document.getElementById('tcVip').checked);
+  tcSaveSched();tcPreview();
+}
+
+/* ── Conductor card & upcoming ────────────────────────────── */
+function refreshCondCard(){
+  const dow=gameDow(0);
+  const conductor=S.sched.conductors[dow]||'';
+  const vip=S.sched.vips[dow]||'';
+  document.getElementById('condName').textContent=conductor||'(not assigned)';
+  document.getElementById('condSub').textContent=`${DLONG[dow]}, ${fmtDate(gameDate(0))} · ${ruleLabel(S.dayRules[dow])}`;
+  const vw=document.getElementById('condVipWrap');
+  if(vip&&S.sched.showVip){vw.style.display='';document.getElementById('condVip').textContent=vip;}
+  else vw.style.display='none';
+}
+function renderUpcoming(){
+  const grid=document.getElementById('upcomingGrid');
+  grid.innerHTML=Array.from({length:7},(_,i)=>{
+    const dow=(gameDow(0)+i)%7;
+    const ds=gameDate(i);
+    const c=S.sched.conductors[dow]||'—';
+    return `<div class="uday${i===0?' today':''}">
+      <div class="uday-lbl">${i===0?'Today · ':''}${ds}</div>
+      <div class="uday-name">${esc(c)}</div>
+      <div class="uday-rule">${esc(ruleLabel(S.dayRules[dow]))}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Pool helpers ─────────────────────────────────────────── */
+function getPool(ruleType,dow){
+  const active=p=>p.active&&p.avail[dow];
+  switch(ruleType){
+    case 'r5-rotation': return S.players.filter(p=>active(p)&&p.role==='r5').map(p=>p.name);
+    case 'r4-rotation': return S.players.filter(p=>active(p)&&p.role==='r4').map(p=>p.name);
+    case 'r3-rotation': return S.players.filter(p=>active(p)&&p.role==='r3').map(p=>p.name);
+    case 'r2-rotation': return S.players.filter(p=>active(p)&&p.role==='r2').map(p=>p.name);
+    default: return S.players.filter(p=>active(p)).map(p=>p.name);
+  }
+}
+function anyPool(dow){return S.players.filter(p=>p.active&&p.avail[dow]).map(p=>p.name);}
+function sortAlpha(a){return [...a].sort((x,y)=>x.toLowerCase().localeCompare(y.toLowerCase()));}
+function topTech(dow){return S.players.filter(p=>p.active&&p.avail[dow]).sort((a,b)=>(b.techPoints||0)-(a.techPoints||0))[0]?.name||'';}
+function topVs(dow)  {return S.players.filter(p=>p.active&&p.avail[dow]).sort((a,b)=>(b.vsPoints||0)-(a.vsPoints||0))[0]?.name||'';}
+function wRandom(pool){
+  const useW=document.getElementById('tcAutoFair')?.checked??S.autoFair;
+  if(!useW||!S.history.length) return pool[Math.floor(Math.random()*pool.length)];
+  const counts={};
+  S.history.forEach(h=>{const k=h.name.toLowerCase();counts[k]=(counts[k]||0)+1;});
+  const w=pool.map(c=>1/((counts[c.toLowerCase()]||0)+1));
+  const tot=w.reduce((a,b)=>a+b,0);
+  let r=Math.random()*tot;
+  for(let i=0;i<pool.length;i++){r-=w[i];if(r<=0)return pool[i];}
+  return pool[pool.length-1];
+}
+
+/* ── Apply Rules (deterministic) ─────────────────────────── */
+function tcApplyRules(){
+  const conductors=['','','','','','',''];
+  const fresh=[];
+  // snapshot rotIdx so we can roll it back if needed
+  const rotSnap=JSON.parse(JSON.stringify(S.rotIdx));
+
+  for(let i=0;i<7;i++){
+    const rule=S.dayRules[i]||{type:'manual'};
+    let name='';
+    switch(rule.type){
+      case 'r5-rotation': name=nextRot('r5',i); break;
+      case 'r4-rotation': name=nextRot('r4',i); break;
+      case 'r3-rotation': name=nextRot('r3',i); break;
+      case 'r2-rotation': name=nextRot('r2',i); break;
+      case 'any-rotation':name=nextRot('any',i); break;
+      case 'tech-top':    name=topTech(i);  break;
+      case 'vs-top':      name=topVs(i);    break;
+      case 'casino':{ const p=anyPool(i); if(p.length) name=wRandom(p); break; }
+      // manual, mvp, bg-mvp → leave blank for manual entry
+      default: name='';
+    }
+    conductors[i]=name;
+    if(name) fresh.push(name);
+  }
+
+  S.sched.conductors=conductors;
+  DAYS.forEach((d,i)=>{const el=document.getElementById('tcC'+d);if(el)el.value=conductors[i];});
+  addHistory(fresh);
+  tcSaveSched();
+  tcPreview();
+  refreshCondCard();
+  renderUpcoming();
+  renderFairness();
+  renderBlocked();
+  tcAllyAutoSync('schedule');
+  tcAllyAutoSync('rot-idx');
+}
+
+function nextRot(roleKey,dow){
+  let pool;
+  if(roleKey==='any') pool=sortAlpha(anyPool(dow));
+  else pool=sortAlpha(S.players.filter(p=>p.active&&p.role===roleKey&&p.avail[dow]).map(p=>p.name));
+  if(!pool.length) return '';
+  const idx=(S.rotIdx[roleKey]||0)%pool.length;
+  const name=pool[idx];
+  S.rotIdx[roleKey]=(idx+1)%pool.length;
+  return name;
+}
+
+/* ── Randomize ───────────────────────────────────────────── */
+function tcRandomize(){
+  const weeks=Math.max(1,Math.min(8,parseInt(document.getElementById('tcWeeks')?.value)||1));
+  const penalty=parseInt(document.getElementById('tcPenalty')?.value)||0;
+  const showVip=document.getElementById('tcVip')?.checked||false;
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-penalty);
+  const cs=cutoff.toISOString().split('T')[0];
+  genWeeks=[]; const fresh=[];
+
+  // Parse custom pool override
+  const rawPool=document.getElementById('tcPoolTxt')?.value||'';
+  const customPool=rawPool.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+
+  for(let w=0;w<weeks;w++){
+    const penBlocked=new Set();
+    if(penalty>0){
+      S.history.forEach(h=>{if(h.date>=cs)penBlocked.add(h.name.toLowerCase());});
+      fresh.forEach(n=>penBlocked.add(n.toLowerCase()));
+    }
+    const conductors=[], usedWeek=new Set();
+    for(let d=0;d<7;d++){
+      const rule=S.dayRules[d]||{type:'manual'};
+      // Skip manual-type days in randomizer
+      const isManual=['manual','mvp','bg-mvp'].includes(rule.type);
+      if(isManual){conductors.push('');continue;}
+
+      let pool=customPool.length?customPool:getPool(rule.type,d);
+      let eligible=pool.filter(n=>!penBlocked.has(n.toLowerCase()));
+      if(!eligible.length) eligible=pool;
+      let p1=eligible.filter(n=>!usedWeek.has(n.toLowerCase()));
+      if(!p1.length) p1=eligible;
+      let c='';
+      if(p1.length){c=wRandom(p1);usedWeek.add(c.toLowerCase());fresh.push(c);}
+      conductors.push(c);
+    }
+    const vips=[];
+    if(showVip){
+      const vUsed=new Set();
+      for(let d=0;d<7;d++){
+        let p=anyPool(d).filter(n=>!vUsed.has(n.toLowerCase()));
+        let v=p.length?wRandom(p):'';
+        if(v)vUsed.add(v.toLowerCase());
+        vips.push(v);
+      }
+    }
+    genWeeks.push({conductors,vips});
+  }
+
+  addHistory(fresh);
+  curWeek=0;showWeek(0);updatePager();renderFairness();renderBlocked();
+  tcAllyAutoSync('schedule');
+  tcAllyAutoSync('rot-idx');
+}
+function showWeek(idx){
+  if(idx<0||idx>=genWeeks.length)return;
+  curWeek=idx;
+  const w=genWeeks[idx];
+  DAYS.forEach((d,i)=>{
+    const c=document.getElementById('tcC'+d);if(c)c.value=w.conductors[i]||'';
+    const v=document.getElementById('tcV'+d);if(v)v.value=w.vips?.[i]||'';
+  });
+  tcSaveSched();tcPreview();updatePager();refreshCondCard();renderUpcoming();
+}
+function tcNavWeek(delta){showWeek(curWeek+delta);}
+function updatePager(){
+  const p=document.getElementById('tcPager');
+  if(genWeeks.length<=1){p.style.display='none';return;}
+  p.style.display='flex';
+  document.getElementById('tcPagerInfo').textContent=`Week ${curWeek+1} / ${genWeeks.length}`;
+  document.getElementById('tcPrev').disabled=curWeek===0;
+  document.getElementById('tcNext').disabled=curWeek===genWeeks.length-1;
+}
+
+/* ── History ──────────────────────────────────────────────── */
+function addHistory(names){
+  const today=new Date().toISOString().split('T')[0];
+  names.forEach(n=>{if(n.trim())S.history.push({name:n.trim(),date:today});});
+  save();
+}
+function tcClearHistory(){
+  if(!confirm('Clear all assignment history and penalty blocks?'))return;
+  S.history=[];save();renderFairness();renderBlocked();
+}
+function renderFairness(){
+  const counts={},nameMap={};
+  S.history.forEach(e=>{const k=e.name.toLowerCase();counts[k]=(counts[k]||0)+1;nameMap[k]=e.name;});
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const el=document.getElementById('fairBars');
+  if(!entries.length){el.innerHTML='<p style="font-size:.84rem;color:var(--text3)">No history yet.</p>';return;}
+  const max=entries[0][1];
+  el.innerHTML=entries.map(([k,n])=>`
+    <div class="frow">
+      <span class="fname">${esc(nameMap[k]||k)}</span>
+      <div class="ftrack"><div class="ffill" style="width:${Math.round(n/max*100)}%"></div></div>
+      <span class="fnum">${n}×</span>
+    </div>`).join('');
+}
+function renderBlocked(){
+  const pen=parseInt(document.getElementById('tcPenalty')?.value)||0;
+  const el=document.getElementById('blockedList');if(!el)return;
+  if(pen===0){el.innerHTML='<span style="font-size:.8rem;color:var(--text3)">Penalty disabled</span>';return;}
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-pen);
+  const cs=cutoff.toISOString().split('T')[0];
+  const blocked=new Set(),nameMap={};
+  S.history.forEach(e=>{if(e.date>=cs){blocked.add(e.name.toLowerCase());nameMap[e.name.toLowerCase()]=e.name;}});
+  if(!blocked.size){el.innerHTML='<span style="font-size:.8rem;color:var(--text3)">None blocked</span>';return;}
+  el.innerHTML=[...blocked].map(k=>`<span class="bchip">${esc(nameMap[k]||k)}</span>`).join('');
+}
+
+/* ── Canvas ───────────────────────────────────────────────── */
+function tcPreview(){
+  const canvas=document.getElementById('tcCanvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const showVip=document.getElementById('tcVip')?.checked;
+  const W=800,rowH=showVip?82:68,hdrH=130,ftrH=40,H=hdrH+7*rowH+ftrH;
+  canvas.width=W;canvas.height=H;
+
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#09101a');bg.addColorStop(1,'#060c13');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const bar=ctx.createLinearGradient(0,0,W,0);
+  bar.addColorStop(0,'transparent');bar.addColorStop(.25,'#e8720c');
+  bar.addColorStop(.75,'#ffd700');bar.addColorStop(1,'transparent');
+  ctx.fillStyle=bar;ctx.fillRect(0,0,W,3);
+
+  ctx.textAlign='center';ctx.shadowColor='#e8720c';ctx.shadowBlur=18;
+  ctx.fillStyle='#ffd700';ctx.font='bold 34px Orbitron,Arial';
+  ctx.fillText('🚂 Train Conductor Schedule',W/2,50);ctx.shadowBlur=0;
+
+  ctx.fillStyle='#9d9baf';ctx.font='17px "Exo 2",Arial';
+  ctx.fillText(`⏰ Boarding Time: ${document.getElementById('tcTime')?.value||'10:00'}`,W/2,80);
+
+  cvRect(ctx,20,98,W-40,38,8,'#e8720c');
+  ctx.fillStyle='#fff';ctx.font='bold 13px "Exo 2",Arial';
+  ctx.textAlign='left';ctx.fillText('DAY',44,122);
+  ctx.textAlign='center';
+  ctx.fillText('CONDUCTOR',showVip?W*.42:W/2,122);
+  if(showVip){ctx.textAlign='right';ctx.fillText('VIP',W-44,122);}
+
+  const conds=DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
+  const vips =DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
+
+  DLONG.forEach((day,i)=>{
+    const y=hdrH+i*rowH,last=i===6;
+    ctx.fillStyle=i%2===0?'rgba(18,28,42,0.85)':'rgba(28,40,57,0.85)';
+    if(last)cvRectBot(ctx,20,y,W-40,rowH-1,8);
+    else ctx.fillRect(20,y,W-40,rowH-1);
+    ctx.fillStyle='rgba(232,114,14,0.12)';ctx.fillRect(20,y+rowH-2,W-40,1);
+
+    const by=y+(showVip?25:35);
+    ctx.textAlign='left';ctx.fillStyle='#ffd700';
+    ctx.font=`bold ${showVip?13:15}px "Exo 2",Arial`;
+    ctx.fillText(DAYS[i].toUpperCase(),44,by);
+
+    const cond=conds[i];
+    ctx.textAlign='center';
+    if(cond){ctx.fillStyle='#e8e6f0';ctx.font=`${showVip?18:20}px "Exo 2",Arial`;ctx.fillText(cond,showVip?W*.42:W/2,by);}
+    else{ctx.fillStyle='#3d3e55';ctx.font=`italic ${showVip?13:15}px "Exo 2",Arial`;ctx.fillText('(Not assigned)',showVip?W*.42:W/2,by);}
+
+    if(showVip&&vips[i]){
+      ctx.textAlign='right';ctx.fillStyle='#ffd700';
+      ctx.font='bold 14px "Exo 2",Arial';
+      ctx.fillText(`⭐ ${vips[i]}`,W-44,by);
+    }
+  });
+
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,215,102,0.5)';ctx.font='12px "Exo 2",Arial';
+  ctx.fillText('commandpost.guide',W/2,H-12);
+}
+function cvRect(ctx,x,y,w,h,r,fill){
+  ctx.fillStyle=fill;ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();ctx.fill();
+}
+function cvRectBot(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y);ctx.closePath();ctx.fill();
+}
+function tcDownload(){
+  tcPreview();
+  try{const a=document.createElement('a');a.href=document.getElementById('tcCanvas').toDataURL('image/png');a.download='train-conductor-schedule.png';a.click();}
+  catch(e){alert('Download failed — right-click the preview and "Save image as…"');}
+}
+
+/* ── Copy for chat ────────────────────────────────────────── */
+function tcCopyChat(){
+  const conds=DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
+  const vips =DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
+  const showVip=document.getElementById('tcVip')?.checked;
+  const time=document.getElementById('tcTime')?.value||'10:00';
+  const wk=genWeeks.length>1?` — Week ${curWeek+1}`:'';
+  let text=`🚂 Train Conductor${wk}\n⏰ ${time}\n\n`;
+  DLONG.forEach((day,i)=>{
+    let line=`${DAYS[i]}: ${conds[i]||'(empty)'}`;
+    if(showVip&&vips[i]) line+=` ⭐ VIP: ${vips[i]}`;
+    text+=line+'\n';
+  });
+  navigator.clipboard.writeText(text)
+    .then(()=>{const b=document.getElementById('tcCopyBtn');const o=b.innerHTML;b.innerHTML='✅ Copied!';setTimeout(()=>b.innerHTML=o,2000);})
+    .catch(()=>alert('Copy failed:\n\n'+text));
+}
+
+/* ── Discord (server proxy) ───────────────────────────────── */
+async function tcDiscordProxy(payload){
+  // Alliance mode: use alliance endpoint — webhook stored server-side, no token needed
+  if(allyId&&allyToken){
+    const isDaily=(payload.action==='daily-manual');
+    const act=isDaily?'discord-daily':'discord-schedule';
+    try{
+      const res=await fetch(`/api/alliance?action=${act}&id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`,{
+        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+      });
+      if(res.status===401){alert('Alliance session expired. Please log in again in the Alliance Account section.');return false;}
+      if(res.status===503){alert('No Discord webhook configured for your alliance.\n\nOpen Alliance Account settings and paste your webhook URL, then click ↑ Push All to Server.');return false;}
+      if(!res.ok){const t=await res.text();alert(`Error ${res.status}: ${t}`);return false;}
+      return true;
+    }catch(e){alert('Network error: '+e.message);return false;}
+  }
+  // Local mode: use shared conductor token + webhook override
+  const webhook=localStorage.getItem('tc-webhook')||'';
+  const token=localStorage.getItem('tc-token')||'';
+  if(!webhook){alert('No Discord webhook URL set.\n\nOpen ⚙️ Settings above and paste your webhook URL, or connect an Alliance Account.');return false;}
+  if(!token){alert('No Conductor Token set.\n\nOpen ⚙️ Settings and paste the token your admin gave you, or connect an Alliance Account instead.');return false;}
+  try{
+    const res=await fetch(`/api/discord?token=${encodeURIComponent(token)}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...payload,webhookOverride:webhook})
+    });
+    if(res.status===401){alert('Invalid Conductor Token.');return false;}
+    if(res.status===503){alert('Discord webhook not configured.');return false;}
+    if(!res.ok){const t=await res.text();alert(`Discord error ${res.status}: ${t}`);return false;}
+    return true;
+  }catch(e){alert('Network error: '+e.message);return false;}
+}
+
+async function tcTestWebhook(){
+  const ok=await tcDiscordProxy({schedule:[],boardingTime:'',weekLabel:'TEST',_test:true});
+  if(ok)alert('✅ Webhook works!');
+}
+
+async function tcPostSchedule(){
+  const btn=document.getElementById('tcDiscBtn');
+  const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳ Posting…';
+  const conds=DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
+  const vips =DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
+  const showVip=document.getElementById('tcVip')?.checked;
+  const time=document.getElementById('tcTime')?.value||'10:00';
+  const wkLabel=genWeeks.length>1?`Week ${curWeek+1} of ${genWeeks.length}`:null;
+  const schedule=DLONG.map((day,i)=>({day,conductor:conds[i]||'',...(showVip&&vips[i]?{vip:vips[i]}:{})}));
+  const ok=await tcDiscordProxy({schedule,boardingTime:time,weekLabel:wkLabel});
+  if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
+  else{btn.innerHTML=orig;btn.disabled=false;}
+}
+
+async function tcPostDaily(){
+  const btn=document.getElementById('tcDailyBtn');
+  const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳ Posting…';
+  const dow=gameDow(0);
+  const conductor=S.sched.conductors[dow]||'';
+  if(!conductor){alert('No conductor set for today. Fill in the schedule first.');btn.innerHTML=orig;btn.disabled=false;return;}
+  const ok=await tcDiscordProxy({action:'daily-manual',conductor,date:gameDate(0),upcomingWeek:Array.from({length:7},(_,i)=>({day:DAYS[(dow+i)%7],conductor:S.sched.conductors[(dow+i)%7]||'?',offset:i}))});
+  if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
+  else{btn.innerHTML=orig;btn.disabled=false;}
+}
+
+/* ── Server roster sync ───────────────────────────────────── */
+async function tcSyncRoster(){
+  const token=localStorage.getItem('tc-token')||'';
+  const msg=document.getElementById('syncMsg');
+  msg.style.display='';
+  if(!token){msg.style.color='var(--red)';msg.textContent='Enter a Conductor Token in Settings first.';return;}
+  msg.style.color='var(--text3)';msg.textContent='Syncing…';
+  try{
+    const res=await fetch(`/api/train?token=${encodeURIComponent(token)}`);
+    if(res.status===401){msg.style.color='var(--red)';msg.textContent='Invalid token.';return;}
+    if(!res.ok){msg.style.color='var(--red)';msg.textContent='Server error.';return;}
+    const roster=await res.json();
+    if(!roster.length){msg.style.color='var(--amber)';msg.textContent='Server roster is empty.';return;}
+    let added=0;
+    roster.forEach(m=>{
+      if(!S.players.some(p=>p.name.toLowerCase()===m.name.toLowerCase())){
+        S.players.push({id:uid(),name:m.name,role:'r4',active:true,avail:[true,true,true,true,true,true,true],vsPoints:0,techPoints:0});
+        added++;
+      }
+    });
+    save();renderPlayers();
+    msg.style.color='var(--green)';
+    msg.textContent=added>0?`✓ Added ${added} new player(s) from server.`:'✓ All roster members already in pool.';
+  }catch(e){msg.style.color='var(--red)';msg.textContent='Network error: '+e.message;}
+}
+
+/* ── Export / Import / Reset ──────────────────────────────── */
+function tcExport(){
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(S,null,2));
+  a.download=`train-scheduler-${gameDate()}.json`;a.click();
+}
+function tcImport(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/json';
+  inp.onchange=()=>{
+    const f=inp.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=e=>{
+      try{S=Object.assign(mkState(),JSON.parse(e.target.result));save();tcInit();alert('✅ Imported.');}
+      catch(err){alert('Invalid JSON file.');}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function tcResetAll(){
+  if(!confirm('Reset all state? This clears your player pool, rules, schedule, and history.'))return;
+  S=mkState();save();tcInit();
+}
+
+/* ── Init ─────────────────────────────────────────────────── */
+function tcInit(){
+  buildRuleRows();
+  buildSchedRows();
+  loadSched();
+  loadSettings();
+  if(S.sched.showVip) document.getElementById('schedRows').classList.add('show-vip');
+  renderPlayers();
+  updateTags();
+  refreshCondCard();
+  renderUpcoming();
+  renderFairness();
+  renderBlocked();
+  tcPreview();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{load();tcInit();tcAllyInit();});
+
+/* ── Alliance Account ─────────────────────────────────────── */
+let allyId='', allyToken='', allyName='';
+let allySettingsTimer=null, rosterSyncTimer=null;
+
+function scheduleRosterSync(){
+  clearTimeout(rosterSyncTimer);
+  rosterSyncTimer=setTimeout(()=>tcAllyAutoSync('roster'),2000);
+}
+
+function tcAllyInit(){
+  allyId    = localStorage.getItem('tc-ally-id')    || '';
+  allyToken = localStorage.getItem('tc-ally-token') || '';
+  allyName  = localStorage.getItem('tc-ally-name')  || '';
+
+  // Populate boarding hour select
+  const sel=document.getElementById('allyBoardingHour');
+  if(sel&&!sel.options.length){
+    for(let h=0;h<24;h++){
+      const o=document.createElement('option');
+      o.value=h;
+      o.textContent=`${String(h).padStart(2,'0')}:00 UTC`;
+      sel.appendChild(o);
+    }
+  }
+
+  if(allyId&&allyToken){
+    tcAllyShowConnected();
+    tcAllyPull();
+  }
+}
+
+function tcAllyTab(tab){
+  document.getElementById('allyRegForm').style.display   = tab==='reg'   ? '' : 'none';
+  document.getElementById('allyLoginForm').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('allyTabReg').classList.toggle('active',   tab==='reg');
+  document.getElementById('allyTabLogin').classList.toggle('active', tab==='login');
+}
+
+function tcAllyShowConnected(){
+  document.getElementById('allyLoginSection').style.display     = 'none';
+  document.getElementById('allyConnectedSection').style.display = '';
+  document.getElementById('allyConnName').textContent = allyName;
+  document.getElementById('allyConnId').textContent   = allyId;
+  const body=document.getElementById('allyBody');
+  if(body) body.style.display='';
+  // Hide legacy admin-only fields in Settings
+  const leg=document.getElementById('tcLegacySettings');
+  if(leg) leg.style.display='none';
+}
+
+function tcAllyShowDisconnected(){
+  document.getElementById('allyLoginSection').style.display     = '';
+  document.getElementById('allyConnectedSection').style.display = 'none';
+  const leg=document.getElementById('tcLegacySettings');
+  if(leg) leg.style.display='';
+}
+
+function tcAllyMsg(msg,color='var(--text3)'){
+  const el=document.getElementById('allyMsg');
+  if(!el) return;
+  el.style.display = msg ? '' : 'none';
+  el.style.color   = color;
+  el.textContent   = msg;
+}
+
+function tcAllySyncMsg(msg,color='var(--text3)'){
+  const el=document.getElementById('allySyncMsg');
+  if(!el) return;
+  el.style.display = msg ? '' : 'none';
+  el.style.color   = color;
+  el.textContent   = msg;
+}
+
+async function tcAllyRegister(){
+  const name     = document.getElementById('allyRegName').value.trim();
+  const server   = document.getElementById('allyRegServer').value.trim();
+  const password = document.getElementById('allyRegPass').value;
+  if(!name)              { tcAllyMsg('Enter an alliance name.',             'var(--red)'); return; }
+  if(password.length<6)  { tcAllyMsg('Password must be at least 6 chars.', 'var(--red)'); return; }
+
+  tcAllyMsg('Creating alliance…','var(--text3)');
+  try{
+    const res=await fetch('/api/alliance?action=register',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,server,password})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok){ tcAllyMsg(data.message||`Error ${res.status}`,'var(--red)'); return; }
+
+    allyId=data.id; allyToken=password; allyName=data.name;
+    localStorage.setItem('tc-ally-id',    allyId);
+    localStorage.setItem('tc-ally-token', allyToken);
+    localStorage.setItem('tc-ally-name',  allyName);
+
+    tcAllyShowConnected();
+    tcAllyMsg(`✓ Alliance created! ID: ${allyId} — share this with your alliance members.`,'var(--green)');
+    // Upload current local state to server as initial state
+    await tcAllyPush();
+  }catch(e){ tcAllyMsg('Network error: '+e.message,'var(--red)'); }
+}
+
+async function tcAllyLogin(){
+  const id       = document.getElementById('allyLoginId').value.trim();
+  const password = document.getElementById('allyLoginPass').value;
+  if(!id||!password){ tcAllyMsg('Enter Alliance ID and password.','var(--red)'); return; }
+
+  tcAllyMsg('Logging in…','var(--text3)');
+  try{
+    const res=await fetch(`/api/alliance?action=auth&id=${encodeURIComponent(id)}&token=${encodeURIComponent(password)}`,{
+      method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok){ tcAllyMsg(data.message||'Invalid ID or password','var(--red)'); return; }
+
+    allyId=id; allyToken=password; allyName=data.alliance?.name||id;
+    localStorage.setItem('tc-ally-id',    allyId);
+    localStorage.setItem('tc-ally-token', allyToken);
+    localStorage.setItem('tc-ally-name',  allyName);
+
+    tcAllyShowConnected();
+    tcAllyApplyServerState(data);
+    tcAllyMsg('✓ Logged in — state loaded from server.','var(--green)');
+  }catch(e){ tcAllyMsg('Network error: '+e.message,'var(--red)'); }
+}
+
+function tcAllyApplyServerState(data){
+  if(!data) return;
+  const {alliance,roster,conductors,vips,rules}=data;
+
+  if(Array.isArray(roster)&&roster.length){
+    S.players=roster.map(r=>({
+      id:uid(), name:r.name, role:r.role||'r4',
+      active: r.active!==false&&r.active!==0,
+      avail: typeof r.avail==='string' ? r.avail.split('').map(c=>c==='1') : Array(7).fill(true),
+      vsPoints:r.vsPoints||0, techPoints:r.techPoints||0,
+    }));
+  }
+  if(Array.isArray(rules)&&rules.length) S.dayRules=rules;
+  if(Array.isArray(conductors)) S.sched.conductors=conductors;
+  if(Array.isArray(vips))       S.sched.vips=vips;
+  if(alliance?.rotIdx)  S.rotIdx={...S.rotIdx,...alliance.rotIdx};
+  if(alliance?.showVip!=null) S.sched.showVip=alliance.showVip;
+
+  // Mirror webhook to local settings inputs
+  if(alliance?.webhook){
+    const w=alliance.webhook;
+    localStorage.setItem('tc-webhook',w);
+    const iw=document.getElementById('tcWebhook');  if(iw) iw.value=w;
+    const aw=document.getElementById('allyWebhook'); if(aw) aw.value=w;
+  }
+  if(alliance?.boardingHour!=null){
+    const sel=document.getElementById('allyBoardingHour');
+    if(sel) sel.value=alliance.boardingHour;
+  }
+  if(alliance?.postDaily!=null){
+    const cb=document.getElementById('allyPostDaily');
+    if(cb) cb.checked=alliance.postDaily;
+  }
+
+  save();
+  // Refresh all UI without losing scroll
+  buildRuleRows();
+  buildSchedRows();
+  loadSched();
+  loadSettings();
+  if(S.sched.showVip) document.getElementById('schedRows').classList.add('show-vip');
+  renderPlayers();
+  updateTags();
+  refreshCondCard();
+  renderUpcoming();
+  renderFairness();
+  renderBlocked();
+  tcPreview();
+}
+
+async function tcAllyPull(){
+  if(!allyId||!allyToken) return;
+  tcAllySyncMsg('Loading from server…','var(--text3)');
+  try{
+    const res=await fetch(`/api/alliance?id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`);
+    if(res.status===401){ tcAllyLogout(); tcAllyMsg('Session expired — please log in again.','var(--amber)'); return; }
+    if(!res.ok){ tcAllySyncMsg('Server error','var(--red)'); return; }
+
+    const data=await res.json();
+    // Update displayed name
+    allyName=data.alliance?.name||allyName;
+    localStorage.setItem('tc-ally-name',allyName);
+    const el=document.getElementById('allyConnName');
+    if(el) el.textContent=allyName;
+
+    tcAllyApplyServerState(data);
+    tcAllySyncMsg('✓ Synced','var(--green)');
+    setTimeout(()=>tcAllySyncMsg('',''),2500);
+  }catch(e){ tcAllySyncMsg('Network error: '+e.message,'var(--red)'); }
+}
+
+async function tcAllyPush(){
+  if(!allyId||!allyToken) return;
+  tcAllySyncMsg('Saving to server…','var(--text3)');
+  const qs=`id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`;
+
+  const playerData=S.players.map((p,i)=>({
+    name:p.name, role:p.role,
+    active:p.active?1:0,
+    avail:p.avail.map(a=>a?'1':'0').join(''),
+    vsPoints:p.vsPoints, techPoints:p.techPoints, sortOrder:i,
+  }));
+
+  const webhook     = document.getElementById('allyWebhook')?.value?.trim()||'';
+  const boardingHour= parseInt(document.getElementById('allyBoardingHour')?.value)||2;
+  const postDaily   = document.getElementById('allyPostDaily')?.checked||false;
+
+  try{
+    await Promise.all([
+      fetch(`/api/alliance?action=settings&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({webhook,boardingHour,postDaily,showVip:S.sched.showVip})}),
+      fetch(`/api/alliance?action=roster&${qs}`,  {method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({players:playerData})}),
+      fetch(`/api/alliance?action=schedule&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({conductors:S.sched.conductors,vips:S.sched.vips})}),
+      fetch(`/api/alliance?action=rules&${qs}`,   {method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({rules:S.dayRules})}),
+      fetch(`/api/alliance?action=rot-idx&${qs}`, {method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({rotIdx:S.rotIdx})}),
+    ]);
+    // Mirror webhook to local settings
+    if(webhook){
+      localStorage.setItem('tc-webhook',webhook);
+      const iw=document.getElementById('tcWebhook'); if(iw) iw.value=webhook;
+    }
+    tcAllySyncMsg('✓ Saved','var(--green)');
+    setTimeout(()=>tcAllySyncMsg('',''),2500);
+  }catch(e){ tcAllySyncMsg('Error: '+e.message,'var(--red)'); }
+}
+
+function tcAllySettingsChanged(){
+  clearTimeout(allySettingsTimer);
+  if(!allyId||!allyToken) return;
+  allySettingsTimer=setTimeout(async()=>{
+    const qs     = `id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`;
+    const webhook= document.getElementById('allyWebhook')?.value?.trim()||'';
+    const bh     = parseInt(document.getElementById('allyBoardingHour')?.value)||2;
+    const pd     = document.getElementById('allyPostDaily')?.checked||false;
+    await fetch(`/api/alliance?action=settings&${qs}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({webhook,boardingHour:bh,postDaily:pd})
+    }).catch(()=>{});
+    if(webhook){
+      localStorage.setItem('tc-webhook',webhook);
+      const iw=document.getElementById('tcWebhook'); if(iw) iw.value=webhook;
+    }
+  },1500);
+}
+
+async function tcAllyAutoSync(what){
+  if(!allyId||!allyToken) return;
+  const qs=`id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`;
+  const calls=[];
+  if(what==='schedule'){
+    calls.push(fetch(`/api/alliance?action=schedule&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({conductors:S.sched.conductors,vips:S.sched.vips})}));
+  }
+  if(what==='rot-idx'){
+    calls.push(fetch(`/api/alliance?action=rot-idx&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({rotIdx:S.rotIdx})}));
+  }
+  if(what==='roster'){
+    const playerData=S.players.map((p,i)=>({
+      name:p.name,role:p.role,active:p.active?1:0,
+      avail:p.avail.map(a=>a?'1':'0').join(''),
+      vsPoints:p.vsPoints,techPoints:p.techPoints,sortOrder:i,
+    }));
+    calls.push(fetch(`/api/alliance?action=roster&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({players:playerData})}));
+  }
+  await Promise.all(calls).catch(()=>{});
+}
+
+function tcAllyLogout(){
+  allyId=''; allyToken=''; allyName='';
+  localStorage.removeItem('tc-ally-id');
+  localStorage.removeItem('tc-ally-token');
+  localStorage.removeItem('tc-ally-name');
+  tcAllyShowDisconnected();
+  tcAllyMsg('Disconnected from alliance account.','var(--text3)');
+}
+
+function tcAllyShowId(){
+  if(!allyId) return;
+  navigator.clipboard?.writeText(allyId)
+    .then(()=>tcAllyMsg('✓ Alliance ID copied to clipboard!','var(--green)'))
+    .catch(()=>prompt('Your Alliance ID (share with alliance members):',allyId));
+}
+</script>
+</body>
+</html>

@@ -6,3 +6,31 @@ pages_build_output_dir = "."
 binding = "DB"
 database_name = "lastwar-servers"
 database_id = "490adbef-33c0-48f0-8c3f-8488546d13cb"
+
+# ── Environment variables (set in Cloudflare Pages dashboard) ──────────────────
+#
+# Required for existing train admin features:
+#   ADMIN_TOKEN         — admin password for /api/train and /api/discord
+#   CONDUCTOR_TOKEN     — (optional) shared token for local-only train.html users
+#   DISCORD_WEBHOOK_URL — (optional) default webhook for admin cron posting
+#
+# Required for multi-tenant alliance features:
+#   CRON_SECRET         — arbitrary secret to protect /api/cron (e.g. a UUID)
+#
+# ── Automated daily posting setup ─────────────────────────────────────────────
+#
+# Cloudflare Pages Functions do NOT support cron triggers directly.
+# To run the hourly cron, choose one of:
+#
+# Option A — Cloudflare Worker (recommended, stays free):
+#   Create a separate Worker with:
+#     [triggers]
+#     crons = ["0 * * * *"]
+#   And in the Worker script:
+#     export default { async scheduled(event, env) {
+#       await fetch('https://commandpost.guide/api/cron?secret=' + env.CRON_SECRET);
+#     }};
+#
+# Option B — External cron service (cron-job.org, easycron.com, etc.):
+#   Point it at: GET https://commandpost.guide/api/cron?secret=YOUR_CRON_SECRET
+#   Set interval: every hour

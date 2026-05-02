@@ -129,8 +129,10 @@ input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
 .pl-blocked-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .pl-blocked-chip{font-size:.72rem;padding:3px 10px;border-radius:99px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);color:var(--red);font-family:'JetBrains Mono',monospace}
 .pl-info-box{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.16);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.65rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:.75rem}
-.pl-collapse-btn{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px;margin-left:4px;border-radius:4px}
-.pl-collapse-btn:hover{color:var(--text)}
+.pl-collapse-btn{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px;margin-left:auto;border-radius:4px;pointer-events:none}
+h2.pl-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+h2.pl-toggle:hover{color:var(--accent)}
+h2.pl-toggle:hover .pl-collapse-btn{color:var(--text)}
 </style>
 </head>
 <body>
@@ -218,7 +220,7 @@ input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
     </div>
   </div>
 
-  <h2>Availability Rules <button class="pl-collapse-btn" onclick="plToggleSec('plAvailBody')">▼</button></h2>
+  <h2 class="pl-toggle" onclick="plToggleSec('plAvailBody')">Availability Rules <button class="pl-collapse-btn">▼</button></h2>
   <div id="plAvailBody" class="pl-panel">
     <div class="pl-info-box">Block a player from driving on a specific day of the week.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
@@ -262,7 +264,7 @@ input[type="time"]:focus{outline:none;border-color:var(--train-orange)}
     <div class="pl-canvas-hint">Preview updates live as you type. Right-click → "Save image as…" if download fails.</div>
   </div>
 
-  <h2>Fairness Stats <button class="pl-collapse-btn" onclick="plToggleSec('plFairBody')">▼</button></h2>
+  <h2 class="pl-toggle" onclick="plToggleSec('plFairBody')">Fairness Stats <button class="pl-collapse-btn">▼</button></h2>
   <div id="plFairBody" class="pl-panel">
     <div id="plFairBars" class="pl-fair-bars"><p style="font-size:.84rem;color:var(--text3)">No history yet — randomize to start tracking.</p></div>
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">

@@ -7,6 +7,7 @@ const NAV_LINKS = [
   ]},
   {label:'Alliance', children:[
     {label:'Alliance Merge Planner', href:'alliance-merge-planner.html', icon:'images/ui/alliancecity_level.png'},
+    {label:'Train Conductor Scheduler', href:'train.html', icon:'images/resources/res_time.png'},
   ]},
   {label:'Guides', children:[
     {label:'Alliance Duel Planner', href:'alliance-duel-planner.html', icon:'images/allianceduel/vs_logo.png'},
@@ -35,6 +36,7 @@ const NAV_LINKS = [
 const SEARCH_INDEX = [
   { title:'Home', url:'index.html', tags:'home overview' },
   { title:'Alliance Merge Planner', url:'alliance-merge-planner.html', tags:'alliance merge planner roster 100 cap R5 R4 R3 R2 R1 warlord recruiter butler muse leadership roles cut list' },
+  { title:'Train Conductor Scheduler', url:'train.html', tags:'train conductor scheduler weekly rotation R4 R3 MVP casino discord webhook schedule planner VIP boarding' },
   { title:'Capital War Planner', url:'capital-war-planner.html', tags:'capital war planner cannon assault rally burn squad garrison president occupation' },
   { title:'Pre-Season Map Planner', url:'preseason-map-planner.html', tags:'preseason map planner territory zone alliance village chemical plant power town metropolis military base capitol' },
   { title:'Desert Storm Planner', url:'desert-storm-planner.html', tags:'desert storm planner tactical map drag drop phase plan auto assign' },

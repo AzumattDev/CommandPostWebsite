@@ -1,6 +1,6 @@
-// GET  /api/train?token=X                       — list roster (admin)
-// POST /api/train?action=add&token=X             — add member, body: { name }
-// POST /api/train?action=remove&id=X&token=X     — remove member by id
+// GET  /api/train?token=X                       — list roster (admin or conductor token)
+// POST /api/train?action=add&token=X             — add member, body: { name }   (admin only)
+// POST /api/train?action=remove&id=X&token=X     — remove member by id          (admin only)
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 
@@ -9,12 +9,18 @@ export async function onRequestOptions() {
 }
 
 function isAdmin(request, env) {
-  const url = new URL(request.url);
-  return url.searchParams.get('token') === env.ADMIN_TOKEN;
+  const token = new URL(request.url).searchParams.get('token');
+  return token === env.ADMIN_TOKEN;
+}
+
+function isConductor(request, env) {
+  if (isAdmin(request, env)) return true;
+  const token = new URL(request.url).searchParams.get('token');
+  return env.CONDUCTOR_TOKEN && token === env.CONDUCTOR_TOKEN;
 }
 
 export async function onRequestGet({ request, env }) {
-  if (!isAdmin(request, env)) return new Response('Unauthorized', { status: 401 });
+  if (!isConductor(request, env)) return new Response('Unauthorized', { status: 401 });
   const rows = await env.DB.prepare(
     `SELECT id, name, sort_order FROM train_roster ORDER BY sort_order ASC, id ASC`
   ).all();
