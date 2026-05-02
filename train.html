@@ -1087,16 +1087,20 @@ async function tcSendDailyAnnouncement(){
   const conductor=S.sched.conductors[dow]||'';
   if(!conductor){alert('No conductor set for today. Fill in the schedule first.');return false;}
   const time=document.getElementById('tcTime')?.value||'';
+  const showVip=document.getElementById('tcVip')?.checked;
+  const todayVip=showVip?(S.sched.vips[dow]||''):'';
   return tcDiscordProxy({
     action:'daily-manual',
     conductor,
+    vip:todayVip,
     date:gameDate(0),
     boardingTime:time,
-    upcomingWeek:Array.from({length:7},(_,i)=>({
-      day:DAYS[(dow+i)%7],
-      conductor:S.sched.conductors[(dow+i)%7]||'?',
-      offset:i,
-    })),
+    upcomingWeek:Array.from({length:7},(_,i)=>{
+      const idx=(dow+i)%7;
+      const entry={day:DAYS[idx],conductor:S.sched.conductors[idx]||'?',offset:i};
+      if(showVip&&S.sched.vips[idx]) entry.vip=S.sched.vips[idx];
+      return entry;
+    }),
   });
 }
 

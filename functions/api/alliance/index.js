@@ -359,19 +359,19 @@ export async function onRequestPost({ request, env }) {
     if (!ally.discord_webhook) {
       return new Response('No Discord webhook configured for this alliance.', { status: 503, headers: CORS });
     }
-    const { conductor, date, upcomingWeek, boardingTime } = body;
+    const { conductor, date, upcomingWeek, boardingTime, vip } = body;
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
-    const todayStr = date || utcDate();
-    const bHour    = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
+    const todayStr   = date || utcDate();
+    const bHour      = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
     const boardingTs = boardingUnixTs(todayStr, bHour);
     const resetTs    = resetUnixTs(todayStr);
 
-    const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => ({
-      name:   date ? fmtShortDate(dateAddDays(date, i)) : item.day,
-      value:  i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`,
-      inline: true,
-    }));
+    const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => {
+      const label = date ? fmtShortDate(dateAddDays(date, i)) : item.day;
+      const cond  = i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`;
+      return { name: label, value: cond + (item.vip ? `\n⭐ VIP: **${item.vip}**` : ''), inline: true };
+    });
 
     const embed = {
       title:       '🚂 Today\'s Train Conductor',
@@ -379,6 +379,7 @@ export async function onRequestPost({ request, env }) {
       color:  0xe8720c,
       fields: [
         { name: 'Date', value: formatDisplayDate(todayStr), inline: false },
+        ...(vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
         ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
       ],
       footer:    { text: `${ally.name} · ashmasters.org · train scheduler` },

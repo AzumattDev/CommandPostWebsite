@@ -149,25 +149,39 @@ export async function onRequestPost({ request, env }) {
 
   /* ── Manual daily post from train.html ──────────────────── */
   if (action === 'daily-manual') {
-    const { conductor, date, upcomingWeek, webhookOverride } = body;
+    const { conductor, date, upcomingWeek, webhookOverride, boardingTime, vip } = body;
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
     const { url: webhookUrl, err } = resolveWebhook(env, webhookOverride);
     if (err) return new Response(err, { status: 503, headers: CORS });
 
-    const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => ({
-      name: `${item.day}`,
-      value: i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`,
-      inline: true,
-    }));
+    const todayStr = date || getGameDateAtReset();
+    let boardingTs = null, resetTs = null;
+    if (boardingTime) {
+      const h = parseInt(boardingTime.split(':')[0]) || 0;
+      const [y, m, d] = todayStr.split('-').map(Number);
+      boardingTs = Math.floor(Date.UTC(y, m - 1, d, h, 0, 0) / 1000);
+      resetTs    = Math.floor(Date.UTC(y, m - 1, d, 2, 0, 0) / 1000);
+    }
+
+    const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => {
+      const label = date ? formatShortDate(addDays(date, i)) : item.day;
+      const cond  = i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`;
+      return { name: label, value: cond + (item.vip ? `\n⭐ VIP: **${item.vip}**` : ''), inline: true };
+    });
+
+    const description = boardingTs
+      ? `**${conductor}** is conducting the train today.\n\nAll aboard — boarding at <t:${boardingTs}:t> · Reset at <t:${resetTs}:t>`
+      : `**${conductor}** is conducting the train today.\n\nAll aboard!`;
 
     const embed = {
       title: '🚂 Today\'s Train Conductor',
-      description: `**${conductor}** is conducting the train today.\n\nAll aboard — see you at boarding time!`,
+      description,
       color: 0xe8720c,
       fields: [
-        { name: 'Date', value: date ? formatDisplayDate(date) : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }), inline: false },
-        ...(weekFields.length ? [{ name: '​', value: '**— Upcoming —**', inline: false }, ...weekFields] : []),
+        { name: 'Date', value: formatDisplayDate(todayStr), inline: false },
+        ...(vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
+        ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
       ],
       footer: { text: 'ashmasters.org · train scheduler' },
       timestamp: new Date().toISOString(),
