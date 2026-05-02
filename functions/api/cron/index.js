@@ -1,22 +1,15 @@
 // GET/POST /api/cron?secret=X
 //
-// Call this endpoint hourly from an external cron service or a separate Cloudflare Worker.
-// It posts the daily conductor announcement to every alliance where:
-//   - post_daily = 1
-//   - boarding_hour_utc matches the current UTC hour
-//   - last_posted_date != today  (prevents duplicate posts)
+// Fires hourly; posts daily conductor announcement to alliances where:
+//   post_daily=1, boarding_hour_utc=currentHour, last_posted_date!=today
 //
-// Env vars required:
-//   CRON_SECRET — arbitrary secret string to protect this endpoint
-//   DB          — D1 database binding
+// Env vars required: CRON_SECRET, DB
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
-
-const DAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function utcDate() {
   const d = new Date();
@@ -27,11 +20,33 @@ function utcDow() {
   return (new Date().getUTCDay() + 6) % 7; // 0=Mon … 6=Sun
 }
 
+function dateAddDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+}
+
+function fmtShortDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC',
+  });
+}
+
 function formatDisplayDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC',
   });
+}
+
+function boardingUnixTs(dateStr, hourUtc) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), 0, 0) / 1000);
+}
+
+function resetUnixTs(dateStr) {
+  return boardingUnixTs(dateStr, 2); // 02:00 UTC game reset
 }
 
 async function postToDiscord(webhookUrl, payload) {
@@ -49,7 +64,7 @@ async function handleCron(env) {
   const dow   = utcDow();
 
   const allyRes = await env.DB.prepare(
-    `SELECT id, name, discord_webhook, show_vip
+    `SELECT id, name, discord_webhook, show_vip, boarding_hour_utc
      FROM alliances
      WHERE post_daily=1
        AND boarding_hour_utc=?
@@ -84,26 +99,37 @@ async function handleCron(env) {
     const weekConds = Array(7).fill('?');
     for (const w of (weekRes.results || [])) weekConds[w.day_index] = w.conductor || '?';
 
+    const boardingTs = boardingUnixTs(today, ally.boarding_hour_utc ?? 2);
+    const resetTs    = resetUnixTs(today);
+
     const weekFields = Array.from({ length: 7 }, (_, i) => {
-      const idx = (dow + i) % 7;
+      const idx  = (dow + i) % 7;
+      const date = dateAddDays(today, i);
       return {
-        name: DAYS_SHORT[idx],
-        value: i === 0 ? `**${weekConds[idx]}** ← today` : `**${weekConds[idx]}**`,
+        name:   fmtShortDate(date),
+        value:  i === 0 ? `**${weekConds[idx]}** ← today` : `**${weekConds[idx] || '?'}**`,
         inline: true,
       };
     });
 
     const embed = {
-      title: '🚂 Today\'s Train Conductor',
-      description: `**${conductor}** is conducting the train today.\n\nAll aboard — see you at boarding time!`,
-      color: 0xe8720c,
+      title:       '🚂 Today\'s Train Conductor',
+      description: [
+        `**${conductor}** is conducting today's train!`,
+        '',
+        'All aboard! 🚂',
+        '',
+        `📅 ${formatDisplayDate(today)}`,
+        `⏰ **Boarding:** <t:${boardingTs}:t>`,
+        `🔄 **Game Reset:** <t:${resetTs}:t>`,
+      ].join('\n'),
+      color:  0xe8720c,
       fields: [
-        { name: 'Date', value: formatDisplayDate(today), inline: false },
-        ...(ally.show_vip === 1 && vip ? [{ name: 'VIP', value: `⭐ **${vip}**`, inline: false }] : []),
-        { name: '​', value: '**— This week —**', inline: false },
+        ...(ally.show_vip === 1 && vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
+        { name: '​', value: '**— This Week —**', inline: false },
         ...weekFields,
       ],
-      footer: { text: `${ally.name} · commandpost.guide · automated reminder` },
+      footer:    { text: `${ally.name} · commandpost.guide · automated reminder` },
       timestamp: new Date().toISOString(),
     };
 

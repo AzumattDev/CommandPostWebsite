@@ -71,13 +71,13 @@ async function loadFullState(db, id) {
 }
 
 const DEFAULT_RULES = [
-  { type: 'r4-rotation', label: '' },
-  { type: 'r4-rotation', label: '' },
-  { type: 'r3-rotation', label: '' },
-  { type: 'bg-mvp',      label: 'BG MVP' },
-  { type: 'tech-top',    label: 'Tech Top' },
-  { type: 'casino',      label: 'Casino Night' },
-  { type: 'mvp',         label: 'Weekly MVP' },
+  { type: 'r4r5-rotation', label: 'Officers' },
+  { type: 'r4r5-rotation', label: 'Officers' },
+  { type: 'r3-rotation',   label: '' },
+  { type: 'bg-mvp',        label: 'BG MVP' },
+  { type: 'tech-top',      label: 'Tech Top' },
+  { type: 'casino',        label: 'Casino Night' },
+  { type: 'mvp',           label: 'Weekly MVP' },
 ];
 
 async function seedDefaultRules(db, id) {
@@ -115,6 +115,40 @@ function formatDisplayDate(dateStr) {
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC',
   });
+}
+
+function utcDate() {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+}
+
+function dateAddDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+}
+
+function fmtShortDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC',
+  });
+}
+
+function boardingUnixTs(dateStr, hourUtc) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), 0, 0) / 1000);
+}
+
+function resetUnixTs(dateStr) {
+  return boardingUnixTs(dateStr, 2); // 02:00 UTC game reset
+}
+
+function currentUtcMonday() {
+  const d = new Date();
+  const dow = (d.getUTCDay() + 6) % 7;
+  const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dow));
+  return `${monday.getUTCFullYear()}-${String(monday.getUTCMonth() + 1).padStart(2, '0')}-${String(monday.getUTCDate()).padStart(2, '0')}`;
 }
 
 /* ── GET: load state ───────────────────────────────────────── */
@@ -269,7 +303,7 @@ export async function onRequestPost({ request, env }) {
     if (!ally.discord_webhook) {
       return new Response('No Discord webhook configured for this alliance. Add one in Alliance Account settings.', { status: 503, headers: CORS });
     }
-    const { schedule, boardingTime, weekLabel, _test } = body;
+    const { schedule, boardingTime, weekLabel, weekStartDate, _test } = body;
     if (_test) {
       try { await postToDiscord(ally.discord_webhook, { content: '🚂 Webhook test — commandpost.guide · Train Conductor Scheduler' }); }
       catch (e) { return new Response(e.message, { status: 502, headers: CORS }); }
@@ -279,15 +313,27 @@ export async function onRequestPost({ request, env }) {
     if (!Array.isArray(schedule) || !schedule.length) {
       return new Response('Missing schedule', { status: 400, headers: CORS });
     }
-    const title  = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
-    const fields = schedule.map(({ day, conductor, vip }) => {
+
+    const monday     = weekStartDate || currentUtcMonday();
+    const boardingTs = boardingUnixTs(monday, ally.boarding_hour_utc ?? 2);
+    const resetTs    = resetUnixTs(monday);
+
+    const title       = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
+    const description = [
+      `⏰ **Daily Boarding:** <t:${boardingTs}:t>`,
+      `🔄 **Game Reset:** <t:${resetTs}:t>`,
+    ].join('\n');
+
+    const fields = schedule.map(({ day, conductor, vip }, i) => {
+      const fieldName = fmtShortDate(dateAddDays(monday, i));
       let value = conductor ? `**${conductor}**` : '*(unassigned)*';
       if (vip) value += `\n⭐ VIP: **${vip}**`;
-      return { name: day, value, inline: true };
+      return { name: fieldName, value, inline: true };
     });
+
     const embed = {
-      title, color: 0xe8720c, fields,
-      footer: { text: `⏰ Boarding: ${boardingTime || '??:??'} · ${ally.name} · commandpost.guide` },
+      title, description, color: 0xe8720c, fields,
+      footer:    { text: `${ally.name} · commandpost.guide` },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(ally.discord_webhook, { embeds: [embed] }); }
@@ -303,20 +349,32 @@ export async function onRequestPost({ request, env }) {
     const { conductor, date, upcomingWeek } = body;
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
+    const todayStr   = date || utcDate();
+    const boardingTs = boardingUnixTs(todayStr, ally.boarding_hour_utc ?? 2);
+    const resetTs    = resetUnixTs(todayStr);
+
     const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => ({
-      name: `${item.day}`,
-      value: i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`,
+      name:   date ? fmtShortDate(dateAddDays(date, i)) : item.day,
+      value:  i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`,
       inline: true,
     }));
+
     const embed = {
-      title: '🚂 Today\'s Train Conductor',
-      description: `**${conductor}** is conducting the train today.\n\nAll aboard — see you at boarding time!`,
-      color: 0xe8720c,
+      title:       '🚂 Today\'s Train Conductor',
+      description: [
+        `**${conductor}** is conducting today's train!`,
+        '',
+        'All aboard! 🚂',
+        '',
+        `📅 ${formatDisplayDate(todayStr)}`,
+        `⏰ **Boarding:** <t:${boardingTs}:t>`,
+        `🔄 **Game Reset:** <t:${resetTs}:t>`,
+      ].join('\n'),
+      color:  0xe8720c,
       fields: [
-        { name: 'Date', value: date ? formatDisplayDate(date) : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }), inline: false },
-        ...(weekFields.length ? [{ name: '​', value: '**— Upcoming —**', inline: false }, ...weekFields] : []),
+        ...(weekFields.length ? [{ name: '​', value: '**— This Week —**', inline: false }, ...weekFields] : []),
       ],
-      footer: { text: `${ally.name} · commandpost.guide · train scheduler` },
+      footer:    { text: `${ally.name} · commandpost.guide · train scheduler` },
       timestamp: new Date().toISOString(),
     };
     try { await postToDiscord(ally.discord_webhook, { embeds: [embed] }); }

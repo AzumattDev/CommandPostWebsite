@@ -172,7 +172,19 @@ h2.toggle:hover .cbtn{color:var(--text)}
 
 <div style="margin-bottom:1.5rem">
   <h1>🚂 Train Conductor Scheduler</h1>
-  <p style="font-size:.88rem;color:var(--text2);max-width:660px;line-height:1.6">Plan your weekly train conductor schedule with per-day rules — R4/R3 rotation, MVP, BG MVP, Top Tech Contributor, Casino, and more. Export as an image or post directly to Discord.</p>
+  <p style="font-size:.88rem;color:var(--text2);max-width:660px;line-height:1.6">Plan your weekly train conductor schedule. Add your players, set a rule for each day, then click <strong style="color:var(--text)">Apply Rules</strong> to auto-fill the week. Post the schedule to Discord or download as an image to share with your alliance.</p>
+</div>
+
+<!-- Quick Start -->
+<div id="quickStart" class="tip-box" style="margin-bottom:1.25rem;display:none">
+  <h3>👋 New here? Here's how it works</h3>
+  <p style="margin-top:.4rem">
+    <strong>1. Add players</strong> — scroll to Player Pool and add everyone who can drive the train. Set their rank (R5/R4/R3…) and which days they're available.<br>
+    <strong>2. Set day rules</strong> — Day Rules lets you pick a strategy per day: rotation through officers, top tech contributor, random pick, or fill in manually (for MVP/Casino nights).<br>
+    <strong>3. Apply Rules</strong> — click the green button to auto-fill the week. The same person won't be scheduled two days in a row.<br>
+    <strong>4. Post to Discord</strong> — connect an Alliance Account, add your Discord webhook, and post the schedule directly. Enable auto-post to have it send automatically every day.
+  </p>
+  <button class="btn btn-ghost btn-sm" style="margin-top:.6rem" onclick="document.getElementById('quickStart').style.display='none';localStorage.setItem('tc-qs-dismissed','1')">Got it, hide this</button>
 </div>
 
 <!-- Today's conductor -->
@@ -292,6 +304,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 <!-- Player Pool -->
 <h2>Player Pool</h2>
 <div class="panel">
+  <input type="text" id="playerSearch" class="tc-in" placeholder="🔍 Search players…" oninput="renderPlayers()" style="width:100%;margin-bottom:8px;display:none">
   <div id="playerList"></div>
   <div class="add-form">
     <div class="ff" style="flex:1;min-width:110px">
@@ -322,7 +335,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 <!-- Day Rules -->
 <h2 class="toggle" onclick="tcToggle('rulesBody')">Day Rules <button class="cbtn">▼</button></h2>
 <div id="rulesBody" class="panel">
-  <div class="info-box">Set a scheduling strategy per day. <strong>Rotation</strong> rules step alphabetically through that rank. <strong>Top</strong> rules auto-pick highest scorer. <strong>Manual / MVP / BG MVP</strong> leave the field blank for you to fill in after applying.</div>
+  <div class="info-box">Choose a rule for each day of the week. <strong>Rotation</strong> — cycles through players of that rank in alphabetical order, picking up where last week left off. <strong>Top Points</strong> — auto-selects whoever has the most tech or VS points. <strong>Manual/MVP/Casino</strong> — leaves the slot blank so you can type in the name yourself after the results are known.</div>
   <div id="ruleRows"></div>
 </div>
 
@@ -418,33 +431,34 @@ h2.toggle:hover .cbtn{color:var(--text)}
 const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const DLONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const RULE_TYPES = [
-  {v:'manual',       l:'Manual Entry'},
-  {v:'r5-rotation',  l:'R5 Rotation (alphabetical)'},
-  {v:'r4-rotation',  l:'R4 Rotation (alphabetical)'},
-  {v:'r3-rotation',  l:'R3 Rotation (alphabetical)'},
-  {v:'r2-rotation',  l:'R2 Rotation (alphabetical)'},
-  {v:'any-rotation', l:'Any Player Rotation'},
-  {v:'tech-top',     l:'Top Tech Contributor'},
-  {v:'vs-top',       l:'Top VS Scorer'},
-  {v:'mvp',          l:'Weekly MVP (manual)'},
-  {v:'bg-mvp',       l:'Battleground MVP (manual)'},
-  {v:'casino',       l:'Casino / Random Pick'},
+  {v:'manual',        l:'Manual — fill in yourself'},
+  {v:'r4r5-rotation', l:'R4 + R5 Rotation — officers & leaders take turns'},
+  {v:'r5-rotation',   l:'R5 Rotation — leaders only, take turns'},
+  {v:'r4-rotation',   l:'R4 Rotation — officers only, take turns'},
+  {v:'r3-rotation',   l:'R3 Rotation — members take turns'},
+  {v:'r2-rotation',   l:'R2 Rotation — take turns'},
+  {v:'any-rotation',  l:'Any Player Rotation — everyone takes turns'},
+  {v:'tech-top',      l:'Top Tech Points — auto-picks highest contributor'},
+  {v:'vs-top',        l:'Top VS Score — auto-picks highest scorer'},
+  {v:'mvp',           l:'Weekly MVP — fill in manually after results'},
+  {v:'bg-mvp',        l:'Battleground MVP — fill in manually after results'},
+  {v:'casino',        l:'Casino Night — random fair pick'},
 ];
 const DEFAULT_RULES = [
-  {type:'r4-rotation', label:''},
-  {type:'r4-rotation', label:''},
-  {type:'r3-rotation', label:''},
-  {type:'bg-mvp',      label:'BG MVP'},
-  {type:'tech-top',    label:'Tech Top'},
-  {type:'casino',      label:'Casino Night'},
-  {type:'mvp',         label:'Weekly MVP'},
+  {type:'r4r5-rotation', label:'Officers'},
+  {type:'r4r5-rotation', label:'Officers'},
+  {type:'r3-rotation',   label:''},
+  {type:'bg-mvp',        label:'BG MVP'},
+  {type:'tech-top',      label:'Tech Top'},
+  {type:'casino',        label:'Casino Night'},
+  {type:'mvp',           label:'Weekly MVP'},
 ];
 
 function mkState() {
   return {
     players:[],
     dayRules:JSON.parse(JSON.stringify(DEFAULT_RULES)),
-    rotIdx:{r5:0,r4:0,r3:0,r2:0,r1:0,any:0},
+    rotIdx:{r5:0,r4:0,r4r5:0,r3:0,r2:0,r1:0,any:0},
     sched:{time:'10:00',showVip:false,conductors:['','','','','','',''],vips:['','','','','','','']},
     history:[],
     penalty:7,
@@ -467,7 +481,8 @@ function load() {
     if (!Array.isArray(S.sched.conductors)||S.sched.conductors.length!==7) S.sched.conductors=['','','','','','',''];
     if (!Array.isArray(S.sched.vips)||S.sched.vips.length!==7) S.sched.vips=['','','','','','',''];
     if (!Array.isArray(S.dayRules)||S.dayRules.length!==7) S.dayRules=JSON.parse(JSON.stringify(DEFAULT_RULES));
-    if (!S.rotIdx) S.rotIdx={r5:0,r4:0,r3:0,r2:0,r1:0,any:0};
+    if (!S.rotIdx) S.rotIdx={r5:0,r4:0,r4r5:0,r3:0,r2:0,r1:0,any:0};
+    if (S.rotIdx.r4r5 == null) S.rotIdx.r4r5=0;
   } catch(e) {}
 }
 function tcSaveSettings() {
@@ -516,6 +531,12 @@ function gameDow(off=0){
   d.setUTCDate(d.getUTCDate()+off);
   return (d.getUTCDay()+6)%7; // 0=Mon..6=Sun
 }
+function gameMonday(){
+  const d=new Date(Date.now()-2*60*60*1000);
+  const dow=(d.getUTCDay()+6)%7;
+  d.setUTCDate(d.getUTCDate()-dow);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
 function fmtDate(ds){
   const [y,m,d]=ds.split('-').map(Number);
   return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
@@ -550,11 +571,15 @@ function tcAddPlayer(){
 }
 function renderPlayers(){
   const el=document.getElementById('playerList');
-  if(!S.players.length){
-    el.innerHTML='<div style="font-size:.85rem;color:var(--text3);padding:8px 0">No players yet — add some below.</div>';
+  const searchEl=document.getElementById('playerSearch');
+  if(searchEl) searchEl.style.display=S.players.length>15?'':'none';
+  const q=(searchEl?.value||'').toLowerCase().trim();
+  const players=q?S.players.filter(p=>p.name.toLowerCase().includes(q)):S.players;
+  if(!players.length){
+    el.innerHTML=`<div style="font-size:.85rem;color:var(--text3);padding:8px 0">${q?`No players match "<em>${esc(q)}</em>".`:'No players yet — add some below.'}</div>`;
     return;
   }
-  el.innerHTML=S.players.map(p=>{
+  el.innerHTML=players.map(p=>{
     const dots=DAYS.map((d,i)=>`<div class="adot${p.avail[i]?' on':''}" title="${DLONG[i]}" onclick="tcToggleAvail('${p.id}',${i})">${d[0]}</div>`).join('');
     return `<div class="player-row">
       <div class="act-toggle${p.active?' on':''}" title="${p.active?'Active':'Inactive'}" onclick="tcToggleActive('${p.id}')"></div>
@@ -683,14 +708,16 @@ function renderUpcoming(){
 function getPool(ruleType,dow){
   const active=p=>p.active&&p.avail[dow];
   switch(ruleType){
-    case 'r5-rotation': return S.players.filter(p=>active(p)&&p.role==='r5').map(p=>p.name);
-    case 'r4-rotation': return S.players.filter(p=>active(p)&&p.role==='r4').map(p=>p.name);
-    case 'r3-rotation': return S.players.filter(p=>active(p)&&p.role==='r3').map(p=>p.name);
-    case 'r2-rotation': return S.players.filter(p=>active(p)&&p.role==='r2').map(p=>p.name);
+    case 'r5-rotation':   return S.players.filter(p=>active(p)&&p.role==='r5').map(p=>p.name);
+    case 'r4r5-rotation': return S.players.filter(p=>active(p)&&(p.role==='r4'||p.role==='r5')).map(p=>p.name);
+    case 'r4-rotation':   return S.players.filter(p=>active(p)&&p.role==='r4').map(p=>p.name);
+    case 'r3-rotation':   return S.players.filter(p=>active(p)&&p.role==='r3').map(p=>p.name);
+    case 'r2-rotation':   return S.players.filter(p=>active(p)&&p.role==='r2').map(p=>p.name);
     default: return S.players.filter(p=>active(p)).map(p=>p.name);
   }
 }
 function anyPool(dow){return S.players.filter(p=>p.active&&p.avail[dow]).map(p=>p.name);}
+function r4r5Pool(dow){return S.players.filter(p=>p.active&&(p.role==='r4'||p.role==='r5')&&p.avail[dow]).map(p=>p.name);}
 function sortAlpha(a){return [...a].sort((x,y)=>x.toLowerCase().localeCompare(y.toLowerCase()));}
 function topTech(dow){return S.players.filter(p=>p.active&&p.avail[dow]).sort((a,b)=>(b.techPoints||0)-(a.techPoints||0))[0]?.name||'';}
 function topVs(dow)  {return S.players.filter(p=>p.active&&p.avail[dow]).sort((a,b)=>(b.vsPoints||0)-(a.vsPoints||0))[0]?.name||'';}
@@ -710,26 +737,32 @@ function wRandom(pool){
 function tcApplyRules(){
   const conductors=['','','','','','',''];
   const fresh=[];
-  // snapshot rotIdx so we can roll it back if needed
-  const rotSnap=JSON.parse(JSON.stringify(S.rotIdx));
+  let lastConductor=''; // prevent back-to-back
 
   for(let i=0;i<7;i++){
     const rule=S.dayRules[i]||{type:'manual'};
     let name='';
     switch(rule.type){
-      case 'r5-rotation': name=nextRot('r5',i); break;
-      case 'r4-rotation': name=nextRot('r4',i); break;
-      case 'r3-rotation': name=nextRot('r3',i); break;
-      case 'r2-rotation': name=nextRot('r2',i); break;
-      case 'any-rotation':name=nextRot('any',i); break;
-      case 'tech-top':    name=topTech(i);  break;
-      case 'vs-top':      name=topVs(i);    break;
-      case 'casino':{ const p=anyPool(i); if(p.length) name=wRandom(p); break; }
+      case 'r5-rotation':   name=nextRot('r5',i,lastConductor);   break;
+      case 'r4r5-rotation': name=nextRot('r4r5',i,lastConductor); break;
+      case 'r4-rotation':   name=nextRot('r4',i,lastConductor);   break;
+      case 'r3-rotation':   name=nextRot('r3',i,lastConductor);   break;
+      case 'r2-rotation':   name=nextRot('r2',i,lastConductor);   break;
+      case 'any-rotation':  name=nextRot('any',i,lastConductor);  break;
+      case 'tech-top':      name=topTech(i); break;
+      case 'vs-top':        name=topVs(i);   break;
+      case 'casino':{
+        const p=anyPool(i);
+        const eligible=p.length>1?p.filter(n=>n.toLowerCase()!==lastConductor):p;
+        if(eligible.length) name=wRandom(eligible);
+        break;
+      }
       // manual, mvp, bg-mvp → leave blank for manual entry
       default: name='';
     }
     conductors[i]=name;
-    if(name) fresh.push(name);
+    if(name){ fresh.push(name); lastConductor=name.toLowerCase(); }
+    else lastConductor='';
   }
 
   S.sched.conductors=conductors;
@@ -745,12 +778,18 @@ function tcApplyRules(){
   tcAllyAutoSync('rot-idx');
 }
 
-function nextRot(roleKey,dow){
+function nextRot(roleKey,dow,skipName=''){
   let pool;
-  if(roleKey==='any') pool=sortAlpha(anyPool(dow));
+  if(roleKey==='any')   pool=sortAlpha(anyPool(dow));
+  else if(roleKey==='r4r5') pool=sortAlpha(r4r5Pool(dow));
   else pool=sortAlpha(S.players.filter(p=>p.active&&p.role===roleKey&&p.avail[dow]).map(p=>p.name));
   if(!pool.length) return '';
-  const idx=(S.rotIdx[roleKey]||0)%pool.length;
+  const startIdx=(S.rotIdx[roleKey]||0)%pool.length;
+  let idx=startIdx;
+  // Skip back-to-back if pool has more than one option
+  if(skipName && pool.length>1 && pool[idx].toLowerCase()===skipName){
+    idx=(startIdx+1)%pool.length;
+  }
   const name=pool[idx];
   S.rotIdx[roleKey]=(idx+1)%pool.length;
   return name;
@@ -1013,7 +1052,7 @@ async function tcPostSchedule(){
   const time=document.getElementById('tcTime')?.value||'10:00';
   const wkLabel=genWeeks.length>1?`Week ${curWeek+1} of ${genWeeks.length}`:null;
   const schedule=DLONG.map((day,i)=>({day,conductor:conds[i]||'',...(showVip&&vips[i]?{vip:vips[i]}:{})}));
-  const ok=await tcDiscordProxy({schedule,boardingTime:time,weekLabel:wkLabel});
+  const ok=await tcDiscordProxy({schedule,boardingTime:time,weekLabel:wkLabel,weekStartDate:gameMonday()});
   if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
   else{btn.innerHTML=orig;btn.disabled=false;}
 }
@@ -1093,6 +1132,10 @@ function tcInit(){
   renderFairness();
   renderBlocked();
   tcPreview();
+  // Show quick start for first-timers (no players added yet, not dismissed)
+  if(!S.players.length && !localStorage.getItem('tc-qs-dismissed')){
+    document.getElementById('quickStart').style.display='';
+  }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{load();tcInit();tcAllyInit();});
