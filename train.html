@@ -252,15 +252,16 @@ h2.toggle:hover .cbtn{color:var(--text)}
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div class="set-row">
-          <label>Auto-Post Hour (UTC)</label>
-          <select id="allyBoardingHour" class="tc-sel" onchange="tcAllySettingsChanged()"></select>
+          <label>Server Timezone</label>
+          <select id="allyServerOffset" class="tc-sel" onchange="tcAllyOffsetChanged()"></select>
         </div>
         <label class="chk-label" style="margin-top:2px">
           <input type="checkbox" id="allyPostDaily" onchange="tcAllySettingsChanged()"> Enable daily auto-post
         </label>
+        <select id="allyBoardingHour" style="display:none"></select>
       </div>
     </div>
-    <div class="info-box" style="margin-bottom:10px;font-size:.82rem">When enabled, the site will automatically post today's conductor to your Discord channel at the selected UTC hour every day.</div>
+    <div class="info-box" style="margin-bottom:10px;font-size:.82rem">Boarding time is set in the Schedule section (server local time). When daily auto-post is enabled, the cron posts at that time each day.</div>
     <div id="allySyncMsg" style="font-size:.78rem;margin-bottom:8px;display:none"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-green btn-sm" onclick="tcAllyPull()">↓ Pull from Server</button>
@@ -344,7 +345,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 <div class="panel">
   <div id="schedRows"></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap">
-    <label style="font-size:.83rem;color:var(--text2)">⏰ Boarding (UTC):</label>
+    <label id="tcBoardingLabel" style="font-size:.83rem;color:var(--text2)">⏰ Boarding:</label>
     <input type="time" id="tcTime" value="10:00" oninput="tcSaveSched();tcPreview();tcUpdateBoardingLocal()">
     <span id="tcTimeLocal" style="font-size:.78rem;color:var(--text3);font-family:'JetBrains Mono',monospace"></span>
     <label class="chk-label" style="margin-left:8px">
@@ -546,18 +547,37 @@ function fmtDate(ds){
 function tcToggle(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
 function tcUpdateBoardingLocal(){
   const t=document.getElementById('tcTime')?.value||'10:00';
-  const [h,m]=(t+':00').split(':').map(Number);
+  const [sh,sm]=(t+':00').split(':').map(Number);
+  // Convert server local time to UTC
+  const utcH=(sh-serverUtcOffset+24)%24;
+  const utcM=sm||0;
+  // Convert UTC to browser local for display
   const now=new Date();
-  const d=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),h,m||0,0));
+  const d=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),utcH,utcM,0));
   const local=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
   const el=document.getElementById('tcTimeLocal');
-  if(el) el.textContent=`= ${local} your time`;
-  // Keep alliance boarding hour in sync
+  if(el){
+    const utcStr=`${String(utcH).padStart(2,'0')}:${String(utcM).padStart(2,'0')} UTC`;
+    el.textContent=serverUtcOffset!==0?`= ${utcStr} · ${local} local`:`= ${local} local`;
+  }
+  // Keep internal boarding hour (UTC) in sync
   const sel=document.getElementById('allyBoardingHour');
-  if(sel&&String(sel.value)!==String(h)){
-    sel.value=h;
+  if(sel&&String(sel.value)!==String(utcH)){
+    sel.value=utcH;
     if(allyId&&allyToken) tcAllySettingsChanged();
   }
+}
+
+function tcAllyOffsetChanged(){
+  serverUtcOffset=parseInt(document.getElementById('allyServerOffset')?.value)||0;
+  localStorage.setItem('tc-server-offset',serverUtcOffset);
+  // Update boarding label to show current offset
+  const lbl=document.getElementById('tcBoardingLabel');
+  if(lbl){
+    const sign=serverUtcOffset>0?`+${serverUtcOffset}`:serverUtcOffset<0?`${serverUtcOffset}`:'';
+    lbl.textContent=sign?`⏰ Boarding (UTC${sign}):`:'⏰ Boarding (UTC):';
+  }
+  tcUpdateBoardingLocal();
 }
 function ruleLabel(rule){
   if(rule.label) return rule.label;
@@ -1086,7 +1106,14 @@ async function tcSendDailyAnnouncement(){
   const dow=gameDow(0);
   const conductor=S.sched.conductors[dow]||'';
   if(!conductor){alert('No conductor set for today. Fill in the schedule first.');return false;}
-  const time=document.getElementById('tcTime')?.value||'';
+  const t=document.getElementById('tcTime')?.value||'';
+  // Convert server local time to UTC before sending
+  let boardingTime='';
+  if(t){
+    const sh=parseInt(t.split(':')[0])||0;
+    const utcH=(sh-serverUtcOffset+24)%24;
+    boardingTime=`${String(utcH).padStart(2,'0')}:00`;
+  }
   const showVip=document.getElementById('tcVip')?.checked;
   const todayVip=showVip?(S.sched.vips[dow]||''):'';
   return tcDiscordProxy({
@@ -1094,7 +1121,7 @@ async function tcSendDailyAnnouncement(){
     conductor,
     vip:todayVip,
     date:gameDate(0),
-    boardingTime:time,
+    boardingTime,
     upcomingWeek:Array.from({length:7},(_,i)=>{
       const idx=(dow+i)%7;
       const entry={day:DAYS[idx],conductor:S.sched.conductors[idx]||'?',offset:i};
@@ -1175,10 +1202,14 @@ function tcInit(){
   }
 }
 
-document.addEventListener('DOMContentLoaded',()=>{load();tcInit();tcAllyInit();});
+document.addEventListener('DOMContentLoaded',()=>{
+  serverUtcOffset=parseInt(localStorage.getItem('tc-server-offset'))||0;
+  load();tcInit();tcAllyInit();
+});
 
 /* ── Alliance Account ─────────────────────────────────────── */
 let allyId='', allyToken='', allyName='';
+let serverUtcOffset=0;
 let allySettingsTimer=null, rosterSyncTimer=null;
 
 function scheduleRosterSync(){
@@ -1191,16 +1222,31 @@ function tcAllyInit(){
   allyToken = localStorage.getItem('tc-ally-token') || '';
   allyName  = localStorage.getItem('tc-ally-name')  || '';
 
-  // Populate boarding hour select
+  // Restore saved server timezone offset
+  serverUtcOffset=parseInt(localStorage.getItem('tc-server-offset'))||0;
+  // Populate server offset select (UTC-12 … UTC+14)
+  const offSel=document.getElementById('allyServerOffset');
+  if(offSel&&!offSel.options.length){
+    for(let o=-12;o<=14;o++){
+      const opt=document.createElement('option');
+      opt.value=o;
+      opt.textContent=o===0?'UTC+0 (game default)':o>0?`UTC+${o}`:`UTC${o}`;
+      offSel.appendChild(opt);
+    }
+    offSel.value=serverUtcOffset;
+  }
+  // Internal hidden boarding-hour select (UTC values 0–23)
   const sel=document.getElementById('allyBoardingHour');
   if(sel&&!sel.options.length){
     for(let h=0;h<24;h++){
       const o=document.createElement('option');
       o.value=h;
-      o.textContent=`${String(h).padStart(2,'0')}:00 UTC`;
+      o.textContent=`${String(h).padStart(2,'0')}:00`;
       sel.appendChild(o);
     }
   }
+  // Apply saved offset to boarding label immediately
+  tcAllyOffsetChanged();
 
   if(allyId&&allyToken){
     tcAllyShowConnected();
@@ -1327,11 +1373,19 @@ function tcAllyApplyServerState(data){
     const iw=document.getElementById('tcWebhook');  if(iw) iw.value=w;
     const aw=document.getElementById('allyWebhook'); if(aw) aw.value=w;
   }
+  if(alliance?.serverUtcOffset!=null){
+    serverUtcOffset=alliance.serverUtcOffset;
+    const offSel=document.getElementById('allyServerOffset');
+    if(offSel) offSel.value=serverUtcOffset;
+    tcAllyOffsetChanged(); // updates label
+  }
   if(alliance?.boardingHour!=null){
+    // boarding_hour_utc from server → convert to server local for display
+    const serverH=(alliance.boardingHour+serverUtcOffset+24)%24;
     const sel=document.getElementById('allyBoardingHour');
-    if(sel) sel.value=alliance.boardingHour;
+    if(sel) sel.value=alliance.boardingHour; // keep UTC internally
     const tc=document.getElementById('tcTime');
-    if(tc) tc.value=`${String(alliance.boardingHour).padStart(2,'0')}:00`;
+    if(tc) tc.value=`${String(serverH).padStart(2,'0')}:00`;
     tcUpdateBoardingLocal();
   }
   if(alliance?.postDaily!=null){
@@ -1391,11 +1445,12 @@ async function tcAllyPush(){
   const webhook     = document.getElementById('allyWebhook')?.value?.trim()||'';
   const boardingHour= parseInt(document.getElementById('allyBoardingHour')?.value)||2;
   const postDaily   = document.getElementById('allyPostDaily')?.checked||false;
+  const serverOff   = parseInt(document.getElementById('allyServerOffset')?.value)||0;
 
   try{
     await Promise.all([
       fetch(`/api/alliance?action=settings&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({webhook,boardingHour,postDaily,showVip:S.sched.showVip})}),
+        body:JSON.stringify({webhook,boardingHour,postDaily,showVip:S.sched.showVip,serverUtcOffset:serverOff})}),
       fetch(`/api/alliance?action=roster&${qs}`,  {method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({players:playerData})}),
       fetch(`/api/alliance?action=schedule&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1420,12 +1475,13 @@ function tcAllySettingsChanged(){
   if(!allyId||!allyToken) return;
   allySettingsTimer=setTimeout(async()=>{
     const qs     = `id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`;
-    const webhook= document.getElementById('allyWebhook')?.value?.trim()||'';
-    const bh     = parseInt(document.getElementById('allyBoardingHour')?.value)||2;
-    const pd     = document.getElementById('allyPostDaily')?.checked||false;
+    const webhook   = document.getElementById('allyWebhook')?.value?.trim()||'';
+    const bh        = parseInt(document.getElementById('allyBoardingHour')?.value)||2;
+    const pd        = document.getElementById('allyPostDaily')?.checked||false;
+    const serverOff = parseInt(document.getElementById('allyServerOffset')?.value)||0;
     await fetch(`/api/alliance?action=settings&${qs}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({webhook,boardingHour:bh,postDaily:pd})
+      body:JSON.stringify({webhook,boardingHour:bh,postDaily:pd,serverUtcOffset:serverOff})
     }).catch(()=>{});
     if(webhook){
       localStorage.setItem('tc-webhook',webhook);

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS alliances (
   show_vip           INTEGER NOT NULL DEFAULT 0,
   rot_idx            TEXT    NOT NULL DEFAULT '{"r5":0,"r4":0,"r3":0,"r2":0,"r1":0,"any":0}',
   last_posted_date   TEXT    NOT NULL DEFAULT '',
+  server_utc_offset  INTEGER NOT NULL DEFAULT 0,
   created_at         INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
@@ -43,3 +44,7 @@ CREATE TABLE IF NOT EXISTS alliance_day_rules (
   label        TEXT    NOT NULL DEFAULT '',
   PRIMARY KEY (alliance_id, day_index)
 );
+
+-- Migration: add server timezone offset (run once if upgrading)
+-- In D1 console: paste this single line and execute:
+-- ALTER TABLE alliances ADD COLUMN server_utc_offset INTEGER NOT NULL DEFAULT 0;

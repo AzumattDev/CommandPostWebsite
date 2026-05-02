@@ -37,7 +37,7 @@ async function resolveAlliance(db, id, token) {
   if (!id || !token) return null;
   const hash = await sha256(token);
   return db.prepare(
-    'SELECT id,name,server,discord_webhook,boarding_hour_utc,post_daily,show_vip,rot_idx FROM alliances WHERE id=? AND token_hash=?'
+    'SELECT id,name,server,discord_webhook,boarding_hour_utc,post_daily,show_vip,rot_idx,server_utc_offset FROM alliances WHERE id=? AND token_hash=?'
   ).bind(id, hash).first();
 }
 
@@ -93,6 +93,7 @@ function allianceView(ally) {
     id: ally.id, name: ally.name, server: ally.server || '',
     webhook: ally.discord_webhook || '',
     boardingHour: ally.boarding_hour_utc ?? 2,
+    serverUtcOffset: ally.server_utc_offset ?? 0,
     postDaily: ally.post_daily === 1,
     showVip: ally.show_vip === 1,
     rotIdx: (() => { try { return JSON.parse(ally.rot_idx || '{}'); } catch { return {}; } })(),
@@ -228,11 +229,12 @@ export async function onRequestPost({ request, env }) {
     const parts = [], vals = [];
     const set = (col, val) => { parts.push(`${col}=?`); vals.push(val); };
 
-    if (body.webhook     !== undefined) set('discord_webhook',   String(body.webhook || '').trim().slice(0, 300) || null);
-    if (body.boardingHour !== undefined) set('boarding_hour_utc', Math.max(0, Math.min(23, parseInt(body.boardingHour) || 0)));
-    if (body.postDaily   !== undefined) set('post_daily',         body.postDaily ? 1 : 0);
-    if (body.showVip     !== undefined) set('show_vip',           body.showVip   ? 1 : 0);
-    if (body.server      !== undefined) set('server',             String(body.server || '').trim().slice(0, 32));
+    if (body.webhook         !== undefined) set('discord_webhook',   String(body.webhook || '').trim().slice(0, 300) || null);
+    if (body.boardingHour   !== undefined) set('boarding_hour_utc', Math.max(0, Math.min(23, parseInt(body.boardingHour) || 0)));
+    if (body.postDaily       !== undefined) set('post_daily',         body.postDaily ? 1 : 0);
+    if (body.showVip         !== undefined) set('show_vip',           body.showVip   ? 1 : 0);
+    if (body.server          !== undefined) set('server',             String(body.server || '').trim().slice(0, 32));
+    if (body.serverUtcOffset !== undefined) set('server_utc_offset',  Math.max(-12, Math.min(14, parseInt(body.serverUtcOffset) || 0)));
 
     if (parts.length) {
       vals.push(id);
