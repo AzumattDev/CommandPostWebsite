@@ -326,11 +326,12 @@ export async function onRequestPost({ request, env }) {
     const boardingTs  = boardingUnixTs(monday, ally.boarding_hour_utc ?? 2);
     const resetTs     = resetUnixTs(monday);
 
-    const title       = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
-    const description = [
-      `⏰ **Daily Boarding:** <t:${boardingTs}:t>`,
-      `🔄 **Game Reset:** <t:${resetTs}:t>`,
-    ].join('\n');
+    const title = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
+
+    const todayItem = todayOffset >= 0 && todayOffset < 7 ? schedule[todayOffset] : null;
+    const descLines = [`⏰ **Boarding:** <t:${boardingTs}:t>  ·  🔄 **Reset:** <t:${resetTs}:t>`];
+    if (todayItem?.conductor) descLines.push('', `Today's conductor: **${todayItem.conductor}**`);
+    const description = descLines.join('\n');
 
     const fields = schedule.map(({ day, conductor, vip }, i) => {
       const fieldName = fmtShortDate(dateAddDays(monday, i));
@@ -372,18 +373,13 @@ export async function onRequestPost({ request, env }) {
 
     const embed = {
       title:       '🚂 Today\'s Train Conductor',
-      description: [
-        `**${conductor}** is conducting today's train!`,
-        '',
-        'All aboard! 🚂',
-        '',
-        `📅 ${formatDisplayDate(todayStr)}`,
-        `⏰ **Boarding:** <t:${boardingTs}:t>`,
-        `🔄 **Game Reset:** <t:${resetTs}:t>`,
-      ].join('\n'),
+      description: `**${conductor}** is conducting the train today.\n\nAll aboard! 🚂`,
       color:  0xe8720c,
       fields: [
-        ...(weekFields.length ? [{ name: '​', value: '**— This Week —**', inline: false }, ...weekFields] : []),
+        { name: 'Date',          value: formatDisplayDate(todayStr),  inline: true },
+        { name: '⏰ Boarding',   value: `<t:${boardingTs}:t>`,        inline: true },
+        { name: '🔄 Game Reset', value: `<t:${resetTs}:t>`,           inline: true },
+        ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
       ],
       footer:    { text: `${ally.name} · commandpost.guide · train scheduler` },
       timestamp: new Date().toISOString(),

@@ -114,19 +114,14 @@ async function handleCron(env) {
 
     const embed = {
       title:       '🚂 Today\'s Train Conductor',
-      description: [
-        `**${conductor}** is conducting today's train!`,
-        '',
-        'All aboard! 🚂',
-        '',
-        `📅 ${formatDisplayDate(today)}`,
-        `⏰ **Boarding:** <t:${boardingTs}:t>`,
-        `🔄 **Game Reset:** <t:${resetTs}:t>`,
-      ].join('\n'),
+      description: `**${conductor}** is conducting the train today.\n\nAll aboard! 🚂`,
       color:  0xe8720c,
       fields: [
+        { name: 'Date',          value: formatDisplayDate(today),  inline: true },
+        { name: '⏰ Boarding',   value: `<t:${boardingTs}:t>`,     inline: true },
+        { name: '🔄 Game Reset', value: `<t:${resetTs}:t>`,        inline: true },
         ...(ally.show_vip === 1 && vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
-        { name: '​', value: '**— This Week —**', inline: false },
+        { name: '​', value: '**— Upcoming conductors —**', inline: false },
         ...weekFields,
       ],
       footer:    { text: `${ally.name} · commandpost.guide · automated reminder` },
