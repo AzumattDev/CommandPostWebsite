@@ -433,10 +433,11 @@ const DLONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Su
 const RULE_TYPES = [
   {v:'manual',        l:'Manual — fill in yourself'},
   {v:'r4r5-rotation', l:'R4 + R5 Rotation — officers & leaders take turns'},
-  {v:'r5-rotation',   l:'R5 Rotation — leaders only, take turns'},
+  {v:'r5-rotation',   l:'R5 — alliance leader drives (single R5)'},
   {v:'r4-rotation',   l:'R4 Rotation — officers only, take turns'},
   {v:'r3-rotation',   l:'R3 Rotation — members take turns'},
   {v:'r2-rotation',   l:'R2 Rotation — take turns'},
+  {v:'r1-rotation',   l:'R1 Rotation — take turns'},
   {v:'any-rotation',  l:'Any Player Rotation — everyone takes turns'},
   {v:'tech-top',      l:'Top Tech Points — auto-picks highest contributor'},
   {v:'vs-top',        l:'Top VS Score — auto-picks highest scorer'},
@@ -554,9 +555,11 @@ function tcAddPlayer(){
   const name=nameEl.value.trim();
   if(!name){nameEl.focus();return;}
   if(S.players.some(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Name already exists.');return;}
+  const role=document.getElementById('apRole').value;
+  if(role==='r5'&&S.players.some(p=>p.role==='r5')){alert('There can only be one R5. Edit the existing R5 player to change their role first.');return;}
   S.players.push({
     id:uid(),name,
-    role:document.getElementById('apRole').value,
+    role,
     active:true,
     avail:[true,true,true,true,true,true,true],
     vsPoints:parseInt(document.getElementById('apVs').value)||0,
@@ -617,8 +620,10 @@ function tcSavePlayer(){
   const n=document.getElementById('emName').value.trim();
   if(!n){document.getElementById('emName').focus();return;}
   if(S.players.some(q=>q.id!==editId&&q.name.toLowerCase()===n.toLowerCase())){alert('Another player has that name.');return;}
+  const newRole=document.getElementById('emRole').value;
+  if(newRole==='r5'&&p.role!=='r5'&&S.players.some(q=>q.id!==editId&&q.role==='r5')){alert('There can only be one R5. Change the existing R5 player\'s role first.');return;}
   p.name=n;
-  p.role=document.getElementById('emRole').value;
+  p.role=newRole;
   p.active=document.getElementById('emActive').value==='1';
   p.vsPoints=parseInt(document.getElementById('emVs').value)||0;
   p.techPoints=parseInt(document.getElementById('emTech').value)||0;
@@ -713,6 +718,7 @@ function getPool(ruleType,dow){
     case 'r4-rotation':   return S.players.filter(p=>active(p)&&p.role==='r4').map(p=>p.name);
     case 'r3-rotation':   return S.players.filter(p=>active(p)&&p.role==='r3').map(p=>p.name);
     case 'r2-rotation':   return S.players.filter(p=>active(p)&&p.role==='r2').map(p=>p.name);
+    case 'r1-rotation':   return S.players.filter(p=>active(p)&&p.role==='r1').map(p=>p.name);
     default: return S.players.filter(p=>active(p)).map(p=>p.name);
   }
 }
@@ -748,6 +754,7 @@ function tcApplyRules(){
       case 'r4-rotation':   name=nextRot('r4',i,lastConductor);   break;
       case 'r3-rotation':   name=nextRot('r3',i,lastConductor);   break;
       case 'r2-rotation':   name=nextRot('r2',i,lastConductor);   break;
+      case 'r1-rotation':   name=nextRot('r1',i,lastConductor);   break;
       case 'any-rotation':  name=nextRot('any',i,lastConductor);  break;
       case 'tech-top':      name=topTech(i); break;
       case 'vs-top':        name=topVs(i);   break;

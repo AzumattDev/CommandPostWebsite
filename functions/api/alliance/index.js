@@ -144,6 +144,12 @@ function resetUnixTs(dateStr) {
   return boardingUnixTs(dateStr, 2); // 02:00 UTC game reset
 }
 
+function daysBetween(fromStr, toStr) {
+  const [fy, fm, fd] = fromStr.split('-').map(Number);
+  const [ty, tm, td] = toStr.split('-').map(Number);
+  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000);
+}
+
 function currentUtcMonday() {
   const d = new Date();
   const dow = (d.getUTCDay() + 6) % 7;
@@ -314,9 +320,11 @@ export async function onRequestPost({ request, env }) {
       return new Response('Missing schedule', { status: 400, headers: CORS });
     }
 
-    const monday     = weekStartDate || currentUtcMonday();
-    const boardingTs = boardingUnixTs(monday, ally.boarding_hour_utc ?? 2);
-    const resetTs    = resetUnixTs(monday);
+    const monday      = weekStartDate || currentUtcMonday();
+    const todayStr    = utcDate();
+    const todayOffset = daysBetween(monday, todayStr);
+    const boardingTs  = boardingUnixTs(monday, ally.boarding_hour_utc ?? 2);
+    const resetTs     = resetUnixTs(monday);
 
     const title       = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
     const description = [
@@ -326,7 +334,10 @@ export async function onRequestPost({ request, env }) {
 
     const fields = schedule.map(({ day, conductor, vip }, i) => {
       const fieldName = fmtShortDate(dateAddDays(monday, i));
-      let value = conductor ? `**${conductor}**` : '*(unassigned)*';
+      const isToday   = i === todayOffset;
+      let value = conductor
+        ? `**${conductor}**${isToday ? ' ← today' : ''}`
+        : `*(unassigned)*${isToday ? ' ← today' : ''}`;
       if (vip) value += `\n⭐ VIP: **${vip}**`;
       return { name: fieldName, value, inline: true };
     });
