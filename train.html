@@ -1446,11 +1446,14 @@ async function tcAllyPush(){
   const boardingHour= parseInt(document.getElementById('allyBoardingHour')?.value)||2;
   const postDaily   = document.getElementById('allyPostDaily')?.checked||false;
   const serverOff   = parseInt(document.getElementById('allyServerOffset')?.value)||0;
+  // Never send an empty webhook — omitting the key leaves the stored URL untouched
+  const settingsBody = {boardingHour, postDaily, showVip:S.sched.showVip, serverUtcOffset:serverOff};
+  if(webhook) settingsBody.webhook = webhook;
 
   try{
     await Promise.all([
       fetch(`/api/alliance?action=settings&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({webhook,boardingHour,postDaily,showVip:S.sched.showVip,serverUtcOffset:serverOff})}),
+        body:JSON.stringify(settingsBody)}),
       fetch(`/api/alliance?action=roster&${qs}`,  {method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({players:playerData})}),
       fetch(`/api/alliance?action=schedule&${qs}`,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1479,9 +1482,12 @@ function tcAllySettingsChanged(){
     const bh        = parseInt(document.getElementById('allyBoardingHour')?.value)||2;
     const pd        = document.getElementById('allyPostDaily')?.checked||false;
     const serverOff = parseInt(document.getElementById('allyServerOffset')?.value)||0;
+    // Never send an empty webhook — omitting the key leaves the stored URL untouched
+    const settingsBody = {boardingHour:bh, postDaily:pd, serverUtcOffset:serverOff};
+    if(webhook) settingsBody.webhook = webhook;
     await fetch(`/api/alliance?action=settings&${qs}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({webhook,boardingHour:bh,postDaily:pd,serverUtcOffset:serverOff})
+      body:JSON.stringify(settingsBody)
     }).catch(()=>{});
     if(webhook){
       localStorage.setItem('tc-webhook',webhook);
