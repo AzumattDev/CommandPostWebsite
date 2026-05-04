@@ -40,9 +40,9 @@ function formatDisplayDate(dateStr) {
   });
 }
 
-function boardingUnixTs(dateStr, hourUtc) {
+function boardingUnixTs(dateStr, hourUtc, minuteUtc = 0) {
   const [y, m, d] = dateStr.split('-').map(Number);
-  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), 0, 0) / 1000);
+  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), Number(minuteUtc), 0) / 1000);
 }
 
 function resetUnixTs(dateStr) {
@@ -58,18 +58,24 @@ async function postToDiscord(webhookUrl, payload) {
   if (!res.ok) throw new Error(`Discord ${res.status}: ${await res.text()}`);
 }
 
-async function handleCron(env) {
+async function handleCron(env, force = false) {
   const hour  = new Date().getUTCHours();
   const today = utcDate();
   const dow   = utcDow();
 
-  const allyRes = await env.DB.prepare(
-    `SELECT id, name, discord_webhook, show_vip, boarding_hour_utc
-     FROM alliances
-     WHERE post_daily=1
-       AND boarding_hour_utc=?
-       AND last_posted_date != ?`
-  ).bind(hour, today).all();
+  const allyRes = force
+    ? await env.DB.prepare(
+        `SELECT id, name, discord_webhook, show_vip, boarding_hour_utc, boarding_minute_utc
+         FROM alliances
+         WHERE post_daily=1`
+      ).all()
+    : await env.DB.prepare(
+        `SELECT id, name, discord_webhook, show_vip, boarding_hour_utc, boarding_minute_utc
+         FROM alliances
+         WHERE post_daily=1
+           AND boarding_hour_utc=?
+           AND last_posted_date != ?`
+      ).bind(hour, today).all();
 
   const alliances = allyRes.results || [];
   const results = [];
@@ -99,7 +105,7 @@ async function handleCron(env) {
     const weekConds = Array(7).fill('?');
     for (const w of (weekRes.results || [])) weekConds[w.day_index] = w.conductor || '?';
 
-    const boardingTs = boardingUnixTs(today, ally.boarding_hour_utc ?? 2);
+    const boardingTs = boardingUnixTs(today, ally.boarding_hour_utc ?? 2, ally.boarding_minute_utc ?? 0);
     const resetTs    = resetUnixTs(today);
 
     const weekFields = Array.from({ length: 7 }, (_, i) => {
@@ -139,11 +145,13 @@ async function handleCron(env) {
 }
 
 export async function onRequestGet({ request, env }) {
-  const secret = new URL(request.url).searchParams.get('secret');
+  const params = new URL(request.url).searchParams;
+  const secret = params.get('secret');
   if (!env.CRON_SECRET || secret !== env.CRON_SECRET) {
     return new Response('Unauthorized', { status: 401 });
   }
-  const result = await handleCron(env);
+  const force = params.get('force') === '1';
+  const result = await handleCron(env, force);
   return Response.json(result, { headers: CORS });
 }
 

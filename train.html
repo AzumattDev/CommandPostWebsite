@@ -346,7 +346,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
   <div id="schedRows"></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap">
     <label id="tcBoardingLabel" style="font-size:.83rem;color:var(--text2)">⏰ Boarding:</label>
-    <input type="time" id="tcTime" value="10:00" step="3600" oninput="tcSaveSched();tcPreview();tcUpdateBoardingLocal()">
+    <input type="time" id="tcTime" value="10:00" oninput="tcSaveSched();tcPreview();tcUpdateBoardingLocal()">
     <span id="tcTimeLocal" style="font-size:.78rem;color:var(--text3);font-family:'JetBrains Mono',monospace"></span>
     <label class="chk-label" style="margin-left:8px">
       <input type="checkbox" id="tcVip" onchange="tcToggleVip()"> Show VIP slot
@@ -1110,9 +1110,11 @@ async function tcSendDailyAnnouncement(){
   // Convert server local time to UTC before sending
   let boardingTime='';
   if(t){
-    const sh=parseInt(t.split(':')[0])||0;
+    const parts=t.split(':');
+    const sh=parseInt(parts[0])||0;
+    const sm=parseInt(parts[1])||0;
     const utcH=(sh-serverUtcOffset+24)%24;
-    boardingTime=`${String(utcH).padStart(2,'0')}:00`;
+    boardingTime=`${String(utcH).padStart(2,'0')}:${String(sm).padStart(2,'0')}`;
   }
   const showVip=document.getElementById('tcVip')?.checked;
   const todayVip=showVip?(S.sched.vips[dow]||''):'';
@@ -1380,9 +1382,10 @@ function tcAllyApplyServerState(data){
     tcAllyOffsetChanged(); // updates label
   }
   if(alliance?.boardingHour!=null){
-    // boarding_hour_utc from server → convert to server local for display
+    // boarding_hour_utc + boarding_minute_utc from server → convert to server local for display
     const serverH=(alliance.boardingHour+serverUtcOffset+24)%24;
-    const serverTimeStr=`${String(serverH).padStart(2,'0')}:00`;
+    const serverM=alliance.boardingMinute??0;
+    const serverTimeStr=`${String(serverH).padStart(2,'0')}:${String(serverM).padStart(2,'0')}`;
     S.sched.time=serverTimeStr; // keep S in sync so loadSched() doesn't overwrite with stale localStorage value
     const sel=document.getElementById('allyBoardingHour');
     if(sel) sel.value=alliance.boardingHour; // keep UTC internally
@@ -1445,11 +1448,16 @@ async function tcAllyPush(){
   }));
 
   const webhook     = document.getElementById('allyWebhook')?.value?.trim()||'';
-  const boardingHour= parseInt(document.getElementById('allyBoardingHour')?.value)||2;
-  const postDaily   = document.getElementById('allyPostDaily')?.checked||false;
+  const tVal        = document.getElementById('tcTime')?.value||'10:00';
+  const tParts      = tVal.split(':');
+  const tsh         = parseInt(tParts[0])||0;
+  const tsm         = parseInt(tParts[1])||0;
   const serverOff   = parseInt(document.getElementById('allyServerOffset')?.value)||0;
+  const boardingHour= (tsh-serverOff+24)%24;
+  const boardingMinute= tsm;
+  const postDaily   = document.getElementById('allyPostDaily')?.checked||false;
   // Never send an empty webhook — omitting the key leaves the stored URL untouched
-  const settingsBody = {boardingHour, postDaily, showVip:S.sched.showVip, serverUtcOffset:serverOff};
+  const settingsBody = {boardingHour, boardingMinute, postDaily, showVip:S.sched.showVip, serverUtcOffset:serverOff};
   if(webhook) settingsBody.webhook = webhook;
 
   try{
@@ -1481,11 +1489,16 @@ function tcAllySettingsChanged(){
   allySettingsTimer=setTimeout(async()=>{
     const qs     = `id=${encodeURIComponent(allyId)}&token=${encodeURIComponent(allyToken)}`;
     const webhook   = document.getElementById('allyWebhook')?.value?.trim()||'';
-    const bh        = parseInt(document.getElementById('allyBoardingHour')?.value)||2;
-    const pd        = document.getElementById('allyPostDaily')?.checked||false;
+    const tVal      = document.getElementById('tcTime')?.value||'10:00';
+    const tParts    = tVal.split(':');
+    const tsh       = parseInt(tParts[0])||0;
+    const tsm       = parseInt(tParts[1])||0;
     const serverOff = parseInt(document.getElementById('allyServerOffset')?.value)||0;
+    const bh        = (tsh-serverOff+24)%24;
+    const bm        = tsm;
+    const pd        = document.getElementById('allyPostDaily')?.checked||false;
     // Never send an empty webhook — omitting the key leaves the stored URL untouched
-    const settingsBody = {boardingHour:bh, postDaily:pd, serverUtcOffset:serverOff};
+    const settingsBody = {boardingHour:bh, boardingMinute:bm, postDaily:pd, serverUtcOffset:serverOff};
     if(webhook) settingsBody.webhook = webhook;
     await fetch(`/api/alliance?action=settings&${qs}`,{
       method:'POST',headers:{'Content-Type':'application/json'},

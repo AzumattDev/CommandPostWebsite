@@ -37,7 +37,7 @@ async function resolveAlliance(db, id, token) {
   if (!id || !token) return null;
   const hash = await sha256(token);
   return db.prepare(
-    'SELECT id,name,server,discord_webhook,boarding_hour_utc,post_daily,show_vip,rot_idx,server_utc_offset FROM alliances WHERE id=? AND token_hash=?'
+    'SELECT id,name,server,discord_webhook,boarding_hour_utc,boarding_minute_utc,post_daily,show_vip,rot_idx,server_utc_offset FROM alliances WHERE id=? AND token_hash=?'
   ).bind(id, hash).first();
 }
 
@@ -92,8 +92,9 @@ function allianceView(ally) {
   return {
     id: ally.id, name: ally.name, server: ally.server || '',
     webhook: ally.discord_webhook || '',
-    boardingHour: ally.boarding_hour_utc ?? 2,
-    serverUtcOffset: ally.server_utc_offset ?? 0,
+    boardingHour:   ally.boarding_hour_utc   ?? 2,
+    boardingMinute: ally.boarding_minute_utc ?? 0,
+    serverUtcOffset: ally.server_utc_offset  ?? 0,
     postDaily: ally.post_daily === 1,
     showVip: ally.show_vip === 1,
     rotIdx: (() => { try { return JSON.parse(ally.rot_idx || '{}'); } catch { return {}; } })(),
@@ -136,9 +137,9 @@ function fmtShortDate(dateStr) {
   });
 }
 
-function boardingUnixTs(dateStr, hourUtc) {
+function boardingUnixTs(dateStr, hourUtc, minuteUtc = 0) {
   const [y, m, d] = dateStr.split('-').map(Number);
-  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), 0, 0) / 1000);
+  return Math.floor(Date.UTC(y, m - 1, d, Number(hourUtc), Number(minuteUtc), 0) / 1000);
 }
 
 function resetUnixTs(dateStr) {
@@ -230,7 +231,8 @@ export async function onRequestPost({ request, env }) {
     const set = (col, val) => { parts.push(`${col}=?`); vals.push(val); };
 
     if (body.webhook         !== undefined) set('discord_webhook',   String(body.webhook || '').trim().slice(0, 300) || null);
-    if (body.boardingHour   !== undefined) set('boarding_hour_utc', Math.max(0, Math.min(23, parseInt(body.boardingHour) || 0)));
+    if (body.boardingHour   !== undefined) set('boarding_hour_utc',   Math.max(0,  Math.min(23, parseInt(body.boardingHour)   || 0)));
+    if (body.boardingMinute !== undefined) set('boarding_minute_utc', Math.max(0,  Math.min(59, parseInt(body.boardingMinute) || 0)));
     if (body.postDaily       !== undefined) set('post_daily',         body.postDaily ? 1 : 0);
     if (body.showVip         !== undefined) set('show_vip',           body.showVip   ? 1 : 0);
     if (body.server          !== undefined) set('server',             String(body.server || '').trim().slice(0, 32));
@@ -325,8 +327,9 @@ export async function onRequestPost({ request, env }) {
     const monday      = weekStartDate || currentUtcMonday();
     const todayStr    = utcDate();
     const todayOffset = daysBetween(monday, todayStr);
-    const bHour       = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
-    const boardingTs  = boardingUnixTs(monday, bHour);
+    const bHour      = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc   ?? 2);
+    const bMin       = boardingTime ? (parseInt(boardingTime.split(':')[1]) || 0) : (ally.boarding_minute_utc ?? 0);
+    const boardingTs = boardingUnixTs(monday, bHour, bMin);
     const resetTs     = resetUnixTs(monday);
 
     const title = weekLabel ? `🚂 Train Conductor Schedule — ${weekLabel}` : '🚂 Train Conductor Schedule';
@@ -365,8 +368,9 @@ export async function onRequestPost({ request, env }) {
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
     const todayStr   = date || utcDate();
-    const bHour      = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc ?? 2);
-    const boardingTs = boardingUnixTs(todayStr, bHour);
+    const bHour      = boardingTime ? (parseInt(boardingTime.split(':')[0]) || 0) : (ally.boarding_hour_utc   ?? 2);
+    const bMin       = boardingTime ? (parseInt(boardingTime.split(':')[1]) || 0) : (ally.boarding_minute_utc ?? 0);
+    const boardingTs = boardingUnixTs(todayStr, bHour, bMin);
     const resetTs    = resetUnixTs(todayStr);
 
     const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => {

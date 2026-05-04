@@ -48,3 +48,7 @@ CREATE TABLE IF NOT EXISTS alliance_day_rules (
 -- Migration: add server timezone offset (run once if upgrading)
 -- In D1 console: paste this single line and execute:
 -- ALTER TABLE alliances ADD COLUMN server_utc_offset INTEGER NOT NULL DEFAULT 0;
+
+-- Migration: add boarding minute support (run once if upgrading)
+-- In D1 console: paste this single line and execute:
+-- ALTER TABLE alliances ADD COLUMN boarding_minute_utc INTEGER NOT NULL DEFAULT 0;
