@@ -1011,6 +1011,57 @@
             background: var(--red-bg)
         }
 
+        /* ── Pen tool ────────────────────────────────────────────── */
+        .pen-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            border: 1px solid var(--ps-bdr);
+            border-radius: 8px;
+            padding: .3rem .75rem;
+            margin-bottom: .5rem;
+            flex-wrap: wrap
+        }
+
+        .pen-lbl {
+            font-size: .7rem;
+            color: var(--text3);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap
+        }
+
+        .pen-sz-btn {
+            padding: 2px 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text2);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: .72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .12s;
+            white-space: nowrap
+        }
+
+        .pen-sz-btn:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .pen-sz-btn.pen-act {
+            background: var(--ps-bg);
+            border-color: var(--ps-bdr);
+            color: var(--ps)
+        }
+
+        #penToggleBtn.pen-on {
+            background: var(--ps-bg);
+            border-color: var(--ps-bdr);
+            color: var(--ps)
+        }
+
         /* ── Mobile ──────────────────────────────────────────────── */
         @media (max-width: 768px) {
             /* Map first, sidebar below */
@@ -1259,13 +1310,26 @@
                 <div class="mode-dot"></div>
                 <span id="modeText">Select a profile above to start planning</span>
                 <span class="mode-hint">87 zones &bull; Ctrl+S to save</span>
+                <button class="mode-export-btn" id="penToggleBtn" onclick="togglePen()">✏ Draw</button>
                 <button class="mode-export-btn" onclick="exportPNG()">⬇ Export PNG</button>
+            </div>
+            <div class="pen-bar" id="penBar" style="display:none">
+                <span class="pen-lbl">Color</span>
+                <input type="color" id="penColor" value="#ff4444" style="width:28px;height:24px;padding:1px;border:1px solid var(--border);border-radius:5px;background:none;cursor:pointer">
+                <span class="pen-lbl" style="margin-left:4px">Size</span>
+                <button class="pen-sz-btn" id="penSz2" onclick="setPenSize(2)">Thin</button>
+                <button class="pen-sz-btn pen-act" id="penSz4" onclick="setPenSize(4)">Med</button>
+                <button class="pen-sz-btn" id="penSz8" onclick="setPenSize(8)">Thick</button>
+                <button class="pen-sz-btn" onclick="undoStroke()" style="margin-left:4px">↩ Undo</button>
+                <button class="pen-sz-btn" onclick="clearStrokes()" style="color:var(--red)">✕ Clear</button>
             </div>
             <div class="map-outer" id="mapOuter">
                 <div id="mapInner">
                     <img src="images/preseason_map.png" id="mapImg" alt="Pre-Season Map" draggable="false">
                     <svg class="map-svg map-fills" id="mapSvgFills" viewBox="0 0 685 558"
                          preserveAspectRatio="xMidYMid meet"></svg>
+                    <svg class="map-svg map-labels" id="drawSvg" viewBox="0 0 685 558"
+                         preserveAspectRatio="xMidYMid meet" style="pointer-events:none"></svg>
                 </div>
                 <svg class="map-svg map-labels" id="mapSvgLabels"></svg>
             </div>
@@ -1928,7 +1992,7 @@
         const server = document.getElementById('npfServer').value.trim();
         const label = document.getElementById('npfLabel').value.trim();
         if (!server && !alliance && !label) return;
-        const p = {id: uid(), alliance, server, label, alliances: [], zones: {}};
+        const p = {id: uid(), alliance, server, label, alliances: [], zones: {}, drawStrokes: []};
         allProfiles.push(p);
         activeId = p.id;
         hideNewForm();
@@ -2887,19 +2951,23 @@
         const selfId = selfAlliance ? selfAlliance.id : null;
         const img = document.getElementById('mapImg');
         const W = img.naturalWidth, H = img.naturalHeight;
-        const SCALE = 3; // 3× supersampling — crisp at any zoom level
+        const SCALE = 3;
         const c = document.createElement('canvas');
         c.width = W * SCALE;
         c.height = H * SCALE;
         const ctx = c.getContext('2d');
-        ctx.scale(SCALE, SCALE); // all subsequent drawing uses original map coords
+        ctx.scale(SCALE, SCALE);
         ctx.drawImage(img, 0, 0, W, H);
         TERR_DATA.forEach(t => {
-            const color = zoneColor(t.id);
-            if (!color) return;
             const z = p && p.zones[t.id];
-            if ((filterType !== null && (!z || z.type !== filterType)) ||
-                (filterAlliance !== null && (!z || z.allianceId !== filterAlliance))) return;
+            const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
+            // Use t.type (auto-detected) for fill color, matching renderFills()
+            const effectiveType = t.type || null;
+            const ztFill = effectiveType ? ZONE_TYPES.find(x => x.id === effectiveType) : null;
+            const color = a ? a.color : (ztFill ? ztFill.color : null);
+            if (!color) return;
+            if ((filterType !== null && effectiveType !== filterType) ||
+                (filterAlliance !== null && (!a || a.id !== filterAlliance))) return;
             const pts = t.pts.split(' ').map(q => q.split(',').map(Number));
             ctx.beginPath();
             ctx.moveTo(pts[0][0], pts[0][1]);
@@ -2913,7 +2981,7 @@
             ctx.lineWidth = 1.2;
             ctx.stroke();
             ctx.globalAlpha = 1;
-            const a = z && z.allianceId ? p.alliances.find(x => x.id === z.allianceId) : null;
+            // Badge: only for zones with explicit type or alliance assignment
             const zt = z && z.type ? ZONE_TYPES.find(x => x.id === z.type) : null;
             if (!a && !zt) return;
             const cStyle = getBannerStyle(a, selfId);
@@ -2951,7 +3019,6 @@
             ctx.textBaseline = 'middle';
             const midY = by + BH / 2;
             if (hasBoth) {
-                // Single-line: [TAG] Name
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 8px Chakra Petch,sans-serif';
                 ctx.fillText('[' + tag + ']', tx, midY);
@@ -2972,11 +3039,32 @@
                 }
             }
         });
+        // Render pen strokes: SVG coord space 685×558 → canvas natural pixel space W×H
+        const strokes = (p && p.drawStrokes) || [];
+        if (strokes.length) {
+            ctx.save();
+            ctx.scale(W / 685, H / 558);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            strokes.forEach(s => {
+                if (!s.d) return;
+                ctx.strokeStyle = s.color;
+                ctx.lineWidth = s.size;
+                ctx.stroke(new Path2D(s.d));
+            });
+            ctx.restore();
+        }
         const slug = p ? [p.server && 'S' + p.server, p.alliance].filter(Boolean).join('-') : '';
-        const link = document.createElement('a');
-        link.download = 'preseason' + (slug ? '-' + slug : '') + '.png';
-        link.href = c.toDataURL('image/png');
-        link.click();
+        try {
+            const link = document.createElement('a');
+            link.download = 'preseason' + (slug ? '-' + slug : '') + '.png';
+            link.href = c.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            alert('Export failed: ' + (e.message || e));
+        }
     }
 
     /* ── Init ───────────────────────────────────────────────────── */
@@ -2985,10 +3073,131 @@
     // causing a TDZ ReferenceError that crashed the whole script on refresh.
     let mpScale = 1, mpX = 0, mpY = 0, mpDrag = false, mpSX = 0, mpSY = 0, mpPX = 0, mpPY = 0, mpMoved = 0;
 
+    /* ── Pen tool ───────────────────────────────────────────────── */
+    let penMode = false, penDragging = false, penSize = 4;
+    let penCurrentPts = [], penLivePath = null;
+
+    function togglePen() {
+        penMode = !penMode;
+        document.getElementById('penToggleBtn').classList.toggle('pen-on', penMode);
+        document.getElementById('penBar').style.display = penMode ? 'flex' : 'none';
+        document.getElementById('mapOuter').style.cursor = penMode ? 'crosshair' : '';
+    }
+
+    function setPenSize(s) {
+        penSize = s;
+        [2, 4, 8].forEach(n => {
+            const b = document.getElementById('penSz' + n);
+            if (b) b.classList.toggle('pen-act', n === s);
+        });
+    }
+
+    function screenToSvg(ex, ey) {
+        const r = document.getElementById('mapOuter').getBoundingClientRect();
+        const ratio = 685 / document.getElementById('mapOuter').offsetWidth;
+        return [
+            (ex - r.left - mpX) / mpScale * ratio,
+            (ey - r.top - mpY) / mpScale * ratio
+        ];
+    }
+
+    function buildSmoothPath(pts) {
+        if (pts.length < 2) return '';
+        let d = `M${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)}`;
+        for (let i = 1; i < pts.length - 1; i++) {
+            const mx = ((pts[i][0] + pts[i + 1][0]) / 2).toFixed(2);
+            const my = ((pts[i][1] + pts[i + 1][1]) / 2).toFixed(2);
+            d += ` Q${pts[i][0].toFixed(2)},${pts[i][1].toFixed(2)} ${mx},${my}`;
+        }
+        d += ` L${pts[pts.length - 1][0].toFixed(2)},${pts[pts.length - 1][1].toFixed(2)}`;
+        return d;
+    }
+
+    function penDown(ex, ey) {
+        penDragging = true;
+        penCurrentPts = [screenToSvg(ex, ey)];
+        const svg = document.getElementById('drawSvg');
+        penLivePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        penLivePath.setAttribute('stroke', document.getElementById('penColor').value);
+        penLivePath.setAttribute('stroke-width', penSize);
+        penLivePath.setAttribute('stroke-linecap', 'round');
+        penLivePath.setAttribute('stroke-linejoin', 'round');
+        penLivePath.setAttribute('fill', 'none');
+        svg.appendChild(penLivePath);
+    }
+
+    function penMove(ex, ey) {
+        if (!penDragging) return;
+        penCurrentPts.push(screenToSvg(ex, ey));
+        if (penLivePath && penCurrentPts.length >= 2)
+            penLivePath.setAttribute('d', buildSmoothPath(penCurrentPts));
+    }
+
+    function penUp() {
+        if (!penDragging) return;
+        penDragging = false;
+        if (penCurrentPts.length < 2) {
+            if (penLivePath) penLivePath.remove();
+            penLivePath = null;
+            penCurrentPts = [];
+            return;
+        }
+        const p = getProfile();
+        if (p) {
+            if (!p.drawStrokes) p.drawStrokes = [];
+            p.drawStrokes.push({
+                d: buildSmoothPath(penCurrentPts),
+                color: document.getElementById('penColor').value,
+                size: penSize
+            });
+            saveAll();
+        }
+        penLivePath = null;
+        penCurrentPts = [];
+        renderStrokes();
+    }
+
+    function undoStroke() {
+        const p = getProfile();
+        if (!p || !p.drawStrokes || !p.drawStrokes.length) return;
+        p.drawStrokes.pop();
+        saveAll();
+        renderStrokes();
+    }
+
+    function clearStrokes() {
+        const p = getProfile();
+        if (!p) return;
+        if (!confirm('Clear all pen drawings?')) return;
+        p.drawStrokes = [];
+        saveAll();
+        renderStrokes();
+    }
+
+    function renderStrokes() {
+        const svg = document.getElementById('drawSvg');
+        if (!svg) return;
+        while (svg.lastChild) svg.removeChild(svg.lastChild);
+        const p = getProfile();
+        const strokes = (p && p.drawStrokes) || [];
+        strokes.forEach(s => {
+            if (!s.d) return;
+            const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            el.setAttribute('d', s.d);
+            el.setAttribute('stroke', s.color);
+            el.setAttribute('stroke-width', s.size);
+            el.setAttribute('stroke-linecap', 'round');
+            el.setAttribute('stroke-linejoin', 'round');
+            el.setAttribute('fill', 'none');
+            svg.appendChild(el);
+        });
+    }
+
     function renderAll() {
         renderProfileSelect();
         renderSidebar();
-        renderMap()
+        renderMap();
+        renderStrokes();
     }
 
     document.addEventListener('click', e => {
@@ -3054,6 +3263,7 @@
 
     _mo.addEventListener('mousedown', e => {
         if (e.button !== 0) return;
+        if (penMode) { penDown(e.clientX, e.clientY); return; }
         mpDrag = true;
         mpSX = e.clientX;
         mpSY = e.clientY;
@@ -3064,6 +3274,7 @@
         // No preventDefault — it suppresses SVG click events per the HTML spec
     });
     document.addEventListener('mousemove', e => {
+        if (penDragging) { penMove(e.clientX, e.clientY); return; }
         if (!mpDrag) return;
         mpMoved = Math.hypot(e.clientX - mpSX, e.clientY - mpSY);
         if (mpMoved < 2) return;
@@ -3075,6 +3286,7 @@
         _rafBadges();
     });
     document.addEventListener('mouseup', () => {
+        if (penDragging) { penUp(); return; }
         if (!mpDrag) return;
         mpDrag = false;
         _mo.classList.remove('mp-dragging');

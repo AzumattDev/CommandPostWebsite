@@ -253,6 +253,17 @@
   .bg-scroll-wrap{height:280px}
   .tl-track{font-size:.48rem}
 }
+.mode-pill{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:3px;margin-bottom:.75rem}
+.mode-btn{padding:5px 20px;border-radius:calc(var(--radius-lg) - 3px);border:none;background:transparent;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mode-btn.mode-active-def{background:var(--cw-perim);color:#fff}
+.mode-btn.mode-active-off{background:var(--type-heavy);color:#fff}
+/* ── Pen tool ─────────────────────────────────────────────── */
+.cw-pen-bar{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--cw-flex-border);border-radius:8px;padding:.3rem .75rem;margin-bottom:.5rem;flex-wrap:wrap}
+.pen-lbl{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.pen-sz-btn{padding:2px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
+.pen-sz-btn:hover{background:var(--surface2);color:var(--text)}
+.pen-sz-btn.pen-act{background:var(--cw-flex-bg);border-color:var(--cw-flex-border);color:var(--cw-flex)}
+#cwPenBtn.pen-on{background:var(--cw-flex-bg);border-color:var(--cw-flex-border);color:var(--cw-flex)}
 </style>
 </head>
 <body>
@@ -260,7 +271,13 @@
 
 <div class="cw-hero">
   <h1><img src="images/ui/capitol.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;margin-right:6px" alt=""><span class="acc">Capitol War</span> Coalition Planner</h1>
-  <p class="sub">Assign top 10–15 alliances to cannons, Capitol defense, perimeter, and flex roles. Generate a Discord-ready battle plan for your coalition.</p>
+  <p class="sub" id="cwSubtitle">Assign top 10–15 alliances to cannons, Capitol defense, perimeter, and flex roles. Generate a Discord-ready battle plan for your coalition.</p>
+</div>
+
+<!-- Mode Toggle -->
+<div class="mode-pill">
+  <button class="mode-btn mode-active-def" id="modeDefBtn" onclick="cwSetMode('defense')">🛡 Defense</button>
+  <button class="mode-btn" id="modeOffBtn" onclick="cwSetMode('offense')">⚔ Offense</button>
 </div>
 
 <!-- Profile bar -->
@@ -377,14 +394,14 @@
 <!-- Timeline -->
 <div class="war-timeline">
   <div class="tl-row">
-    <span class="tl-lbl">8-hr war</span>
-    <div class="tl-track">
-      <div class="tl-seg tl-gold">HOLD · 4h max</div>
-      <div class="tl-seg tl-red">ATK 1 · 2h</div>
-      <div class="tl-seg tl-purple">ATK 2 · 2h</div>
+    <span class="tl-lbl" id="tlLbl">8-hr war</span>
+    <div class="tl-track" id="tlTrack">
+      <div class="tl-seg tl-gold" id="tlSeg1">HOLD · 4h max</div>
+      <div class="tl-seg tl-red" id="tlSeg2">ATK 1 · 2h</div>
+      <div class="tl-seg tl-purple" id="tlSeg3">ATK 2 · 2h</div>
     </div>
   </div>
-  <div class="tl-meta">
+  <div class="tl-meta" id="tlMeta">
     <div class="tl-chip"><span class="tl-dot" style="background:rgba(240,192,64,.55)"></span>Win = 4 total hours Capitol occupied</div>
     <div class="tl-chip"><span class="tl-dot" style="background:rgba(125,112,96,.8)"></span>Mud = square zone, no shields, slow march</div>
     <div class="tl-chip"><span class="tl-dot" style="background:rgba(192,132,255,.55)"></span>4 cannons at mud corners — capture first</div>
@@ -431,7 +448,7 @@
 
     <!-- Tactic -->
     <div class="panel">
-      <div class="panel-title">Defense Strategy</div>
+      <div class="panel-title" id="tacPanelTitle">Defense Strategy</div>
       <div class="tactic-btns">
         <button class="tac-btn active" id="tac-balanced" onclick="cwSetTactic('balanced')">
           <strong>Balanced Defense</strong>
@@ -484,8 +501,19 @@
         <input type="number" class="pt-sel" id="bgZoomInput" value="80" min="35" max="400" style="max-width:58px;min-width:52px" oninput="bgSetZoom(this.value)">
         <span class="pt-lbl" style="color:var(--text3)">%</span>
         <button class="map-tool-btn" onclick="bgScrollToCapitol()">⌖ Center</button>
+        <button class="map-tool-btn" id="cwPenBtn" onclick="cwTogglePen()">✏ Draw</button>
         <button class="map-tool-btn" onclick="cwClearBases()" style="color:var(--red)">✕ Clear</button>
         <span class="gz-val" id="bgCoordLabel" style="min-width:88px;color:var(--text3);font-size:.6rem">—</span>
+      </div>
+      <div class="cw-pen-bar" id="cwPenBar" style="display:none">
+        <span class="pen-lbl">Color</span>
+        <input type="color" id="cwPenColor" value="#ff4444" style="width:28px;height:24px;padding:1px;border:1px solid var(--border);border-radius:5px;background:none;cursor:pointer">
+        <span class="pen-lbl" style="margin-left:4px">Size</span>
+        <button class="pen-sz-btn" id="cwPenSz2" onclick="cwSetPenSize(2)">Thin</button>
+        <button class="pen-sz-btn pen-act" id="cwPenSz4" onclick="cwSetPenSize(4)">Med</button>
+        <button class="pen-sz-btn" id="cwPenSz8" onclick="cwSetPenSize(8)">Thick</button>
+        <button class="pen-sz-btn" onclick="cwUndoPenStroke()" style="margin-left:4px">↩ Undo</button>
+        <button class="pen-sz-btn" onclick="cwClearPenStrokes()" style="color:var(--red)">✕ Clear</button>
       </div>
       <!-- Canvas -->
       <div class="bg-scroll-wrap" id="bgScrollWrap">
@@ -519,8 +547,8 @@
 
     <!-- Rules -->
     <div class="panel" style="margin-bottom:.75rem">
-      <div class="panel-title">Capital War — Coalition Strategy Notes</div>
-      <div class="rules-grid">
+      <div class="panel-title" id="rulesPanelTitle">Capital War — Coalition Strategy Notes</div>
+      <div class="rules-grid" id="cwRulesGrid">
         <div class="rule-item"><span class="ri">💥</span><span><strong>4 corner cannons</strong> fire at enemy Capitol when held — accelerates capture progress. Capture these first, not Capitol.</span></div>
         <div class="rule-item"><span class="ri">🏛️</span><span><strong>Capitol defense</strong>: Primary alliance holds the Capitol. HQ26+ players can clear mud and send squads to Capitol.</span></div>
         <div class="rule-item"><span class="ri">⚡</span><span><strong>Flex/Roam</strong>: Most mobile alliance. No fixed cannon. Eliminates priority threats and disrupts enemy advances across the mud.</span></div>
@@ -539,6 +567,7 @@
     <div class="export-row">
       <button class="cw-btn cw-btn-primary" onclick="cwExportTxt()">📄 Export as TXT</button>
       <button class="cw-btn" onclick="cwExportClip(this)">📋 Copy for Discord</button>
+      <button class="cw-btn" onclick="cwExportPNG()">⬇ Export PNG</button>
     </div>
 
   </div><!-- /main -->
@@ -582,6 +611,28 @@ const ROLE_NODE_MAP={capitol:'capitol',can_nw:'can_nw',can_ne:'can_ne',can_sw:'c
 const ATYPE_COLOR={heavy:'var(--type-heavy)',mid:'var(--type-mid)',support:'var(--type-support)',flex:'var(--type-flex-c)'};
 const ATYPE_LABEL={heavy:'Heavy',mid:'Mid',support:'Support',flex:'Flex'};
 
+const CW_ZONES_OFF=[
+  {id:'flex',     name:'Flex / Disruptors',   emoji:'⚡',cap:3, type:'flex',  cls:'z-flex',
+   desc:'Break up enemy formations — clear defenders near Capitol and perimeter'},
+  {id:'perimeter',name:'Vanguard / Flank',    emoji:'🗡️',cap:20,type:'perim', cls:'z-perim',
+   desc:'Push through enemy perimeter — clear path to Capitol, prevent defender regrouping'},
+  {id:'second',   name:'Reserve / 2nd Wave',  emoji:'🔒',cap:20,type:'second',cls:'z-second',
+   desc:'Second wave — reinforce captured cannons, back up Capitol rally waves'},
+];
+const ROLE_OPTIONS_OFF=[
+  {v:'unassigned',l:'— Unassigned —'},
+  {v:'capitol',   l:'Capitol Raiders'},
+  {v:'can_nw',    l:'Storm Cannon NW'},
+  {v:'can_ne',    l:'Storm Cannon NE'},
+  {v:'can_sw',    l:'Storm Cannon SW'},
+  {v:'can_se',    l:'Storm Cannon SE'},
+  {v:'flex',      l:'Flex / Disruptors'},
+  {v:'perimeter', l:'Vanguard / Flank'},
+  {v:'second',    l:'Reserve / 2nd Wave'},
+];
+function getActiveZones(){return cwMode==='offense'?CW_ZONES_OFF:CW_ZONES;}
+function getActiveRoleOptions(){return cwMode==='offense'?ROLE_OPTIONS_OFF:ROLE_OPTIONS;}
+
 /* ══════════════════════════════════════════════════════════════
    PROFILES
 ══════════════════════════════════════════════════════════════ */
@@ -589,7 +640,7 @@ const PKEY='cw_coalition_v1',AKEY='cw_coal_active';
 let profiles={},activeId=null;
 
 function defaultProfile(){
-  return {alliance:'',server:'',label:'',cwAlliances:[],cwAssignments:Object.fromEntries(ALL_NODES.map(n=>[n.id,[]])),cwTactic:'balanced',cwUID:1,cwBases:[],cwBaseUID:100};
+  return {alliance:'',server:'',label:'',cwAlliances:[],cwAssignments:Object.fromEntries(ALL_NODES.map(n=>[n.id,[]])),cwTactic:'balanced',cwMode:'defense',cwUID:1,cwBases:[],cwBaseUID:100,penStrokes:[]};
 }
 function loadProfiles(){
   try{profiles=JSON.parse(localStorage.getItem(PKEY)||'{}');}catch(e){profiles={};}
@@ -648,20 +699,23 @@ function cwDeleteProfile(){
   renderAll();
 }
 
-let cwAlliances=[],cwAssignments={},cwTactic='balanced',cwUID=1,cwDragId=null,cwBases=[],cwBaseUID=100,cwPlaceAllianceId=null,cwPlaceShielded=false;
+let cwAlliances=[],cwAssignments={},cwTactic='balanced',cwMode='defense',cwUID=1,cwDragId=null,cwBases=[],cwBaseUID=100,cwPlaceAllianceId=null,cwPlaceShielded=false;
+let cwPenStrokes=[],cwPenMode=false,cwPenDragging=false,cwPenSize=4,cwCurrentPts=[];
 
 function loadActiveProfile(){
   ALL_NODES.forEach(n=>cwAssignments[n.id]=[]);
-  cwAlliances=[];cwTactic='balanced';cwUID=1;cwBases=[];cwBaseUID=100;
+  cwAlliances=[];cwTactic='balanced';cwUID=1;cwBases=[];cwBaseUID=100;cwPenStrokes=[];
   if(!activeId||!profiles[activeId]) return;
   const p=profiles[activeId];
   cwAlliances=JSON.parse(JSON.stringify(p.cwAlliances||[]));
   const s=p.cwAssignments||{};
   ALL_NODES.forEach(n=>cwAssignments[n.id]=(s[n.id]||[]).slice());
   cwTactic=p.cwTactic||'balanced';
+  cwMode=p.cwMode||'defense';
   cwUID=p.cwUID||1;
   cwBases=JSON.parse(JSON.stringify(p.cwBases||[]));
   cwBaseUID=p.cwBaseUID||100;
+  cwPenStrokes=JSON.parse(JSON.stringify(p.penStrokes||[]));
   ['balanced','cannon-heavy','layered'].forEach(x=>document.getElementById('tac-'+x).classList.toggle('active',x===cwTactic));
 }
 function saveActiveProfile(){
@@ -669,7 +723,7 @@ function saveActiveProfile(){
   profiles[activeId]=Object.assign(profiles[activeId]||defaultProfile(),{
     cwAlliances:JSON.parse(JSON.stringify(cwAlliances)),
     cwAssignments:Object.fromEntries(ALL_NODES.map(n=>[n.id,(cwAssignments[n.id]||[]).slice()])),
-    cwTactic,cwUID,cwBases:JSON.parse(JSON.stringify(cwBases)),cwBaseUID
+    cwTactic,cwMode,cwUID,cwBases:JSON.parse(JSON.stringify(cwBases)),cwBaseUID,penStrokes:JSON.parse(JSON.stringify(cwPenStrokes))
   });
   saveProfiles();
 }
@@ -785,7 +839,7 @@ function buildMap(){
 }
 
 function buildZones(){
-  document.getElementById('cwZoneGrid').innerHTML=CW_ZONES.map(z=>`
+  document.getElementById('cwZoneGrid').innerHTML=getActiveZones().map(z=>`
     <div class="zone-slot ${z.cls}" id="zone-${z.id}"
          ondragover="event.preventDefault();this.classList.add('drag-over')"
          ondragleave="this.classList.remove('drag-over')"
@@ -800,6 +854,7 @@ function buildZones(){
    RENDER
 ══════════════════════════════════════════════════════════════ */
 function renderAll(){
+  applyModeUI();
   renderSidebar();
   renderMapNodes();
   renderZones();
@@ -819,7 +874,7 @@ function renderSidebar(){
       :'<div style="font-size:.8rem;color:var(--text3)">Create or select a profile first.</div>';
     return;
   }
-  const roleOpts=ROLE_OPTIONS.map(r=>`<option value="${r.v}">${r.l}</option>`).join('');
+  const activeRoleOpts=getActiveRoleOptions();
   list.innerHTML=cwAlliances.map(a=>{
     const col=ATYPE_COLOR[a.type]||'var(--text3)';
     const isAsgn=asgn.has(a.id);
@@ -835,7 +890,7 @@ function renderSidebar(){
         <button class="chip-remove" onclick="cwRemoveAlliance(${a.id})">✕</button>
       </div>
       <div class="chip-meta">
-        <select onchange="cwSetRole(${a.id},this.value)" title="Role">${ROLE_OPTIONS.map(r=>`<option value="${r.v}"${a.role===r.v?' selected':''}>${r.l}</option>`).join('')}</select>
+        <select onchange="cwSetRole(${a.id},this.value)" title="Role">${activeRoleOpts.map(r=>`<option value="${r.v}"${a.role===r.v?' selected':''}>${r.l}</option>`).join('')}</select>
         <span class="atype-badge at-${a.type}">${ATYPE_LABEL[a.type]}</span>
         ${a.members?`<span style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace">${a.members}mbr</span>`:''}
       </div>
@@ -864,7 +919,7 @@ function renderMapNodes(){
 }
 
 function renderZones(){
-  CW_ZONES.forEach(z=>{
+  getActiveZones().forEach(z=>{
     const ids=cwAssignments[z.id]||[];
     const sl=document.getElementById('zslots-'+z.id);
     const tg=document.getElementById('ztags-'+z.id);
@@ -900,6 +955,7 @@ function renderPlan(){
 }
 
 function buildPlan(){
+  if(cwMode==='offense') return buildPlanOffense();
   const asgn=getAssignedSet();
   const unasn=cwAlliances.filter(a=>!asgn.has(a.id));
   const listOf=(nId,sep=' + ')=>{
@@ -912,7 +968,6 @@ function buildPlan(){
     if(!ids.length) return '❌ UNASSIGNED';
     return ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);if(!a) return '';return`   • ${a.tag}${a.fullname?' ('+a.fullname+')':''}${a.members?' — ~'+a.members+' members':''}${a.notes?' | '+a.notes:''}`}).join('\n');
   };
-  const prof=activeId?profiles[activeId]:null;
 
   let h='';
   h+=`<div class="phase-badge ph-cannon">💥 Cannon Assignments</div>\n<pre>`;
@@ -983,6 +1038,192 @@ function buildPlan(){
   h+=`  • Coordinate R5 rallies — rally leader rank = +5% damage bonus`;
   h+=`</pre>`;
   return h;
+}
+
+function buildPlanOffense(){
+  const asgn=getAssignedSet();
+  const unasn=cwAlliances.filter(a=>!asgn.has(a.id));
+  const listOf=(nId,sep=' + ')=>{
+    const ids=cwAssignments[nId]||[];
+    if(!ids.length) return '❌ UNASSIGNED';
+    return ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);return a?a.tag+(a.notes?' ('+a.notes+')':''):'?';}).join(sep);
+  };
+  const listOfFull=(nId)=>{
+    const ids=cwAssignments[nId]||[];
+    if(!ids.length) return '   ❌ UNASSIGNED';
+    return ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);if(!a) return '';return`   • ${a.tag}${a.fullname?' ('+a.fullname+')':''}${a.members?' — ~'+a.members+' members':''}${a.notes?' | '+a.notes:''}`}).join('\n');
+  };
+
+  let h='';
+  h+=`<div class="phase-badge ph-cannon">💥 Phase 1 — Cannon Storm</div>\n<pre>`;
+  h+=`OBJECTIVE: Capture all 4 corner cannons at battle start.\n`;
+  h+=`Held cannons fire passively at the enemy Capitol — this is your force multiplier.\n\n`;
+  h+=`NW Cannon:  ${listOf('can_nw')}\n`;
+  h+=`NE Cannon:  ${listOf('can_ne')}\n`;
+  h+=`SW Cannon:  ${listOf('can_sw')}\n`;
+  h+=`SE Cannon:  ${listOf('can_se')}\n\n`;
+  h+=`Cannon rules:\n`;
+  h+=`  • Pre-position inside the mud zone 10+ min before battle start (slow march speed)\n`;
+  h+=`  • Storm all 4 simultaneously at the opening bell — speed is everything\n`;
+  h+=`  • Once captured, hold them — defenders will counterattack immediately\n`;
+  h+=`  • Cannon zones = 2× kill points vs mud zone. Fight here, not in the mud.\n`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-assault">🏛️ Phase 2 — Capitol Raid</div>\n<pre>`;
+  h+=`${listOf('capitol')} — Lead Capitol rally waves.\n`;
+  const capIds=cwAssignments.capitol||[];
+  if(capIds.length){
+    h+=`\nRally rules:\n`;
+    h+=`  • Send burn squads 2–3 min BEFORE main rallies to deplete garrison by 40–50%\n`;
+    h+=`  • R5 leads main rally for +5% damage bonus (R4 Officer = +5% too)\n`;
+    h+=`  • Stagger rally timing — never let Capitol go uncontested\n`;
+    h+=`  • HQ26+ players clear the mud zone and send squads directly to Capitol\n`;
+    h+=`  • Begin Capitol rallies once 2+ cannons are secured\n`;
+  }
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-flex">⚡ Flex / Disruptors</div>\n<pre>`;
+  h+=`${listOf('flex')} — Free movement — clear the defenders.\n`;
+  h+=`Priority: Eliminate defending alliances on the perimeter and near Capitol.\n`;
+  h+=`Break up enemy formations — don't let defenders regroup on captured cannons.\n`;
+  h+=`Support cannon assault teams immediately if any cannon falls.\n`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-defense">🗡️ Vanguard &amp; Reserve</div>\n<pre>`;
+  h+=`VANGUARD / FLANK:\n${listOfFull('perimeter')}\n\n`;
+  h+=`Rules:\n`;
+  h+=`  • Push aggressively through the enemy perimeter — clear the path to Capitol\n`;
+  h+=`  • Prevent defenders from reinforcing cannons or regrouping\n`;
+  h+=`  • No shields in mud zone — commit fully once you enter\n`;
+  h+=`  • Target enemy commanders and R5/R4 players first\n\n`;
+  h+=`RESERVE / 2ND WAVE:\n${listOfFull('second')}\n\n`;
+  h+=`Rules:\n`;
+  h+=`  • Reinforce captured cannons the moment any falls\n`;
+  h+=`  • Back up Capitol rally waves — never let occupation progress drop\n`;
+  h+=`  • Fill coverage gaps as defenders push back\n`;
+  if(unasn.length){
+    h+=`\nGAP FILL (${unasn.length} unassigned):\n`;
+    h+=unasn.map(a=>`  • ${a.tag}${a.fullname?' ('+a.fullname+')':''} — reinforce any captured position or join Capitol rally queue`).join('\n');
+    h+='\n';
+  }
+  h+=`\n📋 GENERAL ATTACK RULES\n`;
+  h+=`  • Pre-position inside mud zone 10+ min before battle start\n`;
+  h+=`  • No shields in mud zone — commit fully once you enter\n`;
+  h+=`  • Burn squads 2–3 min before main rallies (deplete garrison 40–50%)\n`;
+  h+=`  • Capture all 4 cannons BEFORE sustained Capitol rallies\n`;
+  h+=`  • Win = Capitol occupation bar reaches 100% (≈4 hours of occupation)\n`;
+  h+=`  • Coordinate rally timing — stagger so Capitol is never left uncontested\n`;
+  h+=`  • Individual score ≥50,000 pts required for Winning Streak rewards`;
+  h+=`</pre>\n\n`;
+
+  h+=`<div class="phase-badge ph-cannon">📊 Point Scoring Priority</div>\n<pre>`;
+  h+=`Kill in Capitol or Cannon combat:  +12 pts / Lv.1 troop  ← PRIORITY\n`;
+  h+=`Kill on Contaminated Land (mud):    +6 pts / Lv.1 troop\n\n`;
+  h+=`Cannon positions are worth 2× the mud zone — fight near Capitol and cannons:\n`;
+  h+=`  • 2× kill points vs fighting in the mud zone\n`;
+  h+=`  • Held cannons deal passive damage to enemy Capitol garrison\n`;
+  h+=`  • Denies defenders the same kill-point multiplier\n\n`;
+  h+=`Attack priority order:\n`;
+  h+=`  1. Storm all 4 corner cannons simultaneously at battle start\n`;
+  h+=`  2. Burn squads → main rally waves on Capitol (once 2+ cannons secured)\n`;
+  h+=`  3. Flex disrupts defenders — prevent regrouping on cannons\n`;
+  h+=`  4. Reserve reinforces and sustains all captured positions\n`;
+  h+=`  5. Mud zone skirmishing (lowest value — only when clearing the path)\n\n`;
+  h+=`  • R5/R4 rally leader = +5% damage bonus — always lead with highest rank\n`;
+  h+=`  • Invasion Right is earned via Warzone Duel — coordinate with alliance R5 for timing`;
+  h+=`</pre>`;
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE TOGGLE
+══════════════════════════════════════════════════════════════ */
+function cwSetMode(mode){
+  cwMode=mode;
+  renderAll();
+}
+
+function applyModeUI(){
+  const off=cwMode==='offense';
+  // Mode pill buttons
+  document.getElementById('modeDefBtn').className='mode-btn'+(off?'':' mode-active-def');
+  document.getElementById('modeOffBtn').className='mode-btn'+(off?' mode-active-off':'');
+  // Subtitle
+  const sub=document.getElementById('cwSubtitle');
+  if(sub) sub.textContent=off
+    ?"Plan your server's Capitol attack. Assign alliances to cannon assault, Capitol raid, flex disruption, and reserve roles. Generate a Discord-ready attack order."
+    :"Assign top 10–15 alliances to cannons, Capitol defense, perimeter, and flex roles. Generate a Discord-ready battle plan for your coalition.";
+  // Tactic panel title
+  const tpt=document.getElementById('tacPanelTitle');
+  if(tpt) tpt.textContent=off?'Attack Strategy':'Defense Strategy';
+  // Tactic buttons
+  const b1=document.getElementById('tac-balanced'),b2=document.getElementById('tac-cannon-heavy'),b3=document.getElementById('tac-layered');
+  if(b1){b1.querySelector('strong').textContent=off?'Balanced Assault':'Balanced Defense';b1.querySelector('span').textContent=off?'Cannons first · Capitol rally immediately · flex disrupts defenders':'Top alliances on cannons · primary on Capitol · perimeter shielded';}
+  if(b2){b2.querySelector('strong').textContent=off?'Cannon Blitz':'Cannon Heavy';b2.querySelector('span').textContent=off?'All top alliances rush all 4 cannons simultaneously · Capitol rally follows cannon lock':'Max alliances on cannons · thin perimeter · cannon fire dominance';}
+  if(b3){b3.querySelector('strong').textContent=off?'Phased Attack':'Layered Defense';b3.querySelector('span').textContent=off?'Burn squads soften Capitol · Wave 1 takes cannons · Wave 2 sustained rally':'Strong perimeter + second line · fewer cannon operators but shielded depth';}
+  // Role input select in add-form
+  const ri=document.getElementById('cwRoleInput');
+  if(ri){const prev=ri.value;ri.innerHTML=getActiveRoleOptions().map(r=>`<option value="${r.v}">${r.l}</option>`).join('');ri.value=prev;}
+  // Timeline
+  renderTimeline();
+  // Rules
+  renderRules();
+  // Zones (rebuilds with mode-appropriate names/descriptions)
+  buildZones();
+}
+
+function renderTimeline(){
+  const off=cwMode==='offense';
+  const s1=document.getElementById('tlSeg1'),s2=document.getElementById('tlSeg2'),s3=document.getElementById('tlSeg3'),meta=document.getElementById('tlMeta');
+  if(s1) s1.textContent=off?'STORM · Cannons':'HOLD · 4h max';
+  if(s2) s2.textContent=off?'RALLY · Capitol':'ATK 1 · 2h';
+  if(s3) s3.textContent=off?'HOLD · Maintain':'ATK 2 · 2h';
+  if(meta) meta.innerHTML=off
+    ?`<div class="tl-chip"><span class="tl-dot" style="background:rgba(240,192,64,.55)"></span>Win = Capitol occupation bar reaches 100% (≈4 total hours)</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(125,112,96,.8)"></span>Mud = no shields, slow march — pre-position 10+ min early</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(192,132,255,.55)"></span>4 corner cannons fire at enemy Capitol when you hold them</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(248,113,113,.55)"></span>Burn squads 2–3 min before rallies deplete garrison by 40–50%</div>`
+    :`<div class="tl-chip"><span class="tl-dot" style="background:rgba(240,192,64,.55)"></span>Win = 4 total hours Capitol occupied</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(125,112,96,.8)"></span>Mud = square zone, no shields, slow march</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(192,132,255,.55)"></span>4 cannons at mud corners — capture first</div>
+       <div class="tl-chip"><span class="tl-dot" style="background:rgba(96,165,250,.45)"></span>Top 3 alliances (Lv6 city holders) · Week 3+</div>`;
+}
+
+function renderRules(){
+  const el=document.getElementById('cwRulesGrid');
+  const pt=document.getElementById('rulesPanelTitle');
+  if(!el) return;
+  if(cwMode==='offense'){
+    if(pt) pt.textContent='Capital War — Attack Strategy Notes';
+    el.innerHTML=`
+      <div class="rule-item"><span class="ri">💥</span><span><strong>Storm cannons first</strong> — capture all 4 corner cannons at battle start. Each held cannon fires at enemy Capitol passively. Don't rally Capitol until 2+ cannons are secure.</span></div>
+      <div class="rule-item"><span class="ri">🔥</span><span><strong>Burn squads first</strong>: Send squads 2–3 min before your main rally to deplete garrison by 40–50% before the main wave hits weakened defenses.</span></div>
+      <div class="rule-item"><span class="ri">🏛️</span><span><strong>Capitol Raiders</strong>: Lead rallies directly on Capitol once cannons are secured. R5/R4 rally = +5% damage bonus — always use highest-rank leader.</span></div>
+      <div class="rule-item"><span class="ri">⚡</span><span><strong>Flex / Disruptors</strong>: Clear defending alliances off the perimeter and near Capitol. Break up their formations — prevent counterattacks on your captured cannons.</span></div>
+      <div class="rule-item"><span class="ri">🗡️</span><span><strong>Vanguard / Flank</strong>: Push aggressively through the enemy perimeter. Clear the path to Capitol. Prevent defenders from reinforcing cannons or regrouping.</span></div>
+      <div class="rule-item"><span class="ri">🔒</span><span><strong>Reserve / 2nd Wave</strong>: Reinforce captured cannons immediately if they fall. Back up Capitol rallies — never let occupation progress drop. Fill coverage gaps.</span></div>
+      <div class="rule-item"><span class="ri">☣️</span><span>Mud zone = <strong>no shields, slow march</strong>. Pre-position 10+ min before battle start. Once in mud you're committed — no safe retreat.</span></div>
+      <div class="rule-item"><span class="ri">🎯</span><span><strong>Cannon lock before Capitol rally</strong>: Cannons amplify all Capitol occupation progress. Every cannon you hold is a force multiplier against the defender's garrison.</span></div>
+      <div class="rule-item"><span class="ri">⭐</span><span><strong>R5 rally: +5% · R4 Officer rally: +5%</strong>. Stagger rally timing — never let Capitol go uncontested. Coordinate rally leaders across all attacking alliances.</span></div>
+      <div class="rule-item"><span class="ri">📏</span><span><strong>Win = Capitol occupation reaches 100%</strong> (approximately 4 hours of occupation). Maintain continuous pressure — every minute off Capitol sets you back.</span></div>
+      <div class="rule-item"><span class="ri">🏅</span><span>Individual score <strong>≥50,000 pts</strong> required for Winning Streak rewards. Kill points in Capitol/Cannon = 2× mud zone. Prioritize fighting near Capitol and cannons.</span></div>
+      <div class="rule-item"><span class="ri">📢</span><span>Coordinate on Discord. Share this plan before the event. Confirm each alliance's R5 has seen their assignment and rally timing windows.</span></div>`;
+  } else {
+    if(pt) pt.textContent='Capital War — Coalition Strategy Notes';
+    el.innerHTML=`
+      <div class="rule-item"><span class="ri">💥</span><span><strong>4 corner cannons</strong> fire at enemy Capitol when held — accelerates capture progress. Capture these first, not Capitol.</span></div>
+      <div class="rule-item"><span class="ri">🏛️</span><span><strong>Capitol defense</strong>: Primary alliance holds the Capitol. HQ26+ players can clear mud and send squads to Capitol.</span></div>
+      <div class="rule-item"><span class="ri">⚡</span><span><strong>Flex/Roam</strong>: Most mobile alliance. No fixed cannon. Eliminates priority threats and disrupts enemy advances across the mud.</span></div>
+      <div class="rule-item"><span class="ri">🛡️</span><span><strong>Perimeter</strong>: Stay shielded outside the mud. Act as support garrison for players entering mud. Block enemy base placements.</span></div>
+      <div class="rule-item"><span class="ri">🔒</span><span><strong>Second line</strong>: Just behind perimeter. Prevent enemy advances, block shortcuts to mud edge. Fill defensive gaps.</span></div>
+      <div class="rule-item"><span class="ri">☣️</span><span>Mud zone = <strong>square area</strong>. No shields, slow march. Only non-participating or non-mud players stay near the outer perimeter.</span></div>
+      <div class="rule-item"><span class="ri">👥</span><span>Players unable to be online during the event form the <strong>second defensive line</strong> — position just outside the mud.</span></div>
+      <div class="rule-item"><span class="ri">⭐</span><span><strong>R5 rally: +5% · R4 Officer rally: +5%</strong>. Always use the highest-rank player as rally leader. R5 contact per alliance is key.</span></div>
+      <div class="rule-item"><span class="ri">📏</span><span><strong>Keep enemy march times long</strong> — fill perimeter gaps. Dense coverage = slower enemy advances = more time to respond.</span></div>
+      <div class="rule-item"><span class="ri">🏙️</span><span>Only <strong>top 3 alliances</strong> holding Lv6 cities formally participate, but all allied alliances contribute to the defense.</span></div>
+      <div class="rule-item"><span class="ri">🎯</span><span><strong>Cannon priority order</strong>: assign top-tier alliances. Even one cannon lost lets the enemy accelerate their Capitol capture.</span></div>
+      <div class="rule-item"><span class="ri">📢</span><span>Coordinate on Discord. Share this plan before the event. Confirm each alliance's R5 has seen their assignment.</span></div>`;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1091,6 +1332,45 @@ function planTextPlain(){
   const unasn=cwAlliances.filter(a=>!asgn.has(a.id));
   const listOf=(nId,sep=' + ')=>{const ids=cwAssignments[nId]||[];return ids.length?ids.map(id=>{const a=cwAlliances.find(x=>x.id===id);return a?a.tag+(a.notes?' ('+a.notes+')':''):'?'}).join(sep):'UNASSIGNED'};
   const prof=activeId?profiles[activeId]:null;
+  if(cwMode==='offense'){
+    return [
+      '=== CAPITAL WAR — ATTACK ORDER ===',
+      prof?`Server: S${prof.server||'?'} | Leading Alliance: ${prof.alliance||'?'}${prof.label?' | '+prof.label:''}`:null,
+      `Strategy: ${cwTactic.toUpperCase()}`,
+      '',
+      '--- PHASE 1: CANNON STORM ---',
+      `NW Cannon (Storm):  ${listOf('can_nw')}`,
+      `NE Cannon (Storm):  ${listOf('can_ne')}`,
+      `SW Cannon (Storm):  ${listOf('can_sw')}`,
+      `SE Cannon (Storm):  ${listOf('can_se')}`,
+      'Pre-position 10+ min early. Storm all 4 simultaneously at battle start.',
+      '',
+      '--- PHASE 2: CAPITOL RAID ---',
+      `Capitol Raiders:    ${listOf('capitol')}`,
+      'Burn squads 2–3 min before main rallies. R5/R4 leads for +5% damage bonus.',
+      'Begin Capitol rallies once 2+ cannons are secured.',
+      '',
+      '--- FLEX / DISRUPTORS ---',
+      `Flex:               ${listOf('flex',' · ')}`,
+      'Clear defenders near Capitol and perimeter. Support any fallen cannon.',
+      '',
+      '--- VANGUARD & RESERVE ---',
+      `Vanguard / Flank:   ${listOf('perimeter',' · ')}`,
+      `Reserve / 2nd Wave: ${listOf('second',' · ')}`,
+      '',
+      '--- ATTACK RULES ---',
+      '• Pre-position inside mud zone 10+ min before battle (slow march speed)',
+      '• No shields in mud zone — commit fully once you enter',
+      '• Burn squads 2–3 min before rallies (deplete garrison 40–50%)',
+      '• Capture ALL 4 cannons BEFORE sustained Capitol rallies',
+      '• Win = Capitol occupation reaches 100% (≈4 hours total)',
+      '• Stagger rally timing — never let Capitol go uncontested',
+      '• Individual score ≥50,000 pts required for Winning Streak rewards',
+      ...(unasn.length?['',`Unassigned (${unasn.length}): ${unasn.map(a=>a.tag).join(', ')} — reinforce cannons or join Capitol rally queue`]:[]),
+      '',
+      'Generated by Command Post — commandpost.pages.dev',
+    ].filter(l=>l!==null).join('\n');
+  }
   return [
     '=== CAPITAL WAR COALITION BATTLE PLAN ===',
     prof?`Server: S${prof.server||'?'} | Coordinating Alliance: ${prof.alliance||'?'}${prof.label?' | '+prof.label:''}`:null,
@@ -1127,7 +1407,7 @@ function planTextPlain(){
     'Generated by Command Post — commandpost.pages.dev',
   ].filter(l=>l!==null).join('\n');
 }
-function cwExportTxt(){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(planTextPlain());a.download='capital-war-coalition-plan.txt';a.click();}
+function cwExportTxt(){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(planTextPlain());a.download=cwMode==='offense'?'capital-war-attack-order.txt':'capital-war-coalition-plan.txt';a.click();}
 function cwExportClip(btn){navigator.clipboard.writeText(planTextPlain()).then(()=>{const o=btn.textContent;btn.textContent='✓ Copied!';btn.style.color='var(--green)';setTimeout(()=>{btn.textContent=o;btn.style.color=''},1800)});}
 
 /* ══════════════════════════════════════════════════════════════
@@ -1201,6 +1481,85 @@ function bgLoadImages(){
   bgLvlImg.src='images/ui/alliancecity_level.png';
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PEN TOOL
+══════════════════════════════════════════════════════════════ */
+function cwTogglePen(){
+  cwPenMode=!cwPenMode;
+  document.getElementById('cwPenBtn').classList.toggle('pen-on',cwPenMode);
+  document.getElementById('cwPenBar').style.display=cwPenMode?'flex':'none';
+  const c=document.getElementById('baseGridCanvas');
+  if(c) c.style.cursor=cwPenMode?'crosshair':'grab';
+}
+function cwSetPenSize(s){
+  cwPenSize=s;
+  [2,4,8].forEach(n=>{const b=document.getElementById('cwPenSz'+n);if(b)b.classList.toggle('pen-act',n===s);});
+}
+function cwScreenToWorld(ex,ey){
+  const c=document.getElementById('baseGridCanvas');
+  const r=c.getBoundingClientRect();
+  return [(ex-r.left-bgViewX)/bgViewScale,(ey-r.top-bgViewY)/bgViewScale];
+}
+function cwPenDown(ex,ey){
+  cwPenDragging=true;
+  cwCurrentPts=[cwScreenToWorld(ex,ey)];
+}
+function cwPenMove(ex,ey){
+  if(!cwPenDragging) return;
+  cwCurrentPts.push(cwScreenToWorld(ex,ey));
+  bgRender();
+}
+function cwPenUp(){
+  if(!cwPenDragging) return;
+  cwPenDragging=false;
+  if(cwCurrentPts.length>=2){
+    const col=document.getElementById('cwPenColor');
+    cwPenStrokes.push({pts:cwCurrentPts.slice(),color:col?col.value:'#ff4444',size:cwPenSize});
+    saveActiveProfile();
+  }
+  cwCurrentPts=[];
+  bgRender();
+}
+function cwUndoPenStroke(){
+  if(!cwPenStrokes.length) return;
+  cwPenStrokes.pop();
+  saveActiveProfile();
+  bgRender();
+}
+function cwClearPenStrokes(){
+  if(!cwPenStrokes.length) return;
+  if(!confirm('Clear all pen drawings?')) return;
+  cwPenStrokes=[];
+  saveActiveProfile();
+  bgRender();
+}
+function cwExportPNG(){
+  const canvas=document.getElementById('baseGridCanvas');
+  if(!canvas) return;
+  const SCALE=3;
+  const origW=canvas.width, origH=canvas.height;
+  const saveX=bgViewX, saveY=bgViewY, saveScale=bgViewScale;
+  // Upscale canvas and view transform for crisp export
+  canvas.width=origW*SCALE; canvas.height=origH*SCALE;
+  bgViewX=saveX*SCALE; bgViewY=saveY*SCALE; bgViewScale=saveScale*SCALE;
+  bgRender();
+  const p=activeId?profiles[activeId]:null;
+  const slug=p?[p.server&&'S'+p.server,p.alliance].filter(Boolean).join('-'):'';
+  const fname='capital-war'+(cwMode==='offense'?'-attack':'')+(slug?'-'+slug:'')+'.png';
+  try{
+    const link=document.createElement('a');
+    link.download=fname;
+    link.href=canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }catch(e){alert('Export failed: '+(e.message||e));}
+  // Restore original size and re-render
+  canvas.width=origW; canvas.height=origH;
+  bgViewX=saveX; bgViewY=saveY; bgViewScale=saveScale;
+  bgRender();
+}
+
 function bgInit(){
   const canvas=document.getElementById('baseGridCanvas');
   if(!canvas) return;
@@ -1218,12 +1577,14 @@ function bgInit(){
   // ── Left-drag pan ────────────────────────────────────────────
   canvas.addEventListener('mousedown',e=>{
     if(e.button!==0) return;
+    if(cwPenMode){cwPenDown(e.clientX,e.clientY);e.preventDefault();return;}
     bgPanning=true; bgPanMoved=false;
     bgPanX=e.clientX; bgPanY=e.clientY;
     canvas.style.cursor='grabbing';
     e.preventDefault();
   });
   window.addEventListener('mousemove',e=>{
+    if(cwPenDragging){cwPenMove(e.clientX,e.clientY);return;}
     if(!bgPanning) return;
     const dx=e.clientX-bgPanX, dy=e.clientY-bgPanY;
     if(Math.abs(dx)+Math.abs(dy)>3) bgPanMoved=true;
@@ -1234,9 +1595,10 @@ function bgInit(){
     }
   });
   window.addEventListener('mouseup',e=>{
+    if(cwPenDragging){cwPenUp();return;}
     if(!bgPanning) return;
     bgPanning=false;
-    canvas.style.cursor='grab';
+    canvas.style.cursor=cwPenMode?'crosshair':'grab';
     if(!bgPanMoved) bgHandleClick.call(canvas,e);
   });
 
@@ -1583,6 +1945,29 @@ function bgRender(){
         ctx.fillStyle='#fff'; ctx.fillText(tag,cx2,cy2);
       });
     });
+  }
+  /* ── Pen strokes ─────────────────────────────────────────── */
+  const penColor=document.getElementById('cwPenColor');
+  const liveColor=penColor?penColor.value:'#ff4444';
+  const allStrokes=cwPenStrokes.concat(cwPenDragging&&cwCurrentPts.length>=2?[{pts:cwCurrentPts,color:liveColor,size:cwPenSize}]:[]);
+  if(allStrokes.length){
+    ctx.save();
+    ctx.lineCap='round';ctx.lineJoin='round';
+    allStrokes.forEach(s=>{
+      if(!s.pts||s.pts.length<2) return;
+      ctx.beginPath();
+      ctx.moveTo(s.pts[0][0],s.pts[0][1]);
+      for(let i=1;i<s.pts.length-1;i++){
+        const mx=(s.pts[i][0]+s.pts[i+1][0])/2;
+        const my=(s.pts[i][1]+s.pts[i+1][1])/2;
+        ctx.quadraticCurveTo(s.pts[i][0],s.pts[i][1],mx,my);
+      }
+      ctx.lineTo(s.pts[s.pts.length-1][0],s.pts[s.pts.length-1][1]);
+      ctx.strokeStyle=s.color;
+      ctx.lineWidth=s.size/bgViewScale;
+      ctx.stroke();
+    });
+    ctx.restore();
   }
   ctx.restore();
 }
