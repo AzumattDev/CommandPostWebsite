@@ -1382,10 +1382,12 @@ function tcAllyApplyServerState(data){
   if(alliance?.boardingHour!=null){
     // boarding_hour_utc from server → convert to server local for display
     const serverH=(alliance.boardingHour+serverUtcOffset+24)%24;
+    const serverTimeStr=`${String(serverH).padStart(2,'0')}:00`;
+    S.sched.time=serverTimeStr; // keep S in sync so loadSched() doesn't overwrite with stale localStorage value
     const sel=document.getElementById('allyBoardingHour');
     if(sel) sel.value=alliance.boardingHour; // keep UTC internally
     const tc=document.getElementById('tcTime');
-    if(tc) tc.value=`${String(serverH).padStart(2,'0')}:00`;
+    if(tc) tc.value=serverTimeStr;
     tcUpdateBoardingLocal();
   }
   if(alliance?.postDaily!=null){
