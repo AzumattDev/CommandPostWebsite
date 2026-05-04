@@ -67,7 +67,8 @@ h2{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;margi
 /* Schedule rows */
 .srow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
 .srow:last-child{border-bottom:none}
-.sday{font-family:'Chakra Petch',sans-serif;font-size:.88rem;font-weight:600;color:var(--tr-orange);width:2.8rem;flex-shrink:0}
+.srow.today{background:rgba(251,191,36,.04);border-radius:6px;padding-left:6px;border-left:2px solid var(--amber-border)}
+.sday{font-family:'Chakra Petch',sans-serif;font-size:.88rem;font-weight:600;color:var(--tr-orange);width:3.6rem;flex-shrink:0;line-height:1.25}
 .stag{font-size:.64rem;font-family:'JetBrains Mono',monospace;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;white-space:nowrap;flex-shrink:0;max-width:120px;overflow:hidden;text-overflow:ellipsis}
 .vip-input{display:none}
 .show-vip .vip-input{display:block}
@@ -127,10 +128,10 @@ input[type=time]:focus{outline:none;border-color:var(--tr-orange)}
 .info-box{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.16);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.65rem 1rem;font-size:.82rem;color:var(--text2);margin-bottom:.75rem}
 
 /* Collapsible h2 headers */
-h2.toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
-h2.toggle:hover{color:var(--accent)}
-.cbtn{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px;margin-left:auto;border-radius:4px;pointer-events:none}
-h2.toggle:hover .cbtn{color:var(--text)}
+h2.toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;transition:background .12s}
+h2.toggle:hover{color:var(--accent);background:var(--surface2)}
+.cbtn{font-family:'JetBrains Mono',monospace;font-size:.68rem;background:var(--surface2);border:1px solid var(--border);color:var(--text3);cursor:pointer;padding:2px 9px;margin-left:auto;border-radius:5px;pointer-events:none;transition:all .12s;min-width:28px;text-align:center}
+h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:var(--surface3)}
 
 /* Settings inputs */
 .set-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
@@ -170,9 +171,12 @@ h2.toggle:hover .cbtn{color:var(--text)}
 <body>
 <div class="container">
 
-<div style="margin-bottom:1.5rem">
-  <h1>🚂 Train Conductor Scheduler</h1>
-  <p style="font-size:.88rem;color:var(--text2);max-width:660px;line-height:1.6">Plan your weekly train conductor schedule. Add your players, set a rule for each day, then click <strong style="color:var(--text)">Apply Rules</strong> to auto-fill the week. Post the schedule to Discord or download as an image to share with your alliance.</p>
+<div style="margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:12px">
+  <div style="flex:1">
+    <h1>🚂 Train Conductor Scheduler</h1>
+    <p style="font-size:.88rem;color:var(--text2);max-width:660px;line-height:1.6">Plan your weekly train conductor schedule. Add your players, set a rule for each day, then click <strong style="color:var(--text)">Apply Rules</strong> to auto-fill the week. Post the schedule to Discord or download as an image to share with your alliance.</p>
+  </div>
+  <button class="btn btn-ghost btn-sm" style="flex-shrink:0;margin-top:6px" title="Show quick start guide" onclick="document.getElementById('quickStart').style.display='';localStorage.removeItem('tc-qs-dismissed');document.getElementById('quickStart').scrollIntoView({behavior:'smooth'})">? Help</button>
 </div>
 
 <!-- Quick Start -->
@@ -182,7 +186,8 @@ h2.toggle:hover .cbtn{color:var(--text)}
     <strong>1. Add players</strong> — scroll to Player Pool and add everyone who can drive the train. Set their rank (R5/R4/R3…) and which days they're available.<br>
     <strong>2. Set day rules</strong> — Day Rules lets you pick a strategy per day: rotation through officers, top tech contributor, random pick, or fill in manually (for MVP/Casino nights).<br>
     <strong>3. Apply Rules</strong> — click the green button to auto-fill the week. The same person won't be scheduled two days in a row.<br>
-    <strong>4. Post to Discord</strong> — connect an Alliance Account, add your Discord webhook, and post the schedule directly. Enable auto-post to have it send automatically every day.
+    <strong>4. Penalty Days</strong> — (bottom-right of the schedule) players who drove within this many days are skipped when randomizing, so the same person doesn't drive every week. Default is 7. Set to 0 to disable.<br>
+    <strong>5. Post to Discord</strong> — connect an Alliance Account, add your Discord webhook, and post the schedule directly. Enable auto-post to have it send automatically every day.
   </p>
   <button class="btn btn-ghost btn-sm" style="margin-top:.6rem" onclick="document.getElementById('quickStart').style.display='none';localStorage.setItem('tc-qs-dismissed','1')">Got it, hide this</button>
 </div>
@@ -209,7 +214,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 
 <!-- Alliance Account -->
 <h2 class="toggle" onclick="tcToggle('allyBody')">🏰 Alliance Account <button class="cbtn">▼</button></h2>
-<div id="allyBody" class="panel" style="display:none">
+<div id="allyBody" class="panel">
 
   <!-- Not logged in -->
   <div id="allyLoginSection">
@@ -231,7 +236,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 
     <!-- Login -->
     <div id="allyLoginForm" style="display:none">
-      <div class="set-row"><label>Alliance ID</label><input type="text" id="allyLoginId" placeholder="a1b2c3d4e5f6…" style="font-family:'JetBrains Mono',monospace"></div>
+      <div class="set-row"><label>Alliance ID</label><input type="text" id="allyLoginId" placeholder="a1b2c3d4e5f6…" style="font-family:'JetBrains Mono',monospace" autocomplete="off"></div>
       <div class="set-row" style="margin-bottom:12px"><label>Password</label><input type="password" id="allyLoginPass" placeholder="Alliance password…" onkeydown="if(event.key==='Enter')tcAllyLogin()"></div>
       <button class="btn btn-primary" onclick="tcAllyLogin()">→ Login</button>
     </div>
@@ -248,7 +253,10 @@ h2.toggle:hover .cbtn{color:var(--text)}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div class="set-row">
         <label>Discord Webhook URL</label>
-        <input type="password" id="allyWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcAllySettingsChanged()">
+        <div style="position:relative">
+          <input type="password" id="allyWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcAllySettingsChanged()" style="width:100%;padding-right:40px;box-sizing:border-box">
+          <button type="button" id="allyWebhookEye" onclick="tcToggleWebhookVis()" title="Show/hide webhook URL" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:.9rem;padding:2px 4px;line-height:1">👁</button>
+        </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div class="set-row">
@@ -258,16 +266,26 @@ h2.toggle:hover .cbtn{color:var(--text)}
         <label class="chk-label" style="margin-top:2px">
           <input type="checkbox" id="allyPostDaily" onchange="tcAllySettingsChanged()"> Enable daily auto-post
         </label>
+        <span id="allyLastPosted" style="font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;display:none"></span>
+        <span id="allyNextPost" style="font-size:.7rem;color:var(--green);font-family:'JetBrains Mono',monospace;display:none"></span>
         <select id="allyBoardingHour" style="display:none"></select>
       </div>
     </div>
     <div class="info-box" style="margin-bottom:10px;font-size:.82rem">Boarding time is set in the Schedule section (server local time). When daily auto-post is enabled, the cron posts at that time each day.</div>
     <div id="allySyncMsg" style="font-size:.78rem;margin-bottom:8px;display:none"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-ghost btn-sm" onclick="tcTestWebhook()">🔔 Test Webhook</button>
+      <button class="btn btn-disc btn-sm" onclick="tcPostSchedule()">
+        <svg width="13" height="13" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.55 58.55 0 0 0 45.7.7a.22.22 0 0 0-.23.11 40.78 40.78 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.25 0A37.3 37.3 0 0 0 25.6.81a.22.22 0 0 0-.23-.11A58.36 58.36 0 0 0 10.97 4.9a.2.2 0 0 0-.09.08C1.62 18.73-1 32.2.31 45.5a.24.24 0 0 0 .09.16 58.84 58.84 0 0 0 17.72 8.96.22.22 0 0 0 .24-.08 42.04 42.04 0 0 0 3.63-5.9.22.22 0 0 0-.12-.3 38.73 38.73 0 0 1-5.53-2.63.22.22 0 0 1-.02-.37c.37-.28.74-.57 1.1-.86a.22.22 0 0 1 .22-.03c11.6 5.3 24.15 5.3 35.6 0a.22.22 0 0 1 .23.03c.36.29.73.58 1.1.86a.22.22 0 0 1-.02.37 36.36 36.36 0 0 1-5.54 2.63.22.22 0 0 0-.11.3 47.15 47.15 0 0 0 3.62 5.9.22.22 0 0 0 .24.08 58.7 58.7 0 0 0 17.74-8.96.22.22 0 0 0 .09-.16C73 30.08 69.89 16.7 60.18 4.98a.17.17 0 0 0-.08-.08ZM23.73 37.33c-3.5 0-6.39-3.21-6.39-7.16s2.83-7.16 6.39-7.16c3.59 0 6.44 3.24 6.39 7.16 0 3.95-2.84 7.16-6.39 7.16Zm23.62 0c-3.5 0-6.38-3.21-6.38-7.16s2.83-7.16 6.38-7.16c3.6 0 6.45 3.24 6.4 7.16 0 3.95-2.8 7.16-6.4 7.16Z"/></svg>
+        Post Today's Conductor
+      </button>
+    </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-green btn-sm" onclick="tcAllyPull()">↓ Pull from Server</button>
       <button class="btn btn-primary btn-sm" onclick="tcAllyPush()">↑ Push All to Server</button>
       <button class="btn btn-ghost btn-sm" onclick="tcAllyShowId()">📋 Copy Alliance ID</button>
-      <button class="btn btn-danger btn-sm" onclick="tcAllyLogout()">Disconnect</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcAllyShareLink()">🔗 Share Login Link</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcAllyLogout()">Log Out</button>
     </div>
   </div>
 
@@ -276,7 +294,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 
 <!-- Settings -->
 <h2 class="toggle" onclick="tcToggle('settingsBody')">⚙️ Settings <button class="cbtn">▼</button></h2>
-<div id="settingsBody" class="panel" style="display:none">
+<div id="settingsBody" class="panel">
   <div id="tcLegacySettings">
     <div class="info-box">Connect an <strong>Alliance Account</strong> above to store your webhook securely on the server. These fields are only needed if you are the site administrator managing this without an alliance account.</div>
     <div class="set-row">
@@ -303,8 +321,8 @@ h2.toggle:hover .cbtn{color:var(--text)}
 </div>
 
 <!-- Player Pool -->
-<h2>Player Pool</h2>
-<div class="panel">
+<h2 class="toggle" onclick="tcToggle('playerBody')">Player Pool <button class="cbtn">▼</button></h2>
+<div id="playerBody" class="panel">
   <input type="text" id="playerSearch" class="tc-in" placeholder="🔍 Search players…" oninput="renderPlayers()" style="width:100%;margin-bottom:8px;display:none">
   <div id="playerList"></div>
   <div class="add-form">
@@ -330,13 +348,27 @@ h2.toggle:hover .cbtn{color:var(--text)}
       <button class="btn btn-green" onclick="tcAddPlayer()">＋ Add</button>
     </div>
   </div>
-  <div style="font-size:.72rem;color:var(--text3);margin-top:.5rem">Toggle active (left switch) · Click availability dots to block a day · Click name to edit</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;flex-wrap:wrap;gap:6px">
+    <div style="font-size:.72rem;color:var(--text3)">Toggle active (left switch) · Click availability dots to block a day · Click name to edit</div>
+    <button class="btn btn-ghost btn-sm" onclick="tcToggleBulkAdd()" id="bulkAddBtn">⊕ Bulk Add</button>
+  </div>
+  <div id="bulkAddArea" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+    <div style="font-size:.72rem;color:var(--text3);margin-bottom:5px">Paste player names — one per line. All added as R4, active, available every day. Edit individually after.</div>
+    <textarea id="bulkAddTxt" class="tc-ta" placeholder="Alice&#10;Bob&#10;Charlie…" style="min-height:90px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="btn btn-green btn-sm" onclick="tcBulkAdd()">＋ Add All</button>
+      <button class="btn btn-ghost btn-sm" onclick="tcToggleBulkAdd()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- Day Rules -->
 <h2 class="toggle" onclick="tcToggle('rulesBody')">Day Rules <button class="cbtn">▼</button></h2>
 <div id="rulesBody" class="panel">
-  <div class="info-box">Choose a rule for each day of the week. <strong>Rotation</strong> — cycles through players of that rank in alphabetical order, picking up where last week left off. <strong>Top Points</strong> — auto-selects whoever has the most tech or VS points. <strong>Manual/MVP/Casino</strong> — leaves the slot blank so you can type in the name yourself after the results are known.</div>
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:.75rem">
+    <div class="info-box" style="margin-bottom:0;flex:1">Choose a rule for each day of the week. <strong>Rotation</strong> — cycles through players of that rank in alphabetical order, picking up where last week left off. <strong>Top Points</strong> — auto-selects whoever has the most tech or VS points. <strong>Manual/MVP/Casino</strong> — leaves the slot blank so you can type in the name yourself after the results are known.</div>
+    <button class="btn btn-green btn-sm" style="flex-shrink:0;margin-top:2px" onclick="tcApplyRules()">✓ Apply Rules</button>
+  </div>
   <div id="ruleRows"></div>
 </div>
 
@@ -352,14 +384,14 @@ h2.toggle:hover .cbtn{color:var(--text)}
       <input type="checkbox" id="tcVip" onchange="tcToggleVip()"> Show VIP slot
     </label>
     <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase">Weeks</label><input type="number" id="tcWeeks" value="1" min="1" max="8" class="tc-num" style="width:65px"></div>
-      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase">Penalty Days</label><input type="number" id="tcPenalty" value="7" min="0" max="30" class="tc-num" style="width:65px" oninput="tcSaveSettings()"></div>
+      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase" title="How many weeks to generate at once when using Randomize">Weeks</label><input type="number" id="tcWeeks" value="1" min="1" max="8" class="tc-num" style="width:65px" title="Generate this many weeks of schedules at once (use ◀ ▶ to browse)"></div>
+      <div class="ff"><label style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase" title="Players who drove within this many days are skipped when randomizing">Penalty Days</label><input type="number" id="tcPenalty" value="7" min="0" max="30" class="tc-num" style="width:65px" oninput="tcSaveSettings()" title="Players who drove within this many days are skipped when randomizing (0 = disabled)"></div>
     </div>
   </div>
 </div>
 
 <!-- Pool override (collapsed) -->
-<h2 class="toggle" onclick="tcToggle('poolBody')">Randomizer Pool & Options <button class="cbtn">▼</button></h2>
+<h2 class="toggle" onclick="tcToggle('poolBody')">Randomizer Pool & Options <button class="cbtn">▶</button></h2>
 <div id="poolBody" class="panel" style="display:none">
   <div class="ff" style="margin-bottom:12px">
     <label style="font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em">Custom Pool <span style="font-weight:400">(comma or newline — blank = use Player Pool)</span></label>
@@ -397,7 +429,7 @@ h2.toggle:hover .cbtn{color:var(--text)}
 </div>
 
 <!-- Fairness stats (collapsed) -->
-<h2 class="toggle" onclick="tcToggle('fairBody')">Fairness Stats <button class="cbtn">▼</button></h2>
+<h2 class="toggle" onclick="tcToggle('fairBody')">Fairness Stats <button class="cbtn">▶</button></h2>
 <div id="fairBody" class="panel" style="display:none">
   <div id="fairBars" class="fair-bars"><p style="font-size:.84rem;color:var(--text3)">No history yet — apply rules or randomize to start tracking.</p></div>
   <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
@@ -544,7 +576,19 @@ function fmtDate(ds){
   const [y,m,d]=ds.split('-').map(Number);
   return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 }
-function tcToggle(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'':'none';}
+function tcToggle(id){
+  const el=document.getElementById(id);if(!el)return;
+  const opening=el.style.display==='none';
+  el.style.display=opening?'':'none';
+  const h2=el.previousElementSibling;
+  if(h2){const btn=h2.querySelector('.cbtn');if(btn)btn.textContent=opening?'▼':'▶';}
+}
+function tcToggleWebhookVis(){
+  const inp=document.getElementById('allyWebhook');if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+  const btn=document.getElementById('allyWebhookEye');
+  if(btn)btn.textContent=inp.type==='password'?'👁':'🙈';
+}
 function tcUpdateBoardingLocal(){
   const t=document.getElementById('tcTime')?.value||'10:00';
   const [sh,sm]=(t+':00').split(':').map(Number);
@@ -606,6 +650,7 @@ function tcAddPlayer(){
   document.getElementById('apVs').value='0';
   document.getElementById('apTech').value='0';
   renderPlayers();
+  updatePlayerDatalist();
   scheduleRosterSync();
 }
 function renderPlayers(){
@@ -629,8 +674,8 @@ function renderPlayers(){
     </div>`;
   }).join('');
 }
-function tcToggleActive(id){const p=S.players.find(p=>p.id===id);if(!p)return;p.active=!p.active;save();renderPlayers();}
-function tcToggleAvail(id,i){const p=S.players.find(p=>p.id===id);if(!p)return;p.avail[i]=!p.avail[i];save();renderPlayers();}
+function tcToggleActive(id){const p=S.players.find(p=>p.id===id);if(!p)return;p.active=!p.active;save();renderPlayers();updatePlayerDatalist();}
+function tcToggleAvail(id,i){const p=S.players.find(p=>p.id===id);if(!p)return;p.avail[i]=!p.avail[i];save();renderPlayers();updatePlayerDatalist();}
 
 /* ── Edit Modal ───────────────────────────────────────────── */
 function tcOpenModal(id){
@@ -664,13 +709,13 @@ function tcSavePlayer(){
   p.vsPoints=parseInt(document.getElementById('emVs').value)||0;
   p.techPoints=parseInt(document.getElementById('emTech').value)||0;
   document.querySelectorAll('#emAvail input[type=checkbox]').forEach(cb=>{p.avail[+cb.dataset.day]=cb.checked;});
-  save();tcCloseModal();renderPlayers();tcPreview();
+  save();tcCloseModal();renderPlayers();updatePlayerDatalist();tcPreview();
   scheduleRosterSync();
 }
 function tcDeletePlayer(){
   if(!editId||!confirm('Remove this player?'))return;
   S.players=S.players.filter(p=>p.id!==editId);
-  save();tcCloseModal();renderPlayers();
+  save();tcCloseModal();renderPlayers();updatePlayerDatalist();
   scheduleRosterSync();
 }
 document.addEventListener('DOMContentLoaded',()=>{
@@ -705,15 +750,35 @@ function updateTags(){
 
 /* ── Schedule rows ────────────────────────────────────────── */
 function buildSchedRows(){
-  document.getElementById('schedRows').innerHTML=DAYS.map((d,i)=>`
-    <div class="srow">
-      <span class="sday">${d}</span>
+  const monday=gameMonday();
+  const [my,mm,md]=monday.split('-').map(Number);
+  const todayIdx=gameDow(0);
+  document.getElementById('schedRows').innerHTML=DAYS.map((d,i)=>{
+    const dt=new Date(Date.UTC(my,mm-1,md+i));
+    const shortDate=`${dt.getUTCMonth()+1}/${dt.getUTCDate()}`;
+    return `<div class="srow${i===todayIdx?' today':''}">
+      <span class="sday">${d}<br><span style="font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace;font-weight:400">${shortDate}</span></span>
       <span class="stag" id="stag${i}">${ruleLabel(S.dayRules[i])}</span>
-      <input type="text" id="tcC${d}" class="tc-in" placeholder="${DLONG[i]} conductor…"
+      <input type="text" id="tcC${d}" class="tc-in" list="tcPL${d}" placeholder="${DLONG[i]} conductor…"
              oninput="tcSaveSched();tcPreview()" style="flex:1;font-size:.85rem;padding:6px 8px">
-      <input type="text" id="tcV${d}" class="tc-in vip-input" placeholder="VIP…"
+      <datalist id="tcPL${d}"></datalist>
+      <input type="text" id="tcV${d}" class="tc-in vip-input" list="tcPLAny" placeholder="VIP…"
              oninput="tcSaveSched();tcPreview()" style="flex:1;font-size:.85rem;padding:6px 8px">
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  updatePlayerDatalist();
+}
+function updatePlayerDatalist(){
+  DAYS.forEach((d,i)=>{
+    const dl=document.getElementById('tcPL'+d);
+    if(!dl)return;
+    dl.innerHTML=S.players.filter(p=>p.active&&p.avail[i])
+      .map(p=>`<option value="${esc(p.name)}"></option>`).join('');
+  });
+  // Shared datalist for VIP (all active players)
+  let vipDl=document.getElementById('tcPLAny');
+  if(!vipDl){vipDl=document.createElement('datalist');vipDl.id='tcPLAny';document.body.appendChild(vipDl);}
+  vipDl.innerHTML=S.players.filter(p=>p.active).map(p=>`<option value="${esc(p.name)}"></option>`).join('');
 }
 function tcToggleVip(){
   document.getElementById('schedRows').classList.toggle('show-vip',document.getElementById('tcVip').checked);
@@ -777,6 +842,8 @@ function wRandom(pool){
 
 /* ── Apply Rules (deterministic) ─────────────────────────── */
 function tcApplyRules(){
+  const existing=S.sched.conductors.filter(c=>c.trim());
+  if(existing.length&&!confirm(`This will overwrite ${existing.length} conductor slot${existing.length>1?'s':''} already filled in the schedule. Continue?`))return;
   const conductors=['','','','','','',''];
   const fresh=[];
   let lastConductor=''; // prevent back-to-back
@@ -973,7 +1040,12 @@ function tcPreview(){
   ctx.fillText('🚂 Train Conductor Schedule',W/2,50);ctx.shadowBlur=0;
 
   ctx.fillStyle='#9d9baf';ctx.font='17px "Exo 2",Arial';
-  ctx.fillText(`⏰ Boarding Time: ${document.getElementById('tcTime')?.value||'10:00'}`,W/2,80);
+  {const tVal=document.getElementById('tcTime')?.value||'10:00';
+   const tp=tVal.split(':');const tsh=parseInt(tp[0])||0;const tsm=parseInt(tp[1])||0;
+   const utcH=(tsh-serverUtcOffset+24)%24;
+   const utcStr=`${String(utcH).padStart(2,'0')}:${String(tsm).padStart(2,'0')} UTC`;
+   ctx.fillText(`⏰ Boarding: ${serverUtcOffset!==0?tVal+' · '+utcStr:utcStr}`,W/2,80);}
+
 
   cvRect(ctx,20,98,W-40,38,8,'#e8720c');
   ctx.fillStyle='#fff';ctx.font='bold 13px "Exo 2",Arial';
@@ -1035,9 +1107,13 @@ function tcCopyChat(){
   const conds=DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
   const vips =DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
   const showVip=document.getElementById('tcVip')?.checked;
-  const time=document.getElementById('tcTime')?.value||'10:00';
+  const tVal=document.getElementById('tcTime')?.value||'10:00';
+  const tp=tVal.split(':');const tsh=parseInt(tp[0])||0;const tsm=parseInt(tp[1])||0;
+  const utcH=(tsh-serverUtcOffset+24)%24;
+  const utcStr=`${String(utcH).padStart(2,'0')}:${String(tsm).padStart(2,'0')} UTC`;
+  const timeDisplay=serverUtcOffset!==0?`${tVal} · ${utcStr}`:utcStr;
   const wk=genWeeks.length>1?` — Week ${curWeek+1}`:'';
-  let text=`🚂 Train Conductor${wk}\n⏰ ${time}\n\n`;
+  let text=`🚂 Train Conductor${wk}\n⏰ Boarding: ${timeDisplay}\n\n`;
   DLONG.forEach((day,i)=>{
     let line=`${DAYS[i]}: ${conds[i]||'(empty)'}`;
     if(showVip&&vips[i]) line+=` ⭐ VIP: ${vips[i]}`;
@@ -1250,6 +1326,16 @@ function tcAllyInit(){
   // Apply saved offset to boarding label immediately
   tcAllyOffsetChanged();
 
+  // Pre-fill login ID from share link (?ally=...)
+  const urlAllyId=new URLSearchParams(location.search).get('ally');
+  if(urlAllyId&&!allyId){
+    tcAllyTab('login');
+    const loginIdEl=document.getElementById('allyLoginId');
+    if(loginIdEl){loginIdEl.value=urlAllyId;loginIdEl.focus();}
+    document.getElementById('allyBody')?.scrollIntoView({behavior:'smooth',block:'start'});
+    tcAllyMsg('Alliance ID pre-filled from share link — enter your password to log in.','var(--text2)');
+  }
+
   if(allyId&&allyToken){
     tcAllyShowConnected();
     tcAllyPull();
@@ -1396,6 +1482,21 @@ function tcAllyApplyServerState(data){
   if(alliance?.postDaily!=null){
     const cb=document.getElementById('allyPostDaily');
     if(cb) cb.checked=alliance.postDaily;
+  }
+  const lpEl=document.getElementById('allyLastPosted');
+  if(lpEl){
+    if(alliance?.lastPostedDate){
+      lpEl.textContent=`Last auto-post: ${alliance.lastPostedDate}`;
+      lpEl.style.display='';
+    } else {
+      lpEl.style.display='none';
+    }
+  }
+  const npEl=document.getElementById('allyNextPost');
+  if(npEl){
+    const nextStr=computeNextPost(alliance?.boardingHour??2,alliance?.boardingMinute??0,alliance?.postDaily);
+    if(nextStr){npEl.textContent=`Next auto-post: ${nextStr}`;npEl.style.display='';}
+    else npEl.style.display='none';
   }
 
   save();
@@ -1549,6 +1650,54 @@ function tcAllyShowId(){
   navigator.clipboard?.writeText(allyId)
     .then(()=>tcAllyMsg('✓ Alliance ID copied to clipboard!','var(--green)'))
     .catch(()=>prompt('Your Alliance ID (share with alliance members):',allyId));
+}
+
+function tcAllyShareLink(){
+  if(!allyId){tcAllyMsg('Connect an alliance account first.','var(--amber)');return;}
+  const url=`${location.origin}${location.pathname}?ally=${encodeURIComponent(allyId)}`;
+  navigator.clipboard?.writeText(url)
+    .then(()=>tcAllyMsg('✓ Login link copied — share with alliance members.','var(--green)'))
+    .catch(()=>prompt('Share this login link with your alliance members:',url));
+}
+
+function computeNextPost(boardingHourUtc,boardingMinuteUtc,postDaily){
+  if(!postDaily) return '';
+  const now=new Date();
+  const todayFire=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),boardingHourUtc,boardingMinuteUtc||0));
+  const nextFire=todayFire>now?todayFire:new Date(todayFire.getTime()+86400000);
+  return nextFire.toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function tcToggleBulkAdd(){
+  const area=document.getElementById('bulkAddArea');if(!area)return;
+  const opening=area.style.display==='none';
+  area.style.display=opening?'':'none';
+  const btn=document.getElementById('bulkAddBtn');
+  if(btn)btn.textContent=opening?'✕ Cancel':'⊕ Bulk Add';
+  if(opening)document.getElementById('bulkAddTxt')?.focus();
+}
+
+function tcBulkAdd(){
+  const txt=document.getElementById('bulkAddTxt')?.value||'';
+  const names=txt.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!names.length)return;
+  let added=0,skipped=0;
+  names.forEach(name=>{
+    if(S.players.some(p=>p.name.toLowerCase()===name.toLowerCase())){skipped++;return;}
+    S.players.push({id:uid(),name,role:'r4',active:true,avail:[true,true,true,true,true,true,true],vsPoints:0,techPoints:0});
+    added++;
+  });
+  save();
+  if(document.getElementById('bulkAddTxt'))document.getElementById('bulkAddTxt').value='';
+  tcToggleBulkAdd();
+  renderPlayers();
+  updatePlayerDatalist();
+  scheduleRosterSync();
+  if(added||skipped){
+    const msg=`✓ Added ${added} player${added!==1?'s':''}${skipped?` · ${skipped} duplicate${skipped!==1?'s':''} skipped`:''}`;
+    tcAllyMsg(msg,'var(--green)');
+    setTimeout(()=>tcAllyMsg('',''),3000);
+  }
 }
 </script>
 </body>

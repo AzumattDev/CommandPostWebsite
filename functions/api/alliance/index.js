@@ -92,9 +92,10 @@ function allianceView(ally) {
   return {
     id: ally.id, name: ally.name, server: ally.server || '',
     webhook: ally.discord_webhook || '',
-    boardingHour:   ally.boarding_hour_utc   ?? 2,
-    boardingMinute: ally.boarding_minute_utc ?? 0,
-    serverUtcOffset: ally.server_utc_offset  ?? 0,
+    boardingHour:    ally.boarding_hour_utc   ?? 2,
+    boardingMinute:  ally.boarding_minute_utc ?? 0,
+    serverUtcOffset: ally.server_utc_offset   ?? 0,
+    lastPostedDate:  ally.last_posted_date    || '',
     postDaily: ally.post_daily === 1,
     showVip: ally.show_vip === 1,
     rotIdx: (() => { try { return JSON.parse(ally.rot_idx || '{}'); } catch { return {}; } })(),
