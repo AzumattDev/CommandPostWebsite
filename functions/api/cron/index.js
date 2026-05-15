@@ -108,12 +108,15 @@ async function handleCron(env, force = false) {
     const boardingTs = boardingUnixTs(today, ally.boarding_hour_utc ?? 2, ally.boarding_minute_utc ?? 0);
     const resetTs    = resetUnixTs(today);
 
+    // Anchor to Monday of the current week so the grid always shows Mon→Sun,
+    // never spilling past Sunday into next week regardless of what day fires.
+    const monday = dateAddDays(today, -dow); // dow=0=Mon so subtract 0..6 days
     const weekFields = Array.from({ length: 7 }, (_, i) => {
-      const idx  = (dow + i) % 7;
-      const date = dateAddDays(today, i);
+      const date    = dateAddDays(monday, i);
+      const isToday = i === dow;
       return {
         name:   fmtShortDate(date),
-        value:  i === 0 ? `**${weekConds[idx]}** ← today` : `**${weekConds[idx] || '?'}**`,
+        value:  isToday ? `**${weekConds[i]}** ← today` : `**${weekConds[i] || '?'}**`,
         inline: true,
       };
     });
@@ -125,7 +128,7 @@ async function handleCron(env, force = false) {
       fields: [
         { name: 'Date', value: formatDisplayDate(today), inline: false },
         ...(ally.show_vip === 1 && vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
-        { name: '​', value: '**— Upcoming conductors —**', inline: false },
+        { name: '​', value: '**— This week\'s conductors —**', inline: false },
         ...weekFields,
       ],
       footer:    { text: `${ally.name} · ashmasters.org · automated reminder` },

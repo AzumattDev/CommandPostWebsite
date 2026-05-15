@@ -106,7 +106,7 @@ input[type=time]:focus{outline:none;border-color:var(--tr-orange)}
 
 /* Pager */
 .pager{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
-.pager-info{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);min-width:90px;text-align:center}
+.pager-info{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);min-width:170px;text-align:center;white-space:nowrap}
 .pager button:disabled{opacity:.35;cursor:not-allowed}
 
 /* Canvas */
@@ -236,8 +236,8 @@ h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:
 
     <!-- Login -->
     <div id="allyLoginForm" style="display:none">
-      <div class="set-row"><label>Alliance ID</label><input type="text" id="allyLoginId" placeholder="a1b2c3d4e5f6…" style="font-family:'JetBrains Mono',monospace" autocomplete="off"></div>
-      <div class="set-row" style="margin-bottom:12px"><label>Password</label><input type="password" id="allyLoginPass" placeholder="Alliance password…" onkeydown="if(event.key==='Enter')tcAllyLogin()"></div>
+      <div class="set-row"><label>Alliance ID</label><input type="text" id="allyLoginId" placeholder="a1b2c3d4e5f6…" style="font-family:'JetBrains Mono',monospace" autocomplete="username"></div>
+      <div class="set-row" style="margin-bottom:12px"><label>Password</label><input type="password" id="allyLoginPass" placeholder="Alliance password…" autocomplete="current-password" onkeydown="if(event.key==='Enter')tcAllyLogin()"></div>
       <button class="btn btn-primary" onclick="tcAllyLogin()">→ Login</button>
     </div>
   </div>
@@ -254,7 +254,7 @@ h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:
       <div class="set-row">
         <label>Discord Webhook URL</label>
         <div style="position:relative">
-          <input type="password" id="allyWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcAllySettingsChanged()" style="width:100%;padding-right:40px;box-sizing:border-box">
+          <input type="password" id="allyWebhook" placeholder="https://discord.com/api/webhooks/…" autocomplete="new-password" oninput="tcAllySettingsChanged()" style="width:100%;padding-right:40px;box-sizing:border-box">
           <button type="button" id="allyWebhookEye" onclick="tcToggleWebhookVis()" title="Show/hide webhook URL" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:.9rem;padding:2px 4px;line-height:1">👁</button>
         </div>
       </div>
@@ -275,7 +275,7 @@ h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:
     <div id="allySyncMsg" style="font-size:.78rem;margin-bottom:8px;display:none"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-ghost btn-sm" onclick="tcTestWebhook()">🔔 Test Webhook</button>
-      <button class="btn btn-disc btn-sm" onclick="tcPostSchedule()">
+      <button class="btn btn-disc btn-sm" id="allyDiscBtn" onclick="tcAllyPostToday()">
         <svg width="13" height="13" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.55 58.55 0 0 0 45.7.7a.22.22 0 0 0-.23.11 40.78 40.78 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.25 0A37.3 37.3 0 0 0 25.6.81a.22.22 0 0 0-.23-.11A58.36 58.36 0 0 0 10.97 4.9a.2.2 0 0 0-.09.08C1.62 18.73-1 32.2.31 45.5a.24.24 0 0 0 .09.16 58.84 58.84 0 0 0 17.72 8.96.22.22 0 0 0 .24-.08 42.04 42.04 0 0 0 3.63-5.9.22.22 0 0 0-.12-.3 38.73 38.73 0 0 1-5.53-2.63.22.22 0 0 1-.02-.37c.37-.28.74-.57 1.1-.86a.22.22 0 0 1 .22-.03c11.6 5.3 24.15 5.3 35.6 0a.22.22 0 0 1 .23.03c.36.29.73.58 1.1.86a.22.22 0 0 1-.02.37 36.36 36.36 0 0 1-5.54 2.63.22.22 0 0 0-.11.3 47.15 47.15 0 0 0 3.62 5.9.22.22 0 0 0 .24.08 58.7 58.7 0 0 0 17.74-8.96.22.22 0 0 0 .09-.16C73 30.08 69.89 16.7 60.18 4.98a.17.17 0 0 0-.08-.08ZM23.73 37.33c-3.5 0-6.39-3.21-6.39-7.16s2.83-7.16 6.39-7.16c3.59 0 6.44 3.24 6.39 7.16 0 3.95-2.84 7.16-6.39 7.16Zm23.62 0c-3.5 0-6.38-3.21-6.38-7.16s2.83-7.16 6.38-7.16c3.6 0 6.45 3.24 6.4 7.16 0 3.95-2.8 7.16-6.4 7.16Z"/></svg>
         Post Today's Conductor
       </button>
@@ -299,11 +299,11 @@ h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:
     <div class="info-box">Connect an <strong>Alliance Account</strong> above to store your webhook securely on the server. These fields are only needed if you are the site administrator managing this without an alliance account.</div>
     <div class="set-row">
       <label>Discord Webhook URL</label>
-      <input type="password" id="tcWebhook" placeholder="https://discord.com/api/webhooks/…" oninput="tcSaveSettings()">
+      <input type="password" id="tcWebhook" placeholder="https://discord.com/api/webhooks/…" autocomplete="new-password" oninput="tcSaveSettings()">
     </div>
     <div class="set-row">
       <label>Access Token</label>
-      <input type="password" id="tcToken" placeholder="Token provided by the site admin…" oninput="tcSaveSettings()">
+      <input type="password" id="tcToken" placeholder="Token provided by the site admin…" autocomplete="new-password" oninput="tcSaveSettings()">
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
       <button class="btn btn-ghost btn-sm" onclick="tcTestWebhook()">🔔 Test Webhook</button>
@@ -410,7 +410,7 @@ h2.toggle:hover .cbtn{color:var(--text2);border-color:var(--border2);background:
   <button class="btn btn-gold" onclick="tcDownload()">📥 Download PNG</button>
   <button class="btn btn-disc" id="tcDiscBtn" onclick="tcPostSchedule()">
     <svg width="15" height="15" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1 4.9A58.55 58.55 0 0 0 45.7.7a.22.22 0 0 0-.23.11 40.78 40.78 0 0 0-1.8 3.7 54.1 54.1 0 0 0-16.25 0A37.3 37.3 0 0 0 25.6.81a.22.22 0 0 0-.23-.11A58.36 58.36 0 0 0 10.97 4.9a.2.2 0 0 0-.09.08C1.62 18.73-1 32.2.31 45.5a.24.24 0 0 0 .09.16 58.84 58.84 0 0 0 17.72 8.96.22.22 0 0 0 .24-.08 42.04 42.04 0 0 0 3.63-5.9.22.22 0 0 0-.12-.3 38.73 38.73 0 0 1-5.53-2.63.22.22 0 0 1-.02-.37c.37-.28.74-.57 1.1-.86a.22.22 0 0 1 .22-.03c11.6 5.3 24.15 5.3 35.6 0a.22.22 0 0 1 .23.03c.36.29.73.58 1.1.86a.22.22 0 0 1-.02.37 36.36 36.36 0 0 1-5.54 2.63.22.22 0 0 0-.11.3 47.15 47.15 0 0 0 3.62 5.9.22.22 0 0 0 .24.08 58.7 58.7 0 0 0 17.74-8.96.22.22 0 0 0 .09-.16C73 30.08 69.89 16.7 60.18 4.98a.17.17 0 0 0-.08-.08ZM23.73 37.33c-3.5 0-6.39-3.21-6.39-7.16s2.83-7.16 6.39-7.16c3.59 0 6.44 3.24 6.39 7.16 0 3.95-2.84 7.16-6.39 7.16Zm23.62 0c-3.5 0-6.38-3.21-6.38-7.16s2.83-7.16 6.38-7.16c3.6 0 6.45 3.24 6.4 7.16 0 3.95-2.8 7.16-6.4 7.16Z"/></svg>
-    Post to Discord
+    <span id="tcDiscBtnLabel">Post to Discord</span>
   </button>
   <button class="btn btn-danger btn-sm" onclick="tcClearHistory()">Clear History</button>
 </div>
@@ -571,6 +571,16 @@ function gameMonday(){
   const dow=(d.getUTCDay()+6)%7;
   d.setUTCDate(d.getUTCDate()-dow);
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+function weekMondayStr(weekIdx){
+  const base=gameMonday();
+  const [y,m,d]=base.split('-').map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d+weekIdx*7));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}-${String(dt.getUTCDate()).padStart(2,'0')}`;
+}
+function fmtMonthDay(dateStr){
+  const [y,m,d]=dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y,m-1,d)).toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
 }
 function fmtDate(ds){
   const [y,m,d]=ds.split('-').map(Number);
@@ -971,11 +981,21 @@ function showWeek(idx){
 function tcNavWeek(delta){showWeek(curWeek+delta);}
 function updatePager(){
   const p=document.getElementById('tcPager');
-  if(genWeeks.length<=1){p.style.display='none';return;}
+  const lbl=document.getElementById('tcDiscBtnLabel');
+  if(genWeeks.length<=1){
+    p.style.display='none';
+    if(lbl) lbl.textContent='Post to Discord';
+    return;
+  }
   p.style.display='flex';
-  document.getElementById('tcPagerInfo').textContent=`Week ${curWeek+1} / ${genWeeks.length}`;
+  const mon=weekMondayStr(curWeek);
+  const [y,m,d]=mon.split('-').map(Number);
+  const sunDt=new Date(Date.UTC(y,m-1,d+6));
+  const sun=`${sunDt.getUTCFullYear()}-${String(sunDt.getUTCMonth()+1).padStart(2,'0')}-${String(sunDt.getUTCDate()).padStart(2,'0')}`;
+  document.getElementById('tcPagerInfo').textContent=`Week ${curWeek+1} / ${genWeeks.length} · ${fmtMonthDay(mon)}–${fmtMonthDay(sun)}`;
   document.getElementById('tcPrev').disabled=curWeek===0;
   document.getElementById('tcNext').disabled=curWeek===genWeeks.length-1;
+  if(lbl) lbl.textContent=curWeek===0?'Post to Discord':`Post Week ${curWeek+1} to Discord`;
 }
 
 /* ── History ──────────────────────────────────────────────── */
@@ -1165,7 +1185,32 @@ async function tcTestWebhook(){
 async function tcPostSchedule(){
   const btn=document.getElementById('tcDiscBtn');
   const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳ Posting…';
-  const ok=await tcSendDailyAnnouncement();
+
+  const conds=DAYS.map(d=>document.getElementById('tcC'+d)?.value||'');
+  const vips =DAYS.map(d=>document.getElementById('tcV'+d)?.value||'');
+  const showVip=document.getElementById('tcVip')?.checked||false;
+  const t=document.getElementById('tcTime')?.value||'';
+  let boardingTime='';
+  if(t){
+    const [sh,sm]=t.split(':').map(n=>parseInt(n)||0);
+    const utcH=(sh-serverUtcOffset+24)%24;
+    boardingTime=`${String(utcH).padStart(2,'0')}:${String(sm).padStart(2,'0')}`;
+  }
+
+  const monday=weekMondayStr(curWeek);
+  const [y,m,d]=monday.split('-').map(Number);
+  const sunDt=new Date(Date.UTC(y,m-1,d+6));
+  const sun=`${sunDt.getUTCFullYear()}-${String(sunDt.getUTCMonth()+1).padStart(2,'0')}-${String(sunDt.getUTCDate()).padStart(2,'0')}`;
+  const range=`${fmtMonthDay(monday)}–${fmtMonthDay(sun)}`;
+  const weekLabel=genWeeks.length>1?`Week ${curWeek+1} of ${genWeeks.length} · ${range}`:range;
+
+  const schedule=Array.from({length:7},(_,i)=>{
+    const entry={day:DAYS[i],conductor:conds[i]||''};
+    if(showVip&&vips[i]) entry.vip=vips[i];
+    return entry;
+  });
+
+  const ok=await tcDiscordProxy({schedule,boardingTime,weekLabel,weekStartDate:monday});
   if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
   else{btn.innerHTML=orig;btn.disabled=false;}
 }
@@ -1177,13 +1222,24 @@ async function tcPostDaily(){
   if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
   else{btn.innerHTML=orig;btn.disabled=false;}
 }
+async function tcAllyPostToday(){
+  const btn=document.getElementById('allyDiscBtn');
+  const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳ Posting…';
+  const ok=await tcSendDailyAnnouncement();
+  if(ok){btn.innerHTML='✅ Posted!';setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;},2500);}
+  else{btn.innerHTML=orig;btn.disabled=false;}
+}
 
 async function tcSendDailyAnnouncement(){
   const dow=gameDow(0);
-  const conductor=S.sched.conductors[dow]||'';
+  // When viewing a future week, today's conductor comes from week 1 (genWeeks[0]).
+  // If no generation was run (manual schedule), fall back to whatever is stored.
+  const w1c = (curWeek>0&&genWeeks.length>0) ? genWeeks[0].conductors : S.sched.conductors;
+  const w1v = (curWeek>0&&genWeeks.length>0) ? (genWeeks[0].vips||[]) : S.sched.vips;
+
+  const conductor=w1c[dow]||'';
   if(!conductor){alert('No conductor set for today. Fill in the schedule first.');return false;}
   const t=document.getElementById('tcTime')?.value||'';
-  // Convert server local time to UTC before sending
   let boardingTime='';
   if(t){
     const parts=t.split(':');
@@ -1193,17 +1249,17 @@ async function tcSendDailyAnnouncement(){
     boardingTime=`${String(utcH).padStart(2,'0')}:${String(sm).padStart(2,'0')}`;
   }
   const showVip=document.getElementById('tcVip')?.checked;
-  const todayVip=showVip?(S.sched.vips[dow]||''):'';
+  const todayVip=showVip?(w1v[dow]||''):'';
   return tcDiscordProxy({
     action:'daily-manual',
     conductor,
     vip:todayVip,
     date:gameDate(0),
     boardingTime,
+    weekStartDate:gameMonday(),
     upcomingWeek:Array.from({length:7},(_,i)=>{
-      const idx=(dow+i)%7;
-      const entry={day:DAYS[idx],conductor:S.sched.conductors[idx]||'?',offset:i};
-      if(showVip&&S.sched.vips[idx]) entry.vip=S.sched.vips[idx];
+      const entry={day:DAYS[i],conductor:w1c[i]||'?',isToday:i===dow};
+      if(showVip&&w1v[i]) entry.vip=w1v[i];
       return entry;
     }),
   });
@@ -1598,14 +1654,15 @@ function tcAllySettingsChanged(){
     const bh        = (tsh-serverOff+24)%24;
     const bm        = tsm;
     const pd        = document.getElementById('allyPostDaily')?.checked||false;
-    // Never send an empty webhook — omitting the key leaves the stored URL untouched
+    // Never send an empty or invalid webhook — omitting the key leaves the stored URL untouched
+    const validWebhook = webhook && webhook.startsWith('https://discord.com/api/webhooks/');
     const settingsBody = {boardingHour:bh, boardingMinute:bm, postDaily:pd, serverUtcOffset:serverOff};
-    if(webhook) settingsBody.webhook = webhook;
+    if(validWebhook) settingsBody.webhook = webhook;
     await fetch(`/api/alliance?action=settings&${qs}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify(settingsBody)
     }).catch(()=>{});
-    if(webhook){
+    if(validWebhook){
       localStorage.setItem('tc-webhook',webhook);
       const iw=document.getElementById('tcWebhook'); if(iw) iw.value=webhook;
     }

@@ -23,6 +23,7 @@ const NAV_LINKS = [
   {label:'Territory', children:[
     {label:'Capital War Planner', href:'capital-war-planner.html', icon:'images/ui/capitol.png'},
     {label:'Pre-Season Map Planner', href:'preseason-map-planner.html', icon:'images/ui/capitol.png'},
+    {label:'Season 1 Map Planner', href:'season-1-map-planner.html', icon:'images/ui/capitol.png'},
   ]},
   {label:'Tools', children:[
     {label:'Hero EXP Calculator', href:'hero-exp-calculator.html', icon:'images/allianceduel/heroxp.png'},
@@ -39,6 +40,7 @@ const SEARCH_INDEX = [
   { title:'Train Conductor Scheduler', url:'train.html', tags:'train conductor scheduler weekly rotation R4 R3 MVP casino discord webhook schedule planner VIP boarding' },
   { title:'Capital War Planner', url:'capital-war-planner.html', tags:'capital war planner cannon assault rally burn squad garrison president occupation' },
   { title:'Pre-Season Map Planner', url:'preseason-map-planner.html', tags:'preseason map planner territory zone alliance village chemical plant power town metropolis military base capitol' },
+  { title:'Season 1 Map Planner', url:'season-1-map-planner.html', tags:'season 1 map planner territory zone alliance border farm trade post agricultural gateway stronghold rebel house nobles royal palace crimson plague' },
   { title:'Desert Storm Planner', url:'desert-storm-planner.html', tags:'desert storm planner tactical map drag drop phase plan auto assign' },
   { title:'Canyon Storm Planner', url:'canyon-storm-planner.html', tags:'canyon storm planner rulebringers dawnbreakers faction viro lab phase plan' },
   { title:'Alliance Duel Planner', url:'alliance-duel-planner.html', tags:'alliance duel vs daily planner monday tuesday wednesday thursday friday saturday points' },

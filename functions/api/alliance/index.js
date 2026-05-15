@@ -365,7 +365,7 @@ export async function onRequestPost({ request, env }) {
     if (!ally.discord_webhook) {
       return new Response('No Discord webhook configured for this alliance.', { status: 503, headers: CORS });
     }
-    const { conductor, date, upcomingWeek, boardingTime, vip } = body;
+    const { conductor, date, upcomingWeek, boardingTime, vip, weekStartDate } = body;
     if (!conductor) return new Response('Missing conductor', { status: 400, headers: CORS });
 
     const todayStr   = date || utcDate();
@@ -374,9 +374,13 @@ export async function onRequestPost({ request, env }) {
     const boardingTs = boardingUnixTs(todayStr, bHour, bMin);
     const resetTs    = resetUnixTs(todayStr);
 
+    // weekStartDate (Monday of current week) anchors the 7-day grid so it always
+    // shows Mon→Sun of the current week, never bleeding past Sunday into next week.
+    const anchor = weekStartDate || date || null;
     const weekFields = (upcomingWeek || []).slice(0, 7).map((item, i) => {
-      const label = date ? fmtShortDate(dateAddDays(date, i)) : item.day;
-      const cond  = i === 0 ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`;
+      const label   = anchor ? fmtShortDate(dateAddDays(anchor, i)) : item.day;
+      const isToday = item.isToday ?? false;
+      const cond    = isToday ? `**${item.conductor}** ← today` : `**${item.conductor || '?'}**`;
       return { name: label, value: cond + (item.vip ? `\n⭐ VIP: **${item.vip}**` : ''), inline: true };
     });
 
@@ -387,7 +391,7 @@ export async function onRequestPost({ request, env }) {
       fields: [
         { name: 'Date', value: formatDisplayDate(todayStr), inline: false },
         ...(vip ? [{ name: '⭐ VIP', value: `**${vip}**`, inline: false }] : []),
-        ...(weekFields.length ? [{ name: '​', value: '**— Upcoming conductors —**', inline: false }, ...weekFields] : []),
+        ...(weekFields.length ? [{ name: '​', value: '**— This week\'s conductors —**', inline: false }, ...weekFields] : []),
       ],
       footer:    { text: `${ally.name} · ashmasters.org · train scheduler` },
       timestamp: new Date().toISOString(),
