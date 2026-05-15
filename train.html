@@ -808,10 +808,15 @@ function refreshCondCard(){
 }
 function renderUpcoming(){
   const grid=document.getElementById('upcomingGrid');
+  const todayDow=gameDow(0);
   grid.innerHTML=Array.from({length:7},(_,i)=>{
-    const dow=(gameDow(0)+i)%7;
+    const absDow=todayDow+i;
+    const overflow=absDow>6; // crossed into next week
+    const dow=overflow?absDow-7:absDow;
     const ds=gameDate(i);
-    const c=S.sched.conductors[dow]||'—';
+    // Overflow days: use the next generated week if available, never loop this week's data
+    const overflowConds=overflow&&genWeeks.length>curWeek+1?genWeeks[curWeek+1].conductors:null;
+    const c=overflow?(overflowConds?overflowConds[dow]||'—':'—'):S.sched.conductors[dow]||'—';
     return `<div class="uday${i===0?' today':''}">
       <div class="uday-lbl">${i===0?'Today · ':''}${ds}</div>
       <div class="uday-name">${esc(c)}</div>
