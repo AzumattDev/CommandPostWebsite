@@ -64,7 +64,10 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
   <img src="images/headquarters.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
   <h1 style="margin:0">HQ Upgrade Planner</h1>
 </div>
-<p class="subtitle">See required building upgrades, total resources, and construction time — with your buffs applied. Click any building to exclude it from totals.</p>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem">
+  <p class="subtitle" style="margin:0">See required building upgrades, total resources, and construction time — with your buffs applied. Click any building to exclude it from totals.</p>
+  <button onclick="exportHQPlan()" style="background:rgba(232,114,14,0.12);border:1px solid rgba(232,114,14,0.4);color:#e8720c;border-radius:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Export as Image</button>
+</div>
 
 <div class="panel">
   <div class="panel-label">1 — Your HQ Levels</div>
@@ -124,6 +127,7 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
 <div class="note" style="margin-top:1.5rem"><strong>Build order:</strong> Always upgrade Tech Center first, then Drill Ground, then HQ itself. Starting HQ before its prereqs are done just wastes the free builder slot.</div>
 
 <script src="data/buildings.js"></script>
+<script src="js/infographic.js"></script>
 <script>
 // ─── STATE ────────────────────────────────────────────────────────────────────
 const off = new Set();
@@ -250,6 +254,43 @@ function toggle(k){
 }
 
 go();
+
+function exportHQPlan() {
+  const cur = document.getElementById('hqCur')?.value || '?';
+  const tgt = document.getElementById('hqTgt')?.value || '?';
+
+  const statEls = document.querySelectorAll('#statGrid .stat');
+  if (!statEls.length) { alert('Select your HQ levels above to generate the plan first.'); return; }
+
+  const stats = Array.from(statEls).map(el => ({
+    label: el.querySelector('.sl')?.textContent?.trim() || '',
+    value: el.querySelector('.sv')?.textContent?.trim() || '',
+  })).filter(s => s.label && s.value);
+
+  // Rows excluding the total row and excluded (off) buildings
+  const dataRows = Array.from(document.querySelectorAll('#tbody tr:not(.total-row):not(.off)'));
+  const rows = dataRows.slice(0, 12).map(tr =>
+    Array.from(tr.querySelectorAll('td')).map(td => {
+      const clone = td.cloneNode(true);
+      clone.querySelectorAll('.est').forEach(el => el.remove());
+      return clone.textContent.trim().replace(/\s+/g, ' ');
+    })
+  );
+  const totalRows = dataRows.length;
+
+  const ig = new IG.Builder(`HQ ${cur} → ${tgt} Upgrade Plan`, 'Resource Requirements', { icon: '🏛️' });
+  ig.stats(stats);
+  ig.divider();
+  ig.section(`Building Requirements (${Math.min(rows.length, 12)} of ${totalRows})`);
+  if (rows.length) {
+    ig.table(['Building', 'Iron', 'Food', 'Gold', 'Oil', 'Time'], rows,
+      { colWidths: [0.28, 0.145, 0.145, 0.145, 0.145, 0.14], cellAlign: ['left','center','center','center','center','center'] });
+  }
+  if (totalRows > 12) {
+    ig.callout(`+${totalRows - 12} more buildings not shown. See full plan on commandpost.ashmasters.org`, 'info');
+  }
+  ig.download(`hq-plan-${cur}-to-${tgt}.png`);
+}
 </script>
 </div>
 </body>

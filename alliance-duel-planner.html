@@ -145,7 +145,10 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
     <img src="images/allianceduel/vs_logo.png" style="width:48px;height:48px;object-fit:contain;flex-shrink:0" alt="">
     <h1 style="margin:0">Alliance Duel VS — Daily Planner</h1>
   </div>
-  <p class="subtitle">Last War: Survival — What to do today, what to prepare for tomorrow (Mon–Sat)</p>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.35rem">
+    <p class="subtitle" style="margin:0">Last War: Survival — What to do today, what to prepare for tomorrow (Mon–Sat)</p>
+    <button onclick="exportDuelDay()" style="background:rgba(232,114,14,0.12);border:1px solid rgba(232,114,14,0.4);color:#e8720c;border-radius:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Export Today's Plan</button>
+  </div>
 
   <div class="score-bar">
     <div class="score-chip"><div class="day">Sun</div><div class="chip-theme">Prep Day</div><div class="pts pts-0">—</div></div>
@@ -188,6 +191,7 @@ h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; background: l
 </div>
 
 <script src="data/alliance-duel-days.js"></script>
+<script src="js/infographic.js"></script>
 <script>
 
 const tabsEl = document.getElementById('tabs');
@@ -478,6 +482,81 @@ function tcHint(){
   document.getElementById('tcHint').textContent=`You are UTC${off>=0?'+':''}${off} · ${rel}`;
 }
 tcInit();
+
+function exportDuelDay() {
+  const day = days[activeIdx];
+  if (!day) return;
+
+  // Strip HTML tags and return plain text
+  function stripHtml(s) {
+    if (!s) return '';
+    const div = document.createElement('div');
+    div.innerHTML = s;
+    return div.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // First meaningful sentence, capped at maxLen chars
+  function firstSentence(s, maxLen = 105) {
+    const plain = stripHtml(s);
+    const m = plain.match(/^[^.!?]+[.!?]/);
+    const sentence = m ? m[0] : plain;
+    if (sentence.length <= maxLen) return sentence;
+    return sentence.slice(0, maxLen).replace(/\s\S+$/, '') + '…';
+  }
+
+  const ig = new IG.Builder(
+    `${day.name} — Alliance Duel`,
+    day.theme + (day.value ? ' · ' + day.value : ''),
+    { icon: '⚔️' }
+  );
+
+  // Numbered priority checklist
+  if (day.quicklist?.length) {
+    ig.section('Priority Checklist');
+    ig.list(day.quicklist.slice(0, 5).map(t => ({ text: t })), { numbered: true });
+  }
+
+  // Today's tasks with pts note + first-sentence description
+  if (day.today?.length) {
+    ig.divider();
+    ig.section("Today's Tasks & How-To");
+    const taskItems = day.today
+      .filter(t => t.t)
+      .map(t => ({
+        text:    t.t,
+        note:    t.pts || null,
+        detail:  t.d ? firstSentence(t.d) : null,
+        highlight: !!t.warn,
+      }));
+    ig.list(taskItems);
+  }
+
+  // Strategy tips — title + first sentence of description
+  if (day.tips?.length) {
+    ig.divider();
+    ig.section('Strategy Tips');
+    ig.list(day.tips.slice(0, 3).map(t => ({
+      text:   t.t,
+      detail: t.d ? firstSentence(t.d, 95) : null,
+    })));
+  }
+
+  // Prep for tomorrow
+  if (day.prep?.length) {
+    ig.divider();
+    ig.section('Prepare for Tomorrow');
+    ig.list(day.prep.slice(0, 3).map(t => ({ text: t.t })));
+  }
+
+  // Point sources as badges
+  if (day.points?.length) {
+    ig.divider();
+    ig.section('What Scores Points');
+    ig.badgeRow(day.points.map(p => ({ text: p, color: IG.C.GOLD })));
+  }
+
+  ig.download(`duel-${day.tab.toLowerCase()}.png`);
+}
 </script>
 </body>
 </html>

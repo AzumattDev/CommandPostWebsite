@@ -175,9 +175,12 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
   </div>
   <p class="subtitle">Last War: Survival — Counter system, meta formations, and when to build what</p>
 
-  <div class="page-tabs">
-    <button class="page-tab pg-active" onclick="showPage('guide')">Formations &amp; Guide</button>
-    <button class="page-tab" onclick="showPage('positions')">Position Map</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap">
+    <div class="page-tabs">
+      <button class="page-tab pg-active" onclick="showPage('guide')">Formations &amp; Guide</button>
+      <button class="page-tab" onclick="showPage('positions')">Position Map</button>
+    </div>
+    <button onclick="exportFormation()" style="background:rgba(232,114,14,0.12);border:1px solid rgba(232,114,14,0.4);color:#e8720c;border-radius:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">Export Formation Card</button>
   </div>
   <div class="page-panel active" id="panel-page-guide">
 
@@ -764,6 +767,7 @@ h1 span { background: linear-gradient(135deg, var(--tank), var(--air), var(--mis
   </div><!-- /panel-page-positions -->
 </div>
 
+<script src="js/infographic.js"></script>
 <script>
 function showPage(page) {
   history.replaceState(null, '', '#' + page);
@@ -792,6 +796,36 @@ function showSquad(type) {
   if (h === 'positions') showPage('positions');
   else if (['tank','air','missile','hybrid'].includes(h)) showSquad(h);
 })();
+
+function exportFormation() {
+  const panel = document.querySelector('.squad-panel.active') || document.querySelector('.squad-panel');
+  if (!panel) return;
+  const squadKey  = panel.id?.replace('panel-', '') || 'squad';
+  const squadLabel = { tank: 'Tank', air: 'Aircraft', missile: 'Missile', hybrid: 'Hybrid' }[squadKey] || squadKey;
+
+  const cards = panel.querySelectorAll('.formation-card');
+  if (!cards.length) { alert('No formations visible. Select a squad type first.'); return; }
+
+  const ig = new IG.Builder(`${squadLabel} Formations`, 'Squad Builder Reference', { icon: '⚔️' });
+
+  cards.forEach((card, i) => {
+    const title = card.querySelector('.form-title')?.textContent?.trim() || `Formation ${i+1}`;
+    const badge = card.querySelector('.form-badge')?.textContent?.trim() || '';
+    const heroes = Array.from(card.querySelectorAll('.hero-slot')).map(slot => {
+      const name = slot.querySelector('.hero-name')?.textContent?.trim() || '';
+      const role = slot.querySelector('.hero-role')?.textContent?.trim() || '';
+      return name ? { text: name + (role ? ' — ' + role : '') } : null;
+    }).filter(Boolean);
+    const desc = (card.querySelector('.form-desc')?.textContent?.trim() || '').replace(/\s+/g, ' ');
+
+    if (i > 0) ig.divider();
+    ig.section(title + (badge ? ' · ' + badge : ''));
+    if (heroes.length) ig.list(heroes);
+    if (desc) ig.callout(desc.slice(0, 220) + (desc.length > 220 ? '…' : ''), 'info');
+  });
+
+  ig.download(`squad-${squadKey}-formations.png`);
+}
 </script>
 </body>
 </html>

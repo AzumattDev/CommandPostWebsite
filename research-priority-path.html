@@ -46,7 +46,10 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
   <img src="images/research/sci_tree_specialforces.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
   <h1 style="margin:0">Research Priority Path</h1>
 </div>
-<p class="subtitle">Last War: Survival — The optimal Tech Center route from HQ 1 to T10 troops and beyond</p>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.35rem">
+  <p class="subtitle" style="margin:0">Last War: Survival — The optimal Tech Center route from HQ 1 to T10 troops and beyond</p>
+  <button onclick="exportResearchPath()" style="background:rgba(232,114,14,0.12);border:1px solid rgba(232,114,14,0.4);color:#e8720c;border-radius:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Export as Image</button>
+</div>
 
 <div class="tip-box"><h3>The one-line summary</h3><p>Development + Economy (no badges, run always) → Alliance Duel (badges, unlock reward chests) → Special Forces (badges, unlock T10) → Age of Oil (post-Season 2)</p></div>
 
@@ -148,5 +151,44 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem;background:linear-grad
 
 <div class="tip-box"><h3>Tech power matters more than you think</h3><p>Having 200k more tech power than your opponent can close a 500k squad power gap. Research isn't glamorous but it's one of the most impactful multipliers in the game — especially the Morale and Damage Reduction nodes in Special Forces.</p></div>
 </div>
+<script src="js/infographic.js"></script>
+<script>
+function exportResearchPath() {
+  const BADGE_COLOR = { p1: IG.C.GREEN, p2: IG.C.BLUE, p3: IG.C.ORANGE, p4: IG.C.AMBER, skip: IG.C.RED };
+  const nodes = document.querySelectorAll('.flow-node');
+  const items = Array.from(nodes).map(n => {
+    const titleEl = n.querySelector('.fn-title');
+    const badgeEl = n.querySelector('.fn-badge');
+    // fn-title may contain an img; grab textContent and strip leading whitespace
+    const title = (titleEl?.textContent || '').trim().replace(/\s+/g, ' ');
+    const badge = (badgeEl?.textContent || '').trim();
+    const cls   = Array.from(badgeEl?.classList || []).find(c => /^p\d|skip/.test(c)) || 'p4';
+    return { text: title, note: badge, color: BADGE_COLOR[cls] || IG.C.TEXT_DIM };
+  });
+
+  const checkpoints = [
+    ['HQ 20', '~15%', 'Economy coming online'],
+    ['HQ 25', '~35%', 'Garage 1 near complete'],
+    ['HQ 28', '~55%', 'VS Tech well started'],
+    ['HQ 30', '~75%', 'Special Forces open'],
+  ];
+
+  new IG.Builder('Research Priority Path', 'Optimal Tech Center Route', { icon: '🔬' })
+    .section('Priority Order — run from top')
+    .list(items, { numbered: true })
+    .divider()
+    .section('Dual Queue Strategy')
+    .list([
+      { text: 'Queue 1: Development → Economy (always running, no badges)', color: IG.C.GREEN },
+      { text: 'Queue 2: Garage 1 → Alliance Duel VS Tech → Special Forces' },
+    ])
+    .divider()
+    .section('Progress Checkpoints')
+    .table(['HQ Level', 'Research %', 'Milestone'], checkpoints,
+      { colWidths: [0.18, 0.18, 0.64] })
+    .callout('Spend Valor Badges ONLY on Wednesdays (VS Day 3) — you earn points for researching AND badges from better reward chests.', 'tip')
+    .download('research-priority-path.png');
+}
+</script>
 </body>
 </html>

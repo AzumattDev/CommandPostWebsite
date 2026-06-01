@@ -132,7 +132,10 @@ details[open].glossary summary::before { transform: rotate(90deg); }
     <img src="images/troops/troop_t8.png" style="width:42px;height:42px;object-fit:contain;flex-shrink:0" alt="">
     <h1 style="margin:0">Waterfall Troop Training</h1>
   </div>
-  <p class="subtitle">The most efficient method for troop recovery, power growth, and VS Day event scoring</p>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.35rem">
+    <p class="subtitle" style="margin:0">The most efficient method for troop recovery, power growth, and VS Day event scoring</p>
+    <button onclick="exportWaterfall()" style="background:rgba(232,114,14,0.12);border:1px solid rgba(232,114,14,0.4);color:#e8720c;border-radius:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Export as Image</button>
+  </div>
 
   <details class="glossary">
     <summary>Key terms — word bank</summary>
@@ -348,6 +351,7 @@ details[open].glossary summary::before { transform: rotate(90deg); }
   </div>
 </div>
 
+<script src="js/infographic.js"></script>
 <script>
 const MILEPOSTS = [6, 10, 14, 17, 20, 24, 27, 30];
 const TIER_MAP = {6:'T3', 10:'T4', 14:'T5', 17:'T6', 20:'T7', 24:'T8', 27:'T9', 30:'T10'};
@@ -616,6 +620,51 @@ function renderSim() {
 
 loadInputs();
 calculate();
+
+function exportWaterfall() {
+  const bVals = ['b1','b2','b3','b4'].map(id => parseInt(document.getElementById(id)?.value) || 0);
+  const hq    = parseInt(document.getElementById('hq')?.value) || 0;
+  const levels = bVals.filter(v => v > 0).sort((a, b) => a - b);
+
+  if (!levels.length) { alert('Enter your barracks levels first.'); return; }
+
+  const lvls      = simLvl.length  ? simLvl  : levels;
+  const tiers     = simTier.length ? simTier : lvls.map(l => getTierForLevel(l));
+  const trainTier = simTrainTier   || getTierForLevel(Math.min(...lvls));
+
+  const TIER_CLR = {
+    T3: '#9ca3af', T4: IG.C.BLUE, T5: IG.C.GREEN, T6: IG.C.AMBER,
+    T7: '#f97316', T8: IG.C.RED,  T9: IG.C.PURPLE, T10: '#fde68a',
+  };
+
+  const uniqueTiers = [...new Set(tiers)].sort();
+  const depth = uniqueTiers.length;
+  const depthLabel = depth >= 4 ? 'Excellent' : depth >= 3 ? 'Good' : 'Needs work';
+
+  const cascade = [];
+  for (let i = 0; i < uniqueTiers.length - 1; i++) {
+    cascade.push({ text: `Promote ${uniqueTiers[i]} → ${uniqueTiers[i+1]}`, color: TIER_CLR[uniqueTiers[i+1]] || IG.C.TEXT });
+  }
+  if (uniqueTiers.length) {
+    cascade.push({ text: `Deploy ${uniqueTiers[uniqueTiers.length-1]} in VS battle`, highlight: true, color: IG.C.GOLD });
+  }
+
+  new IG.Builder('Waterfall Training', `HQ ${hq} · ${lvls.length} Barracks`, { icon: '💧' })
+    .section('My Barracks Setup')
+    .stats(lvls.map((lv, i) => ({ label: `Barracks ${i+1}`, value: `Lv ${lv}`, color: TIER_CLR[tiers[i]] || IG.C.GOLD })))
+    .divider()
+    .section('Weekly Training Plan')
+    .list([
+      { text: `Train tier all week: ${trainTier}`, highlight: true, color: TIER_CLR[trainTier] || IG.C.GOLD },
+      { text: `Waterfall depth: ${depth} tiers (${depthLabel})` },
+      { text: `Tier spread: ${uniqueTiers.join(' → ')}` },
+    ])
+    .divider()
+    .section('VS Day Cascade')
+    .list(cascade)
+    .callout(`Always train ${trainTier} all week so every barracks has troops ready to promote on VS Day.`, 'tip')
+    .download('waterfall-training.png');
+}
 </script>
 </body>
 </html>

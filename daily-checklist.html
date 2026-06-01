@@ -87,6 +87,7 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
   <div class="top-actions">
     <button class="btn-sm" onclick="checkAll()">Check all</button>
     <button class="btn-sm btn-danger" onclick="uncheckAll()">Uncheck all</button>
+    <button class="btn-sm" onclick="exportChecklist()" style="background:rgba(232,114,14,0.12);border-color:rgba(232,114,14,0.4);color:#e8720c">Export as Image</button>
   </div>
 </div>
 
@@ -102,6 +103,7 @@ h1{font-family:'Chakra Petch',sans-serif;font-size:1.6rem;font-weight:700;margin
 </div>
 
 </div>
+<script src="js/infographic.js"></script>
 <script>
 const TODAY_KEY = () => new Date().toISOString().slice(0, 10);
 
@@ -266,6 +268,43 @@ function updateHeader() {
 updateHeader();
 setInterval(updateHeader, 1000);
 render();
+
+function exportChecklist() {
+  const tasks   = allTasks();
+  const total   = tasks.length;
+  const done    = tasks.filter(t => state.checked.has(t.id)).length;
+  const dateStr = state.date || new Date().toISOString().split('T')[0];
+
+  const catMeta = {
+    essential:  { label: 'Essential',     color: IG.C.GREEN  },
+    alliance:   { label: 'Alliance',      color: IG.C.BLUE   },
+    production: { label: 'Build & Train', color: IG.C.ORANGE },
+    events:     { label: 'Events',        color: IG.C.AMBER  },
+    custom:     { label: 'Custom',        color: IG.C.RED    },
+  };
+
+  const makeGroup = cat => ({
+    label: catMeta[cat].label,
+    color: catMeta[cat].color,
+    items: tasks.filter(t => t.cat === cat).map(t => ({
+      text: t.title,
+      done: state.checked.has(t.id),
+    })),
+  });
+
+  const leftGroups  = ['essential', 'alliance'].map(makeGroup).filter(g => g.items.length > 0);
+  const rightGroups = ['production', 'events', 'custom'].map(makeGroup).filter(g => g.items.length > 0);
+
+  new IG.Builder('Daily Checklist', dateStr, { icon: '✅' })
+    .stats([
+      { label: 'Completed',   value: done,         color: done === total ? IG.C.GREEN : IG.C.ORANGE },
+      { label: 'Remaining',   value: total - done, color: total - done === 0 ? IG.C.GREEN : IG.C.TEXT_DIM },
+      { label: 'Total Tasks', value: total },
+    ], 3)
+    .divider()
+    .twoCol(leftGroups, rightGroups)
+    .download(`daily-checklist-${dateStr}.png`);
+}
 </script>
 </body>
 </html>
