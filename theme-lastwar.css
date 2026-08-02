@@ -1,0 +1,826 @@
+﻿/*
+ * Last War: Survival — Site Theme
+ * Dark mode (default) + Light mode via [data-theme="light"] on <html>
+ * Loaded dynamically by nav.js after its own inline styles so selectors here win.
+ */
+
+/* ── Google Fonts additions ─────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE  (default / data-theme="dark")
+   Palette: deep navy hull + gold rank + teal action + electric blue UI
+   ═══════════════════════════════════════════════════════════════════════════ */
+html,
+html[data-theme="dark"] {
+  /* Base surfaces */
+  --bg:       #060c18;
+  --surface:  #0d1b2e;
+  --surface2: #122038;
+  --surface3: #182848;
+  --border:   #1e3a60;
+  --border2:  #2a5090;
+
+  /* Text */
+  --text:  #dceeff;
+  --text2: #7bacc8;
+  --text3: #4a7099;
+
+  /* Gold — primary accent, replaces orange */
+  --accent:      #f0b840;
+  --accent2:     #c88c10;
+  --accent-bg:   rgba(240,184,64,.10);
+  --purple:      #f0b840;
+  --purple-bg:   rgba(240,184,64,.10);
+  --purple-border:rgba(240,184,64,.30);
+
+  /* Teal — interactive / action */
+  --cyan:        #00d4f0;
+  --cyan-bg:     rgba(0,212,240,.08);
+  --cyan-border: rgba(0,212,240,.28);
+
+  /* Electric blue — info / links */
+  --blue:        #4db8ff;
+  --blue-bg:     rgba(77,184,255,.08);
+  --blue-border: rgba(77,184,255,.25);
+
+  /* Green — positive */
+  --green:        #34d399;
+  --green-bg:     rgba(52,211,153,.08);
+  --green-border: rgba(52,211,153,.25);
+
+  /* Amber — warning */
+  --amber:        #f0b840;
+  --amber-bg:     rgba(240,184,64,.10);
+  --amber-border: rgba(240,184,64,.30);
+
+  /* Red — danger / notification */
+  --red:    #ff5f5f;
+  --red-bg: rgba(255,95,95,.08);
+
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  /* LW-specific tokens */
+  --lw-gold:        #f0b840;
+  --lw-gold-glow:   rgba(240,184,64,.35);
+  --lw-teal:        #00b4d8;
+  --lw-teal-glow:   rgba(0,180,216,.30);
+  --lw-btn-blue:    linear-gradient(180deg,#1e6fc8 0%,#0d4a96 100%);
+  --lw-btn-blue-h:  linear-gradient(180deg,#2880e8 0%,#1460c0 100%);
+  --lw-btn-teal:    linear-gradient(180deg,#00c8e8 0%,#0090b8 100%);
+  --lw-btn-teal-h:  linear-gradient(180deg,#00deff 0%,#00aad4 100%);
+  --lw-btn-gold:    linear-gradient(180deg,#f8c840 0%,#c88010 100%);
+  --lw-header-bg:   linear-gradient(180deg,#0a1e3a 0%,#060c18 100%);
+  --lw-panel-grad:  linear-gradient(160deg,#0f2040 0%,#060c18 100%);
+  --lw-separator:   linear-gradient(90deg,transparent,#f0b840,transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT MODE  (data-theme="light")
+   Palette: sandy parchment base + deep navy text + gold + blue UI panels
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="light"] {
+  --bg:       #e8d8b4;
+  --surface:  #f0e4c8;
+  --surface2: #e4d4b0;
+  --surface3: #d8c89a;
+  --border:   #c0a878;
+  --border2:  #a08858;
+
+  --text:  #0a1828;
+  --text2: #2a4060;
+  --text3: #4a6080;
+
+  --accent:      #b86800;
+  --accent2:     #904800;
+  --accent-bg:   rgba(184,104,0,.10);
+  --purple:      #b86800;
+  --purple-bg:   rgba(184,104,0,.10);
+  --purple-border:rgba(184,104,0,.30);
+
+  --cyan:        #007aaa;
+  --cyan-bg:     rgba(0,122,170,.10);
+  --cyan-border: rgba(0,122,170,.30);
+
+  --blue:        #1660c0;
+  --blue-bg:     rgba(22,96,192,.10);
+  --blue-border: rgba(22,96,192,.28);
+
+  --green:        #0a7a50;
+  --green-bg:     rgba(10,122,80,.10);
+  --green-border: rgba(10,122,80,.30);
+
+  --amber:        #b86800;
+  --amber-bg:     rgba(184,104,0,.10);
+  --amber-border: rgba(184,104,0,.30);
+
+  --red:    #b82020;
+  --red-bg: rgba(184,32,32,.08);
+
+  --lw-gold:        #c07800;
+  --lw-gold-glow:   rgba(192,120,0,.25);
+  --lw-teal:        #007aaa;
+  --lw-teal-glow:   rgba(0,122,170,.20);
+  --lw-btn-blue:    linear-gradient(180deg,#1e70d8 0%,#0d4ea8 100%);
+  --lw-btn-blue-h:  linear-gradient(180deg,#2888f0 0%,#1568d0 100%);
+  --lw-btn-teal:    linear-gradient(180deg,#00a8d0 0%,#007898 100%);
+  --lw-btn-teal-h:  linear-gradient(180deg,#00c0f0 0%,#0098bc 100%);
+  --lw-btn-gold:    linear-gradient(180deg,#e8a020 0%,#a86400 100%);
+  --lw-header-bg:   linear-gradient(180deg,#c8b490 0%,#b8a078 100%);
+  --lw-panel-grad:  linear-gradient(160deg,#eee0c0 0%,#d8c8a0 100%);
+  --lw-separator:   linear-gradient(90deg,transparent,#c07800,transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL BODY & BACKGROUND  — uses real game assets
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * Dark mode: the actual in-game loading screen (tiled blue "LAST WAR" art)
+ * hidden under a heavy dark overlay so it reads as a subtle texture.
+ */
+html[data-theme="dark"] body::before,
+html:not([data-theme]) body::before {
+  background-image:
+    /* dark overlay keeps text legible */
+    linear-gradient(rgba(6,12,24,.87), rgba(6,12,24,.87)),
+    /* subtle gold glow at top */
+    radial-gradient(ellipse 70% 35% at 50% 0%, rgba(240,184,64,.06) 0%, transparent 60%),
+    /* actual Last War loading screen texture */
+    url('images/game/ui/loading_common_bg.png');
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: 0 0, 0 0, center center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/*
+ * Light mode: the real in-game desert terrain tile (Desert Storm ground texture).
+ * A warm sandy overlay keeps it from being too saturated.
+ */
+html[data-theme="light"] body::before {
+  background-image:
+    /* warm sandy overlay */
+    linear-gradient(rgba(232,216,176,.72), rgba(224,208,164,.80)),
+    /* actual desert terrain from the game */
+    url('images/game/ui/O_terrain_desert_02.png');
+  background-size: 100% 100%, 480px 480px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  background-attachment: fixed, fixed;
+}
+
+/*
+ * Dark mode nav: same loading-screen texture at a heavier tint
+ * so the bar feels grounded in the game's chrome.
+ */
+html[data-theme="dark"] .cp-nav,
+html:not([data-theme]) .cp-nav {
+  background-image:
+    linear-gradient(rgba(6,12,24,.96), rgba(6,12,24,.96)),
+    url('images/game/ui/loading_common_bg.png') !important;
+  background-size: auto, cover !important;
+  background-position: 0 0, center !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NAV OVERRIDES  (nav.js injects its own <style>; this file loads after it)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* --- Nav bar --- */
+html[data-theme="dark"] .cp-nav,
+html:not([data-theme]) .cp-nav {
+  border-bottom: 1px solid #1e3a60 !important;
+}
+html[data-theme="light"] .cp-nav {
+  background: rgba(200,172,120,.96) !important;
+  border-bottom: 1px solid #a08858 !important;
+}
+
+/* --- Brand --- */
+html[data-theme="dark"] .cp-brand,
+html:not([data-theme]) .cp-brand { color: #f0b840 !important; }
+html[data-theme="dark"] .cp-brand:hover,
+html:not([data-theme]) .cp-brand:hover { color: #f8d060 !important; }
+html[data-theme="light"] .cp-brand { color: #0a1828 !important; }
+html[data-theme="light"] .cp-brand:hover { color: #b86800 !important; }
+html[data-theme="light"] .cp-brand span { color: #4a6080 !important; }
+
+/* --- Nav links --- */
+html[data-theme="light"] .cp-link { color: #2a4060 !important; }
+html[data-theme="light"] .cp-link:hover { color: #0a1828 !important; background: rgba(0,0,0,.06) !important; }
+html[data-theme="light"] .cp-link.active { color: #b86800 !important; background: rgba(184,104,0,.10) !important; }
+
+/* --- Dropdowns --- */
+html[data-theme="dark"] .cp-dropdown,
+html:not([data-theme]) .cp-dropdown {
+  background: #0a1828 !important;
+  border-color: #1e3a60 !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(240,184,64,.08) !important;
+}
+html[data-theme="light"] .cp-dropdown {
+  background: #e8d8b4 !important;
+  border-color: #c0a878 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15) !important;
+}
+html[data-theme="light"] .cp-dd-item { color: #2a4060 !important; }
+html[data-theme="light"] .cp-dd-item:hover { color: #0a1828 !important; background: rgba(0,0,0,.05) !important; }
+html[data-theme="light"] .cp-dd-item.active { color: #b86800 !important; }
+
+/* --- Active link accent --- */
+html[data-theme="dark"] .cp-link.active,
+html:not([data-theme]) .cp-link.active { color: #f0b840 !important; background: rgba(240,184,64,.08) !important; }
+html[data-theme="dark"] .cp-dd-item.active,
+html:not([data-theme]) .cp-dd-item.active { color: #f0b840 !important; }
+
+/* --- Time bar --- */
+html[data-theme="dark"] .cp-timebar,
+html:not([data-theme]) .cp-timebar { border-top-color: #1e3a60 !important; }
+html[data-theme="light"] .cp-timebar { border-top-color: #c0a878 !important; }
+html[data-theme="light"] .cp-tb-label { color: #4a6080 !important; }
+html[data-theme="light"] .cp-tb-sub   { color: #4a6080 !important; }
+html[data-theme="light"] .cp-tb-local { color: #2a4060 !important; }
+html[data-theme="dark"] .cp-tb-reset,
+html:not([data-theme]) .cp-tb-reset { color: #f0b840 !important; }
+html[data-theme="light"] .cp-tb-reset { color: #b86800 !important; }
+html[data-theme="dark"] .cp-tb-srv,
+html:not([data-theme]) .cp-tb-srv { color: #00d4f0 !important; }
+html[data-theme="light"] .cp-tb-srv { color: #007aaa !important; }
+html[data-theme="light"] .cp-tb-divider { background: #c0a878 !important; }
+
+/* --- Mobile menu --- */
+html[data-theme="light"] .cp-mobile-menu { background: rgba(200,172,120,.98) !important; }
+html[data-theme="light"] .cp-mob-label { color: #4a6080 !important; }
+html[data-theme="light"] .cp-mob-link { color: #2a4060 !important; }
+html[data-theme="light"] .cp-mob-link.active { color: #b86800 !important; }
+
+/* --- Search --- */
+html[data-theme="dark"] .cp-search-box,
+html:not([data-theme]) .cp-search-box {
+  background: #0a1828 !important;
+  border-color: #2a5090 !important;
+}
+html[data-theme="light"] .cp-search-box {
+  background: #f0e4c8 !important;
+  border-color: #c0a878 !important;
+}
+html[data-theme="light"] .cp-search-input { color: #0a1828 !important; }
+html[data-theme="light"] .cp-search-input::placeholder { color: #8a9aaa !important; }
+html[data-theme="light"] .cp-search-result:hover,
+html[data-theme="light"] .cp-search-result.focused { background: rgba(184,104,0,.08) !important; }
+html[data-theme="light"] .cp-sr-title { color: #0a1828 !important; }
+html[data-theme="light"] .cp-search-input-wrap { border-bottom-color: #c0a878 !important; }
+html[data-theme="light"] .cp-search-result { border-bottom-color: #d8c8a0 !important; }
+html[data-theme="light"] .cp-search-btn {
+  color: #4a6080 !important;
+  border-color: #c0a878 !important;
+}
+html[data-theme="light"] .cp-search-btn kbd {
+  background: #e4d4b0 !important;
+  border-color: #c0a878 !important;
+  color: #4a6080 !important;
+}
+
+/* --- Theme toggle button --- */
+.lw-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text3);
+  font-size: .78rem;
+  padding: 5px 9px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lw-theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--lw-gold);
+  background: var(--accent-bg);
+}
+.lw-theme-toggle .lw-tt-icon { font-size: .95rem; line-height: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CARD ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * Dark mode cards: the real in-game blue-grey panel swatch (common_windows_bg)
+ * tinted very dark so it reads as a subtle texture inside each card.
+ */
+html[data-theme="dark"] .card,
+html:not([data-theme]) .card {
+  position: relative;
+  background:
+    /* gold corner brackets — top-left, top-right, bottom-left, bottom-right */
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) left top    / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) left top    / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) right top   / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) right top   / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) left bottom / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) left bottom / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) right bottom/ 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.28),rgba(240,184,64,.28)) right bottom/ 1px 12px no-repeat,
+    /* panel */
+    linear-gradient(160deg,rgba(15,32,64,.97) 0%,rgba(6,12,24,.99) 100%) left top / 100% 100% no-repeat,
+    url('images/game/ui/common_windows_bg.png') left top / 100% 100% no-repeat;
+  border-color: #1e3a60;
+  box-shadow: inset 0 0 40px rgba(0,212,240,.03), inset 0 1px 0 rgba(77,184,255,.05);
+  overflow: hidden;
+}
+html[data-theme="dark"] .guide-card,
+html:not([data-theme]) .guide-card {
+  background:
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) left top    / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) left top    / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) right top   / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) right top   / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) left bottom / 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) left bottom / 1px 12px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) right bottom/ 12px 1px no-repeat,
+    linear-gradient(rgba(240,184,64,.20),rgba(240,184,64,.20)) right bottom/ 1px 12px no-repeat,
+    linear-gradient(160deg,rgba(15,32,64,.97) 0%,rgba(6,12,24,.99) 100%) left top / 100% 100% no-repeat,
+    url('images/game/ui/common_windows_bg.png') left top / 100% 100% no-repeat;
+  border-color: #1e3a60;
+}
+html[data-theme="dark"] .guide-card:hover,
+html:not([data-theme]) .guide-card:hover {
+  border-color: var(--lw-gold);
+  box-shadow: 0 0 0 1px rgba(240,184,64,.15), 0 8px 32px rgba(0,0,0,.5);
+}
+html[data-theme="light"] .guide-card:hover {
+  border-color: var(--lw-gold);
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+}
+
+/* Section tag pill */
+html[data-theme="dark"] .section-tag,
+html:not([data-theme]) .section-tag {
+  background: #0a1828;
+  border-color: #1e3a60;
+  color: var(--text3);
+  font-size: .68rem;
+  letter-spacing: .12em;
+}
+html[data-theme="light"] .section-tag {
+  background: #e4d4b0;
+  border-color: #c0a878;
+}
+
+/* Section line */
+html[data-theme="dark"] .section-line,
+html:not([data-theme]) .section-line {
+  background: linear-gradient(90deg, #1e3a60, transparent) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUTS & FORM ELEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] .tc-inp,
+html:not([data-theme]) .tc-inp {
+  background: #060c18;
+  border-color: #1e3a60;
+}
+html[data-theme="dark"] .tc-inp:focus,
+html:not([data-theme]) .tc-inp:focus { border-color: var(--lw-teal); }
+html[data-theme="light"] .tc-inp { background: #f0e4c8; border-color: #c0a878; color: #0a1828; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAST WAR UTILITY CLASSES  (for optional use in pages)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Game-style panel header — like "ALLIANCE" / "MEMBER LIST" bars */
+.lw-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: .6rem 1rem;
+  background-image:
+    var(--lw-header-bg),
+    url('images/game/ui/common_windows_titlebg@2x.png');
+  background-size: auto, 100% 100%;
+  border-bottom: 2px solid var(--lw-gold);
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text);
+}
+.lw-panel-header .lw-ph-icon { width: 20px; height: 20px; object-fit: contain; opacity: .9; }
+
+/* Gold ribbon section accent — real game asset */
+.lw-ribbon {
+  display: block;
+  width: 220px;
+  height: 44px;
+  background: url('images/game/ui/UIalliance_img_memberbg.png') center/contain no-repeat;
+  margin: 0 auto .5rem;
+  pointer-events: none;
+}
+
+/* Gold horizontal separator */
+.lw-sep {
+  height: 1px;
+  background: var(--lw-separator);
+  border: none;
+  margin: 1.5rem 0;
+  opacity: .6;
+}
+
+/* Rank badges  R1–R5 */
+.lw-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 20px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: .72rem;
+  letter-spacing: .03em;
+  flex-shrink: 0;
+}
+.lw-r5 { background: linear-gradient(135deg,#e8c030,#a06800); color: #fff8e0; border: 1px solid #f0d060; }
+.lw-r4 { background: linear-gradient(135deg,#c8a020,#806000); color: #fff0c0; border: 1px solid #d0b040; }
+.lw-r3 { background: linear-gradient(135deg,#a09070,#706040); color: #f0e8d0; border: 1px solid #b0a080; }
+.lw-r2 { background: linear-gradient(135deg,#8090a8,#506070); color: #e0eaf4; border: 1px solid #90a8c0; }
+.lw-r1 { background: linear-gradient(135deg,#607080,#384858); color: #d0dce8; border: 1px solid #788898; }
+
+/* Gold star row */
+.lw-stars { color: var(--lw-gold); font-size: .9rem; letter-spacing: 1px; }
+
+/* Notification dot */
+.lw-notif {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--red);
+  flex-shrink: 0;
+}
+
+/* Game-style blue gradient button */
+.lw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(77,184,255,.4);
+  background: var(--lw-btn-blue);
+  color: #dceeff;
+  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  font-weight: 600;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.lw-btn:hover {
+  background: var(--lw-btn-blue-h);
+  border-color: rgba(77,184,255,.6);
+  box-shadow: 0 4px 16px rgba(0,90,200,.4), inset 0 1px 0 rgba(255,255,255,.12);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* Teal action button */
+.lw-btn-teal {
+  background: var(--lw-btn-teal);
+  border-color: rgba(0,212,240,.4);
+  color: #e0faff;
+}
+.lw-btn-teal:hover {
+  background: var(--lw-btn-teal-h);
+  border-color: rgba(0,212,240,.7);
+  box-shadow: 0 4px 16px rgba(0,180,216,.4), inset 0 1px 0 rgba(255,255,255,.12);
+  color: #fff;
+}
+
+/* Gold premium button */
+.lw-btn-gold {
+  background: var(--lw-btn-gold);
+  border-color: rgba(240,184,64,.5);
+  color: #fff8e0;
+}
+.lw-btn-gold:hover {
+  box-shadow: 0 4px 16px rgba(240,184,64,.35), inset 0 1px 0 rgba(255,255,255,.15);
+  border-color: rgba(240,184,64,.8);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* ── Event-mode card backgrounds using real game halftone assets ─────────── */
+
+/*
+ * Alliance Duel / VS — blue halftone (Tex_wsh_league_grade_bg_01 = your team side)
+ * Enemy / opposing side uses the red-orange halftone (bg_02)
+ */
+.lw-card-duel {
+  border-color: rgba(77,184,255,.45) !important;
+  background-image:
+    linear-gradient(160deg, rgba(10,24,56,.93) 0%, rgba(6,12,24,.97) 100%),
+    url('images/game/ui/Tex_wsh_league_grade_bg_01.png') !important;
+  background-size: auto, cover !important;
+  background-position: 0 0, center !important;
+}
+.lw-card-duel::before { background: linear-gradient(90deg,#4db8ff,#1e6fc8) !important; }
+
+.lw-card-vs {
+  border-color: rgba(240,80,60,.45) !important;
+  background-image:
+    linear-gradient(160deg, rgba(48,12,8,.93) 0%, rgba(24,6,4,.97) 100%),
+    url('images/game/ui/Tex_wsh_league_grade_bg_02.png') !important;
+  background-size: auto, cover !important;
+  background-position: 0 0, center !important;
+}
+.lw-card-vs::before { background: linear-gradient(90deg,#ff5040,#c02010) !important; }
+
+/* Desert Storm — uses the real desert terrain as card background texture */
+.lw-card-storm {
+  border-color: rgba(220,140,40,.45) !important;
+  background-image:
+    linear-gradient(160deg, rgba(48,28,6,.93) 0%, rgba(24,14,2,.97) 100%),
+    url('images/game/ui/O_terrain_desert_02.png') !important;
+  background-size: auto, 300px 300px !important;
+  background-position: 0 0, 0 0 !important;
+}
+.lw-card-storm::before { background: linear-gradient(90deg,#e08020,#a05010) !important; }
+
+/* Canyon Storm */
+.lw-card-canyon { border-color: rgba(160,100,40,.4) !important; }
+.lw-card-canyon::before { background: linear-gradient(90deg,#a06428,#784818) !important; }
+
+/* Season 1 – Crimson Plague */
+.lw-card-season1 { border-color: rgba(200,30,60,.4) !important; }
+.lw-card-season1::before { background: linear-gradient(90deg,#c01e3c,#901830) !important; }
+
+/* Season 2 */
+.lw-card-season2 { border-color: rgba(100,160,240,.4) !important; }
+.lw-card-season2::before { background: linear-gradient(90deg,#6490e8,#3060c0) !important; }
+
+/* Season 3 – Golden Kingdom */
+.lw-card-season3 { border-color: rgba(220,180,40,.4) !important; }
+.lw-card-season3::before { background: linear-gradient(90deg,#dcb428,#a87810) !important; }
+
+/* Hero h1 accent color */
+html[data-theme="dark"] .hero h1 .accent,
+html:not([data-theme]) .hero h1 .accent { color: var(--lw-gold); }
+html[data-theme="light"] .hero h1 .accent { color: var(--accent); }
+
+/* Footer */
+html[data-theme="light"] .footer { border-top-color: #c0a878; }
+
+/* Tip/warn boxes light */
+html[data-theme="light"] .tip-box  { background: rgba(10,122,80,.08); }
+html[data-theme="light"] .warn-box { background: rgba(184,32,32,.06); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLLBAR (dark)
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] ::-webkit-scrollbar,
+html:not([data-theme]) ::-webkit-scrollbar { width: 6px; background: #060c18; }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb,
+html:not([data-theme]) ::-webkit-scrollbar-thumb {
+  background: #1e3a60;
+  border-radius: 3px;
+}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+html:not([data-theme]) ::-webkit-scrollbar-thumb:hover { background: #f0b840; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECTION COLOR
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] ::selection,
+html:not([data-theme]) ::selection { background: rgba(240,184,64,.25); color: #fff8e0; }
+html[data-theme="light"] ::selection { background: rgba(184,104,0,.20); color: #0a1828; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLOATING HERO ART  (fixed right-side decoration, desktop only)
+   Monica portrait from heroiconsbig — transparent-background PNG.
+   Partially off-screen (right:-90px) so it doesn't eat content space.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lw-page-hero-art {
+  position: fixed;
+  bottom: 0;
+  right: -20px;
+  width: 260px;
+  height: 310px;
+  background-position: bottom center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.18;
+  filter: grayscale(20%);
+  transition: opacity .5s ease, right .5s ease, filter .5s ease;
+}
+@media (min-width: 1100px) {
+  .lw-page-hero-art:hover {
+    opacity: 0.40;
+    right: 0px;
+    filter: grayscale(0%);
+    pointer-events: auto;
+  }
+}
+@media (max-width: 1099px) {
+  .lw-page-hero-art { display: none; }
+}
+html[data-theme="light"] .lw-page-hero-art {
+  opacity: 0.12;
+  filter: grayscale(30%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO PORTRAIT STRIP — circular crop with gold ring
+   The heroiconsbig PNGs have transparent backgrounds so we back them with
+   a dark navy gradient. object-position: top gets the face in the circle.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] .hero-portraits img,
+html:not([data-theme]) .hero-portraits img {
+  border-radius: 50% !important;
+  border: 2px solid rgba(240,184,64,.45) !important;
+  background: linear-gradient(145deg, #0a1e3a 0%, #060c18 100%) !important;
+  object-position: top center;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.55));
+}
+html[data-theme="dark"] .hero-portraits img:hover,
+html:not([data-theme]) .hero-portraits img:hover {
+  border-color: var(--lw-gold) !important;
+  box-shadow: 0 0 14px var(--lw-gold-glow), 0 0 0 4px rgba(240,184,64,.10) !important;
+  filter: drop-shadow(0 4px 14px rgba(240,184,64,.35));
+}
+html[data-theme="light"] .hero-portraits img {
+  border-radius: 50% !important;
+  border: 2px solid rgba(184,104,0,.40) !important;
+  background: #e0cfa8 !important;
+  object-position: top center;
+}
+html[data-theme="light"] .hero-portraits img:hover {
+  border-color: var(--lw-gold) !important;
+  box-shadow: 0 0 10px rgba(192,120,0,.30) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INDEX PAGE HERO SECTION — side art (large Monica, desktop only)
+   Positioned absolutely inside .hero; fades in from the right.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.hero-side-art {
+  position: absolute;
+  right: -140px;
+  bottom: -30px;
+  width: 300px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  animation: heroArtFade 1s ease 0.8s forwards;
+}
+.hero-side-art img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@keyframes heroArtFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+html[data-theme="dark"] .hero-side-art,
+html:not([data-theme]) .hero-side-art {
+  filter:
+    drop-shadow(0 0 30px rgba(240,184,64,.28))
+    drop-shadow(0 0 12px rgba(0,180,216,.15));
+}
+html[data-theme="dark"] .hero-side-art img,
+html:not([data-theme]) .hero-side-art img { opacity: 0.50; }
+html[data-theme="light"] .hero-side-art {
+  filter: drop-shadow(0 0 20px rgba(192,120,0,.20));
+}
+html[data-theme="light"] .hero-side-art img { opacity: 0.30; }
+@media (max-width: 1180px) { .hero-side-art { display: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CARD SHIMMER  — diagonal light sweep on hover via ::after
+   guide-card already has overflow:hidden; .card gets it added above.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes lwShimmer {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(250%) skewX(-18deg); }
+}
+html[data-theme="dark"] .card::after,
+html:not([data-theme]) .card::after,
+html[data-theme="dark"] .guide-card::after,
+html:not([data-theme]) .guide-card::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -40%;
+  width: 60%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.07) 50%, transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  pointer-events: none;
+  z-index: 4;
+}
+html[data-theme="dark"] .card:hover::after,
+html:not([data-theme]) .card:hover::after,
+html[data-theme="dark"] .guide-card:hover::after,
+html:not([data-theme]) .guide-card:hover::after {
+  animation: lwShimmer .7s ease forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY — Rajdhani on all h2 / h3 site-wide
+   ═══════════════════════════════════════════════════════════════════════════ */
+h2, h3 {
+  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  letter-spacing: .03em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACTIVE NAV LINK — gold pulse glow
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes lwNavPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240,184,64,0); }
+  50%       { box-shadow: 0 0 8px 2px rgba(240,184,64,.22); }
+}
+html[data-theme="dark"] .cp-link.active,
+html:not([data-theme]) .cp-link.active {
+  animation: lwNavPulse 2.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCANLINE + DOT OVERLAY (body::after)
+   Mimics the faint grid texture layered over all Last War UI panels.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] body::after,
+html:not([data-theme]) body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 3px,
+      rgba(255,255,255,.010) 3px, rgba(255,255,255,.010) 4px
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='.55' fill='rgba(255,255,255,0.038)'/%3E%3C/svg%3E");
+  background-size: 100% 4px, 24px 24px;
+}
+html[data-theme="light"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,.010) 3px, rgba(0,0,0,.010) 4px
+  );
+  background-size: 100% 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTION HEROES  (index.html section-header mini-portrait row)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.section-heroes {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+  align-items: center;
+}
+.section-heroes img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 50%;
+  opacity: 0.60;
+  transition: opacity .2s, transform .2s;
+}
+html[data-theme="dark"] .section-heroes img,
+html:not([data-theme]) .section-heroes img {
+  border: 1px solid rgba(240,184,64,.35);
+  background: linear-gradient(135deg,#0a1e3a,#060c18);
+}
+html[data-theme="light"] .section-heroes img {
+  border: 1px solid rgba(184,104,0,.30);
+  background: #e0cfa8;
+}
+.section-heroes img:hover { opacity: 1; transform: translateY(-2px) scale(1.1); }
+
