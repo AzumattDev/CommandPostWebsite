@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -120,9 +120,9 @@
   opacity: 0; animation: fadeUp .6s ease .4s forwards;
 }
 .hero-portraits img {
-  width: 52px; height: 52px; object-fit: cover;
+  width: 64px; height: 64px; object-fit: cover; object-position: top center;
   border-radius: 10px; border: 1px solid var(--border);
-  background: var(--surface); opacity: .75;
+  background: var(--surface); opacity: .78;
   transition: opacity .2s, transform .2s, border-color .2s;
 }
 .hero-portraits img:hover { opacity: 1; transform: translateY(-3px); border-color: var(--border2); }
@@ -173,6 +173,10 @@
 
 <div class="container">
   <section class="hero">
+    <!-- Desktop-only large hero art — theme CSS controls visibility -->
+    <div class="hero-side-art" aria-hidden="true">
+      <img src="images/game/heroes/hero_icon_Monica.png" alt="">
+    </div>
     <div class="hero-eyebrow">Ash Masters Alliance</div>
     <h1><span class="accent">The Command Post</span><br><span class="dim">Last War: Survival</span></h1>
     <p class="hero-sub">Ash Masters' strategy hub. Interactive guides and planning tools — no fluff, no ads, no paywalled info.</p>
@@ -181,24 +185,27 @@
       <div class="hero-stat"><div class="num">0</div><div class="lbl">Ads or paywalls</div></div>
       <div class="hero-stat"><div class="num">100%</div><div class="lbl">Interactive</div></div>
     </div>
-    <!-- Hero portrait strip — replace with your preferred hero images (52×52 cropped portraits work best) -->
     <div class="hero-portraits">
-      <img src="images/hero_murphy.png"    alt="Murphy">
-      <img src="images/hero_kimberly.png"  alt="Kimberly">
-      <img src="images/hero_williams.png"  alt="Williams">
-      <img src="images/hero_lucius.png"    alt="Lucius">
-      <img src="images/hero_dva.png"       alt="DVA">
-      <img src="images/hero_morrison.png"  alt="Morrison">
-      <img src="images/hero_fiona.png"     alt="Fiona">
-      <img src="images/hero_tesla.png"     alt="Tesla">
-      <img src="images/hero_adam.png"      alt="Adam">
-      <img src="images/hero_mcgregor.png"  alt="McGregor">
+      <img src="images/game/heroes/hero_icon_Audie_Murphy.png" alt="Murphy">
+      <img src="images/game/heroes/hero_icon_Monica.png"       alt="Monica">
+      <img src="images/game/heroes/hero_icon_Fiona.png"        alt="Fiona">
+      <img src="images/game/heroes/hero_icon_Lucius.png"       alt="Lucius">
+      <img src="images/game/heroes/hero_icon_dva.png"          alt="D.Va">
+      <img src="images/game/heroes/hero_icon_Morrison.png"     alt="Morrison">
+      <img src="images/game/heroes/hero_icon_Stetman.png"      alt="Stetman">
+      <img src="images/game/heroes/hero_icon_Rick.png"         alt="Rick">
+      <img src="images/game/heroes/hero_icon_Gump.png"         alt="Gump">
+      <img src="images/game/heroes/hero_icon_Alex.png"         alt="Alex">
     </div>
   </section>
 
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Event Planners</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Katyusha.png" alt="" title="Katyusha">
+      <img src="images/game/heroes/hero_icon_Morrison.png" alt="" title="Morrison">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -229,6 +236,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Weekly Events & Planning</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Monica.png" alt="" title="Monica">
+      <img src="images/game/heroes/hero_icon_Gump.png" alt="" title="Gump">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -269,6 +280,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Troops & Squad Building</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Adam.png" alt="" title="Adam">
+      <img src="images/game/heroes/hero_icon_Aldridge.png" alt="" title="Aldridge">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -299,6 +314,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Progression Systems</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Einstein.png" alt="" title="Einstein">
+      <img src="images/game/heroes/hero_icon_Stetman.png" alt="" title="Stetman">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -349,6 +368,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Calculators & Tools</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Lucius.png" alt="" title="Lucius">
+      <img src="images/game/heroes/hero_icon_Tesla.png" alt="" title="Tesla">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -398,6 +421,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Alliance Management</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Fiona.png" alt="" title="Fiona">
+      <img src="images/game/heroes/hero_icon_Monica.png" alt="" title="Monica">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">
@@ -416,6 +443,10 @@
   <div class="section-header">
     <div class="section-line"></div>
     <span class="section-tag">Maps, Territory & Alliance Strategy</span>
+    <div class="section-heroes">
+      <img src="images/game/heroes/hero_icon_Nimitz.png" alt="" title="Nimitz">
+      <img src="images/game/heroes/hero_icon_Audie_Murphy.png" alt="" title="Audie Murphy">
+    </div>
     <div class="section-line" style="background:linear-gradient(270deg, var(--border2), transparent)"></div>
   </div>
   <div class="guides-grid">

@@ -43,7 +43,7 @@ async function resolveAlliance(db, id, token) {
 
 async function loadFullState(db, id) {
   const [rosterRes, schedRes, rulesRes] = await Promise.all([
-    db.prepare('SELECT id,name,role,active,avail,vs_points,tech_points,sort_order FROM alliance_roster WHERE alliance_id=? ORDER BY sort_order ASC,id ASC').bind(id).all(),
+    db.prepare('SELECT id,name,role,active,avail,vs_points,tech_points,power,sort_order FROM alliance_roster WHERE alliance_id=? ORDER BY sort_order ASC,id ASC').bind(id).all(),
     db.prepare('SELECT day_index,conductor,vip FROM alliance_schedule WHERE alliance_id=? ORDER BY day_index').bind(id).all(),
     db.prepare('SELECT day_index,rule_type,label FROM alliance_day_rules WHERE alliance_id=? ORDER BY day_index').bind(id).all(),
   ]);
@@ -52,7 +52,7 @@ async function loadFullState(db, id) {
     id: r.id, name: r.name, role: r.role,
     active: r.active === 1,
     avail: String(r.avail || '1111111'),
-    vsPoints: r.vs_points, techPoints: r.tech_points, sortOrder: r.sort_order,
+    vsPoints: r.vs_points, techPoints: r.tech_points, power: r.power || 0, sortOrder: r.sort_order,
   }));
 
   const conductors = Array(7).fill('');
@@ -260,9 +260,10 @@ export async function onRequestPost({ request, env }) {
         const avail  = String(p.avail || '1111111').replace(/[^01]/g, '1').slice(0, 7).padEnd(7, '1');
         const vs     = Math.max(0, parseInt(p.vsPoints)  || 0);
         const tech   = Math.max(0, parseInt(p.techPoints) || 0);
+        const power  = Math.max(0, parseInt(p.power) || 0);
         return env.DB.prepare(
-          'INSERT OR IGNORE INTO alliance_roster (alliance_id,name,role,active,avail,vs_points,tech_points,sort_order) VALUES (?,?,?,?,?,?,?,?)'
-        ).bind(id, name, role, active, avail, vs, tech, i);
+          'INSERT OR IGNORE INTO alliance_roster (alliance_id,name,role,active,avail,vs_points,tech_points,power,sort_order) VALUES (?,?,?,?,?,?,?,?,?)'
+        ).bind(id, name, role, active, avail, vs, tech, power, i);
       })
       .filter(Boolean);
 

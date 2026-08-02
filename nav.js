@@ -1,4 +1,29 @@
-(function(){
+﻿(function(){
+
+// ── Last War Theme bootstrap ──────────────────────────────────────────────
+(function lwThemeInit(){
+  const saved = localStorage.getItem('lw-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  // Inject theme CSS after nav's own inline style so our selectors win
+  const lk = document.createElement('link');
+  lk.rel = 'stylesheet'; lk.href = 'theme-lastwar.css';
+  document.head.appendChild(lk);
+})();
+
+window.lwToggleTheme = function(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('lw-theme', next);
+  const btn = document.querySelector('.lw-theme-toggle');
+  if(btn){
+    const icon = btn.querySelector('.lw-tt-icon');
+    const lbl  = btn.querySelector('.lw-tt-lbl');
+    if(icon) icon.textContent = next === 'dark' ? '🌙' : '🌤';
+    if(lbl)  lbl.textContent  = next === 'dark' ? 'Dark' : 'Light';
+  }
+};
+
 const NAV_LINKS = [
   {label:'Home', href:'index.html', icon:'images/home_icon.png'},
   {label:'Events', children:[
@@ -152,6 +177,12 @@ NAV_LINKS.forEach(item => {
   }
 });
 
+// Theme toggle — label/icon reflects current state
+const _curTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+navHTML += `<button class="lw-theme-toggle" onclick="lwToggleTheme()" title="Toggle light/dark mode">
+  <span class="lw-tt-icon">${_curTheme === 'dark' ? '🌙' : '🌤'}</span>
+  <span class="lw-tt-lbl">${_curTheme === 'dark' ? 'Dark' : 'Light'}</span>
+</button>`;
 navHTML += `<button class="cp-search-btn" onclick="cpSearchOpen()" title="Search (Ctrl+K)">
   <span class="cp-search-icon">⌕</span> Search <kbd>Ctrl K</kbd>
 </button>`;
@@ -196,11 +227,115 @@ navHTML += `<div class="cp-search-overlay" id="cpSearchOverlay" onclick="cpSearc
   </div>
 </div>`;
 
+const PAGE_HERO_MAP = {
+  'index.html':                  'hero_icon_Monica.png',
+  'alliance-duel-planner.html':  'hero_icon_Monica.png',
+  'alliance-merge-planner.html': 'hero_icon_Fiona.png',
+  'desert-storm-planner.html':   'hero_icon_Katyusha.png',
+  'canyon-storm-planner.html':   'hero_icon_Morrison.png',
+  'train.html':                  'hero_icon_Rick.png',
+  'capital-war-planner.html':    'hero_icon_Audie_Murphy.png',
+  'preseason-map-planner.html':  'hero_icon_Nimitz.png',
+  'season-1-map-planner.html':   'hero_icon_David_Stirling.png',
+  'waterfall-training.html':     'hero_icon_Adam.png',
+  'squad-builder.html':          'hero_icon_Aldridge.png',
+  'research-priority-path.html': 'hero_icon_Einstein.png',
+  'hq-upgrade-planner.html':     'hero_icon_Stetman.png',
+  'hero-exp-calculator.html':    'hero_icon_Lucius.png',
+  'speedup-calculator.html':     'hero_icon_Tesla.png',
+  'gear-upgrade-guide.html':     'hero_icon_Basilone.png',
+  'drone-upgrade-guide.html':    'hero_icon_Alex.png',
+  'stamina-roi-guide.html':      'hero_icon_Gump.png',
+  'power-progression.html':      'hero_icon_Cage.png',
+  'vip-diamond-guide.html':      'hero_icon_MissHot.png',
+  'server-tracker.html':         'hero_icon_richard.png',
+};
+
+const _LW_HEROES = [
+  'hero_icon_Monica.png','hero_icon_Audie_Murphy.png','hero_icon_Morrison.png',
+  'hero_icon_Fiona.png','hero_icon_Lucius.png','hero_icon_dva.png',
+  'hero_icon_Tesla.png','hero_icon_Carly.png','hero_icon_Katyusha.png',
+  'hero_icon_Adam.png','hero_icon_Stetman.png','hero_icon_Rick.png',
+  'hero_icon_Gump.png','hero_icon_Alex.png','hero_icon_Ewan_McGregor.png',
+  'hero_icon_Einstein.png','hero_icon_Nimitz.png','hero_icon_Sally_Ride.png',
+  'hero_icon_David_Stirling.png','hero_icon_Aldridge.png','hero_icon_Basilone.png',
+  'hero_icon_Tom.png','hero_icon_Yuriko.png','hero_icon_richard.png',
+  'hero_icon_sara.png','hero_icon_MissHot.png','hero_icon_Farhad.png',
+  'hero_icon_black_widow.png','hero_icon_Revenger.png','hero_icon_hager.png',
+  'hero_icon_Cruzo.png','hero_icon_Cage.png','hero_icon_lambo.png',
+  'hero_icon_Rockfield.png','hero_icon_Doctor_Poison.png','hero_icon_elsa.png',
+];
+
+// Keyword → [hero1, hero2] pairs for section-header auto-decoration
+const SECTION_KW = [
+  [['research','tech','science'],          ['hero_icon_Einstein.png','hero_icon_Stetman.png']],
+  [['waterfall','troop','training'],        ['hero_icon_Adam.png','hero_icon_Aldridge.png']],
+  [['squad','formation','lineup'],          ['hero_icon_Adam.png','hero_icon_Morrison.png']],
+  [['desert storm','desert'],              ['hero_icon_Katyusha.png','hero_icon_Morrison.png']],
+  [['canyon'],                             ['hero_icon_Morrison.png','hero_icon_Katyusha.png']],
+  [['duel','vs','weekly event'],           ['hero_icon_Monica.png','hero_icon_Fiona.png']],
+  [['capital war','capitol war','capital'],['hero_icon_Audie_Murphy.png','hero_icon_Nimitz.png']],
+  [['map','territory','preseason','season'],['hero_icon_Nimitz.png','hero_icon_David_Stirling.png']],
+  [['alliance','merge','member','roster'], ['hero_icon_Monica.png','hero_icon_Fiona.png']],
+  [['hero exp','hero level','hero'],       ['hero_icon_Lucius.png','hero_icon_Monica.png']],
+  [['gear','equipment','craft'],           ['hero_icon_Basilone.png','hero_icon_Adam.png']],
+  [['drone','component','chip'],           ['hero_icon_Alex.png','hero_icon_Tesla.png']],
+  [['hq','headquarter','building'],        ['hero_icon_Stetman.png','hero_icon_Rick.png']],
+  [['vip','diamond','spend'],              ['hero_icon_MissHot.png','hero_icon_Cage.png']],
+  [['speedup','speed','time'],             ['hero_icon_Tesla.png','hero_icon_Gump.png']],
+  [['power','progression','milestone'],    ['hero_icon_Cage.png','hero_icon_Adam.png']],
+  [['train','conductor','schedule'],       ['hero_icon_Rick.png','hero_icon_Gump.png']],
+  [['stamina','roi','resource'],           ['hero_icon_Gump.png','hero_icon_Tesla.png']],
+];
+
+function _lwPickSectionHeroes(text) {
+  const t = text.toLowerCase();
+  for (const [keys, heroes] of SECTION_KW) {
+    if (keys.some(k => t.includes(k))) return heroes;
+  }
+  // fallback — two random from the list
+  const a = _LW_HEROES[Math.floor(Math.random() * _LW_HEROES.length)];
+  let b = _LW_HEROES[Math.floor(Math.random() * _LW_HEROES.length)];
+  if (b === a) b = _LW_HEROES[(Math.floor(Math.random() * _LW_HEROES.length) + 1) % _LW_HEROES.length];
+  return [a, b];
+}
+
+function _lwInjectSectionHeroes() {
+  document.querySelectorAll('.section-header').forEach(header => {
+    if (header.querySelector('.section-heroes')) return; // already decorated (index.html)
+    const tag = header.querySelector('.section-tag');
+    if (!tag) return;
+    const heroes = _lwPickSectionHeroes(tag.textContent);
+    const div = document.createElement('div');
+    div.className = 'section-heroes';
+    heroes.forEach(h => {
+      const img = document.createElement('img');
+      img.src = 'images/game/heroes/' + h;
+      img.alt = '';
+      div.appendChild(img);
+    });
+    tag.insertAdjacentElement('afterend', div);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', _lwInjectSectionHeroes);
+
+function _lwInjectHeroArt() {
+  const hero = PAGE_HERO_MAP[currentPage] || _LW_HEROES[Math.floor(Math.random() * _LW_HEROES.length)];
+  const a = document.createElement('div');
+  a.className = 'lw-page-hero-art';
+  a.setAttribute('aria-hidden', 'true');
+  a.style.backgroundImage = `url('images/game/heroes/${hero}')`;
+  document.body.appendChild(a);
+}
+
 if (document.body) {
   document.body.insertAdjacentHTML('afterbegin', navHTML);
+  _lwInjectHeroArt();
 } else {
   document.addEventListener('DOMContentLoaded', function() {
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+    _lwInjectHeroArt();
   });
 }
 

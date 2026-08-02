@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS alliance_roster (
   avail        TEXT    NOT NULL DEFAULT '1111111',
   vs_points    INTEGER NOT NULL DEFAULT 0,
   tech_points  INTEGER NOT NULL DEFAULT 0,
+  power        INTEGER NOT NULL DEFAULT 0,
   sort_order   INTEGER NOT NULL DEFAULT 0,
   UNIQUE(alliance_id, name)
 );
@@ -52,3 +53,7 @@ CREATE TABLE IF NOT EXISTS alliance_day_rules (
 -- Migration: add boarding minute support (run once if upgrading)
 -- In D1 console: paste this single line and execute:
 -- ALTER TABLE alliances ADD COLUMN boarding_minute_utc INTEGER NOT NULL DEFAULT 0;
+
+-- Migration: add roster power for point tiebreaks (run once if upgrading)
+-- In D1 console: paste this single line and execute:
+-- ALTER TABLE alliance_roster ADD COLUMN power INTEGER NOT NULL DEFAULT 0;
